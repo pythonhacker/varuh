@@ -225,7 +225,6 @@ Manually decrypt the database using `-d` option.
 	$ varuh -d mypasswds 
 	Password: 
 	Decryption complete.
-	(anand) anand@antix1:~
 
 Now the database is active again and you can see the listings.
 
@@ -242,3 +241,134 @@ Now the database is active again and you can see the listings.
 
 Listing and Searching
 =====================
+
+## List an entry using id
+
+To list an entry using its id,
+
+	$ varuh -l 8
+	=====================================================================
+	ID: 8
+	Title: Google account
+	User: anandpillai@alumni.iitm.ac.in
+	URL: 
+	Password: ***********
+	Notes: 
+	Modified: 2021-21-25 15:02:50
+	=====================================================================
+
+## To search an entry
+
+An entry can be searched on its title, username, URL or notes. Search is case-insensitive.
+
+	$ varuh -f google
+	=====================================================================
+	ID: 8
+	Title: Google account
+	User: anandpillai@alumni.iitm.ac.in
+	URL: 
+	Password: **********
+	Notes: 
+	Modified: 2021-21-25 15:02:50
+	=====================================================================
+	ID: 9
+	Title: Google account
+	User: xyz@gmail.com
+	URL: 
+	Password: ********
+	Notes: 
+	Modified: 2021-21-25 15:05:36
+	=====================================================================
+	ID: 10
+	Title: Google account
+	User: somethingaboutme@gmail.com
+	URL: 
+	Password: ***********
+	Notes: 
+	Modified: 2021-21-25 15:09:51
+	=====================================================================
+
+## To list all entries
+
+To list all entries, use the option `-a`.
+
+	$ varuh -a
+	=====================================================================
+	ID: 1
+	Title: My Bank #1
+	User: myusername1
+	URL: https://mysuperbank1.com
+	Password: ***********
+	Notes: 
+	Modified: 2021-21-15 15:40:29
+	=====================================================================
+	ID: 2
+	Title: My Digital Locker #1
+	User: mylockerusername
+	URL: https://mysuperlocker1.com
+	Password: **********
+	Notes: 
+	Modified: 2021-21-18 12:44:10
+	=====================================================================
+	ID: 3
+	Title: My Bank Login #2
+	User: mybankname2
+	URL: https://myaveragebank.com
+	Password: **********
+	Notes: 
+	Modified: 2021-21-19 14:16:33
+	=====================================================================
+	...
+
+By default the listing is in ascending ID order. This can be changed in the configuration (see below).
+
+## Turn on visible passwords
+
+To turn on visible passwords, modify the configuration setting (see below) or use the `-s` flag.
+
+## See current active database path
+
+	$ varuh -p
+	/home/anand/mypasswds
+
+Configuration
+=============
+
+`Varuh` uses the standard [Free Desktop XDG Base Directory Spec](https://specifications.freedesktop.org/basedir-spec/basedir-spec-0.8.html) for storing its configuration in a JSON file. This usually translates to a folder name *.config/varuh* in your home directory on *nix systems.
+
+The config file is named *config.json*. It looks as follows.
+
+`{
+	"active_db": "/home/anand/mypasswds",
+	"auto_encrypt": true,
+	"visible_passwords": false,
+	"path": "/home/anand/.config/varuh/config.json",
+	"list_order": "id,asc",
+	"delimiter": "=",
+	"color": "default",
+	"bgcolor": "bgblack"
+}
+`
+You can modify the following variables.
+
+1. `auto_encrypt` - Set this to true to enable automatic encryption/decryption when switching databases. Otherwise you have to do this manually. The default is `true`.
+2. `visible_passwords` - Set this to true to always show passwords in clear text in listings. Otherwise passwords are masked using asterisks. This can be overridden with the `-s` flag.
+3. `list_order` - Ordering when using the `-a` option to view all listings. Supported fields are,
+   * id - Uses the `ID` field.
+   * timestamp - Uses the `Modified` timestamp field. Use this to show latest entries first.
+   * title - Uses the `Title` field.
+   * username - Uses the `User` field.
+
+	Always specify this field as `<field>,<order>`. Supported `<order>` are `asc` and `desc`.
+4. `delimiter` - This modifies the delimiter string when printing a listing. Only one character is allowed.
+5. `color` - The foreground color of the text when printing listings.
+6. `bgcolor` - The background color of the text when printing listings.
+
+Visit this [gist](https://gist.github.com/abritinthebay/d80eb99b2726c83feb0d97eab95206c4) to see the supported color options. All color values must be in lower-case.
+
+The fields `active_db` and `path` are used by the program for internal use. Please don't modify them!
+
+License
+=======
+
+`Varuh` is licensed under the [GNU GPL V3](https://www.gnu.org/licenses/gpl-3.0.html) license. See the LICENSE file for details.
