@@ -2,13 +2,13 @@
 package main
 
 import (
-	"os"
-	"fmt"
 	"bufio"
 	"errors"
-	"strings"
+	"fmt"
+	"os"
+	"path/filepath"
 	"strconv"
-	"path/filepath"		
+	"strings"
 )
 
 // Print the current active database path
@@ -40,7 +40,7 @@ func setActiveDatabasePath(dbPath string) error {
 	var fullPath string
 	var activeEncrypted bool
 	var newEncrypted bool
-	
+
 	err, settings := getOrCreateLocalConfig(APP)
 
 	if err != nil {
@@ -50,7 +50,7 @@ func setActiveDatabasePath(dbPath string) error {
 
 	if settings != nil {
 		var flag bool
-		
+
 		if _, err = os.Stat(dbPath); os.IsNotExist(err) {
 			fmt.Printf("Error - path %s does not exist\n", dbPath)
 			return err
@@ -70,7 +70,7 @@ func setActiveDatabasePath(dbPath string) error {
 		if _, flag = isFileEncrypted(fullPath); flag {
 			newEncrypted = true
 		}
-		
+
 		// If autoencrypt is true - encrypt current DB automatically
 		if settings.AutoEncrypt {
 
@@ -81,7 +81,7 @@ func setActiveDatabasePath(dbPath string) error {
 					activeEncrypted = true
 				}
 			}
-			
+
 			if newEncrypted {
 				// Decrypt new database if it is encrypted
 				fmt.Printf("Database %s is encrypted, decrypting it\n", fullPath)
@@ -102,12 +102,12 @@ func setActiveDatabasePath(dbPath string) error {
 		}
 
 		if newEncrypted {
-			// Use should manually decrypt before switching			
+			// Use should manually decrypt before switching
 			fmt.Println("Auto-encrypt disabled, decrypt new database manually before switching.")
 			return nil
 		}
-		
-		settings.ActiveDB  = fullPath
+
+		settings.ActiveDB = fullPath
 		err = updateSettings(settings, settings.ConfigPath)
 		if err == nil {
 			fmt.Println("Switched active database successfully.")
@@ -116,7 +116,7 @@ func setActiveDatabasePath(dbPath string) error {
 		}
 
 		return err
-		
+
 	} else {
 		fmt.Printf("Error - null config\n")
 		return errors.New("null config")
@@ -136,17 +136,17 @@ func addNewEntry() error {
 	if err = checkActiveDatabase(); err != nil {
 		return err
 	}
-	
+
 	reader := bufio.NewReader(os.Stdin)
 	title = readInput(reader, "Title")
 	url = readInput(reader, "URL")
 
-	if len(url)>0 && !strings.HasPrefix(strings.ToLower(url), "http://") && !strings.HasPrefix(strings.ToLower(url), "https://") {
+	if len(url) > 0 && !strings.HasPrefix(strings.ToLower(url), "http://") && !strings.HasPrefix(strings.ToLower(url), "https://") {
 		url = "http://" + url
 	}
-	
+
 	userName = readInput(reader, "Username")
-	
+
 	fmt.Printf("Password (enter to generate new): ")
 	err, passwd = readPassword()
 
@@ -158,7 +158,7 @@ func addNewEntry() error {
 	//	fmt.Printf("Password => %s\n", passwd)
 
 	notes = readInput(reader, "\nNotes")
-	
+
 	// Title and username/password are mandatory
 	if len(title) == 0 {
 		fmt.Printf("Error - valid Title required\n")
@@ -171,7 +171,7 @@ func addNewEntry() error {
 	if len(passwd) == 0 {
 		fmt.Printf("Error - valid Password required\n")
 		return errors.New("invalid input")
-	}		
+	}
 
 	// Trim spaces
 	err = addNewDatabaseEntry(title, userName, url, passwd, notes)
@@ -179,7 +179,7 @@ func addNewEntry() error {
 	if err != nil {
 		fmt.Printf("Error adding entry - \"%s\"\n", err.Error())
 	}
-	
+
 	return err
 }
 
@@ -198,9 +198,9 @@ func editCurrentEntry(idString string) error {
 	if err = checkActiveDatabase(); err != nil {
 		return err
 	}
-	
+
 	id, _ = strconv.Atoi(idString)
-	
+
 	err, entry = getEntryById(id)
 	if err != nil || entry == nil {
 		fmt.Printf("No entry found for id %d\n", id)
@@ -208,14 +208,14 @@ func editCurrentEntry(idString string) error {
 	}
 
 	reader := bufio.NewReader(os.Stdin)
-	
+
 	fmt.Printf("Current Title: %s\n", entry.Title)
 	title = readInput(reader, "New Title")
-	
+
 	fmt.Printf("Current URL: %s\n", entry.Url)
 	url = readInput(reader, "New URL")
 
-	if len(url)>0 && !strings.HasPrefix(strings.ToLower(url), "http://") && !strings.HasPrefix(strings.ToLower(url), "https://") {
+	if len(url) > 0 && !strings.HasPrefix(strings.ToLower(url), "http://") && !strings.HasPrefix(strings.ToLower(url), "https://") {
 		url = "http://" + url
 	}
 
@@ -231,7 +231,7 @@ func editCurrentEntry(idString string) error {
 		err, passwd = generateRandomPassword(16)
 	}
 	//	fmt.Printf("Password => %s\n", passwd)
-	
+
 	fmt.Printf("\nCurrent Notes: %s\n", entry.Notes)
 	notes = readInput(reader, "New Notes")
 
@@ -240,7 +240,6 @@ func editCurrentEntry(idString string) error {
 	if err != nil {
 		fmt.Printf("Error updating entry - \"%s\"\n", err.Error())
 	}
-
 
 	return err
 }
@@ -255,9 +254,9 @@ func listCurrentEntry(idString string) error {
 	if err = checkActiveDatabase(); err != nil {
 		return err
 	}
-	
+
 	id, _ = strconv.Atoi(idString)
-	
+
 	//	fmt.Printf("Listing current entry - %d\n", id)
 	err, entry = getEntryById(id)
 	if err != nil || entry == nil {
@@ -272,24 +271,24 @@ func listCurrentEntry(idString string) error {
 func listAllEntries() error {
 
 	var err error
-	
+
 	if err = checkActiveDatabase(); err != nil {
 		return err
 	}
-	
-	err, settings := getOrCreateLocalConfig(APP)	
+
+	err, settings := getOrCreateLocalConfig(APP)
 
 	if err != nil {
 		fmt.Printf("Error parsing config - \"%s\"\n", err.Error())
 		return err
-	}	
+	}
 
 	orderKeys := strings.Split(settings.ListOrder, ",")
 	err, entries := iterateEntries(orderKeys[0], orderKeys[1])
 
 	if err == nil {
 		if len(entries) > 0 {
-			fmt.Println("=====================================================================")				
+			fmt.Println("=====================================================================")
 			for _, entry := range entries {
 				printEntry(&entry, false)
 			}
@@ -313,7 +312,7 @@ func findCurrentEntry(term string) error {
 	if err = checkActiveDatabase(); err != nil {
 		return err
 	}
-	
+
 	err, entries = searchDatabaseEntry(term)
 	if err != nil || len(entries) == 0 {
 		fmt.Printf("Entry for query \"%s\" not found\n", term)
@@ -324,14 +323,14 @@ func findCurrentEntry(term string) error {
 		if len(entries) == 1 {
 			delim = true
 		} else {
-			fmt.Println("=====================================================================")		
+			fmt.Println("=====================================================================")
 		}
-			
+
 		for _, entry := range entries {
 			printEntry(&entry, delim)
 		}
 	}
-	
+
 	return nil
 }
 
@@ -345,9 +344,9 @@ func removeCurrentEntry(idString string) error {
 	if err = checkActiveDatabase(); err != nil {
 		return err
 	}
-	
+
 	id, _ = strconv.Atoi(idString)
-	
+
 	err, entry = getEntryById(id)
 	if err != nil || entry == nil {
 		fmt.Printf("No entry with id %d was found\n", id)
@@ -359,7 +358,7 @@ func removeCurrentEntry(idString string) error {
 	if err == nil {
 		fmt.Printf("Entry with id %d was removed from the database\n", id)
 	}
-	
+
 	return err
 }
 
@@ -373,9 +372,9 @@ func copyCurrentEntry(idString string) error {
 	if err = checkActiveDatabase(); err != nil {
 		return err
 	}
-	
+
 	id, _ = strconv.Atoi(idString)
-	
+
 	err, entry = getEntryById(id)
 	if err != nil || entry == nil {
 		fmt.Printf("No entry with id %d was found\n", id)
@@ -387,7 +386,7 @@ func copyCurrentEntry(idString string) error {
 		fmt.Printf("Error cloning entry: \"%s\"\n", err.Error())
 		return err
 	}
-			
+
 	return nil
 }
 
@@ -400,7 +399,7 @@ func encryptActiveDatabase() error {
 	if err = checkActiveDatabase(); err != nil {
 		return err
 	}
-	
+
 	err, dbPath = getActiveDatabase()
 	if err != nil {
 		fmt.Printf("Error getting active database path - \"%s\"\n", err.Error())
@@ -417,11 +416,11 @@ func encryptDatabase(dbPath string) error {
 	var passwd string
 	var passwd2 string
 
-	fmt.Printf("Password: ")	
+	fmt.Printf("Password: ")
 	err, passwd = readPassword()
 
 	if err == nil {
-		fmt.Printf("\nPassword again: ")	
+		fmt.Printf("\nPassword again: ")
 		err, passwd2 = readPassword()
 		if err == nil {
 			if passwd != passwd2 {
@@ -450,13 +449,13 @@ func decryptDatabase(dbPath string) error {
 	var err error
 	var passwd string
 	var flag bool
-	
+
 	if err, flag = isFileEncrypted(dbPath); !flag {
 		fmt.Println(err.Error())
 		return err
 	}
 
-	fmt.Printf("Password: ")	
+	fmt.Printf("Password: ")
 	err, passwd = readPassword()
 
 	if err != nil {
@@ -469,5 +468,5 @@ func decryptDatabase(dbPath string) error {
 		fmt.Println("\nDecryption complete.")
 	}
 
-	return err		
+	return err
 }

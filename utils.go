@@ -2,16 +2,16 @@
 package main
 
 import (
-	"os"
-	"fmt"
 	"bufio"
-	"errors"
-	"strings"
-	"path/filepath"
 	"encoding/json"
+	"errors"
+	"fmt"
 	"github.com/kirsle/configdir"
 	"golang.org/x/crypto/ssh/terminal"
-)	
+	"os"
+	"path/filepath"
+	"strings"
+)
 
 const DELIMSIZE int = 69
 
@@ -22,10 +22,10 @@ type SettingsOverride struct {
 
 // Settings structure for local config
 type Settings struct {
-	ActiveDB string `json:"active_db"`
-	AutoEncrypt bool `json:"auto_encrypt"`
-	ShowPasswords bool `json:"visible_passwords"`
-	ConfigPath string `json:"path"`
+	ActiveDB      string `json:"active_db"`
+	AutoEncrypt   bool   `json:"auto_encrypt"`
+	ShowPasswords bool   `json:"visible_passwords"`
+	ConfigPath    string `json:"path"`
 	// Key to order listings when using -a option
 	// Valid values are
 	// 1. timestamp,{desc,asc}
@@ -33,25 +33,25 @@ type Settings struct {
 	// 3. username, {desc,asc}
 	// 4. id, {desc,asc{
 	ListOrder string `json:"list_order"`
-	Delim string `json:"delimiter"`
-	Color string `json:"color"` // fg color to print
-	BgColor string `json:"bgcolor"` // bg color to print
+	Delim     string `json:"delimiter"`
+	Color     string `json:"color"`   // fg color to print
+	BgColor   string `json:"bgcolor"` // bg color to print
 }
 
 // Global settings override
 var settingsRider SettingsOverride
 
 // Write settings to disk
-func writeSettings(settings* Settings, configFile string) error {
+func writeSettings(settings *Settings, configFile string) error {
 
 	fh, err := os.Create(configFile)
 	if err != nil {
-		fmt.Printf("Error generating configuration file %s - \"%s\"\n", configFile, err.Error())			
+		fmt.Printf("Error generating configuration file %s - \"%s\"\n", configFile, err.Error())
 		return err
 	}
-	
+
 	defer fh.Close()
-	
+
 	encoder := json.NewEncoder(fh)
 	encoder.SetIndent("", "\t")
 	err = encoder.Encode(&settings)
@@ -59,27 +59,26 @@ func writeSettings(settings* Settings, configFile string) error {
 	return err
 }
 
-
 // Write updated settings to disk
-func updateSettings(settings* Settings, configFile string) error {
+func updateSettings(settings *Settings, configFile string) error {
 
 	fh, err := os.OpenFile(configFile, os.O_RDWR, 0644)
 	if err != nil {
-		fmt.Printf("Error opening config file %s - \"%s\"\n", configFile, err.Error())		
+		fmt.Printf("Error opening config file %s - \"%s\"\n", configFile, err.Error())
 		return err
 	}
-	
+
 	defer fh.Close()
-	
+
 	encoder := json.NewEncoder(fh)
-	encoder.SetIndent("", "\t")	
+	encoder.SetIndent("", "\t")
 	err = encoder.Encode(&settings)
 
 	if err != nil {
-		fmt.Printf("Error updating config %s - \"%s\"\n", configFile, err.Error())		
+		fmt.Printf("Error updating config %s - \"%s\"\n", configFile, err.Error())
 		return err
 	}
-	
+
 	return err
 }
 
@@ -91,7 +90,7 @@ func getOrCreateLocalConfig(app string) (error, *Settings) {
 	var configFile string
 	var err error
 	var fh *os.File
-	
+
 	configPath = configdir.LocalConfig(app)
 	err = configdir.MakePath(configPath) // Ensure it exists.
 	if err != nil {
@@ -100,15 +99,15 @@ func getOrCreateLocalConfig(app string) (error, *Settings) {
 
 	configFile = filepath.Join(configPath, "config.json")
 	//	fmt.Printf("Config file, path => %s %s\n", configFile, configPath)
-	
+
 	if _, err = os.Stat(configFile); err == nil {
 		fh, err = os.Open(configFile)
 		if err != nil {
-			return err, nil			
+			return err, nil
 		}
-		
+
 		defer fh.Close()
-		
+
 		decoder := json.NewDecoder(fh)
 		err = decoder.Decode(&settings)
 		if err != nil {
@@ -117,7 +116,7 @@ func getOrCreateLocalConfig(app string) (error, *Settings) {
 
 	} else {
 		//		fmt.Printf("Creating default configuration ...")
-		settings = Settings{"", true, false, configFile, "id,asc", "=", "default", "bgblack",}
+		settings = Settings{"", true, false, configFile, "id,asc", "=", "default", "bgblack"}
 
 		if err = writeSettings(&settings, configFile); err == nil {
 			// fmt.Println(" ...done")
@@ -145,7 +144,7 @@ func hasActiveDatabase() bool {
 	if err != nil {
 		fmt.Printf("Error parsing local config - \"%s\"\n", err.Error())
 	}
-	
+
 	return false
 }
 
@@ -184,7 +183,7 @@ func readPassword() (error, string) {
 
 	var passwd []byte
 	var err error
-	
+
 	passwd, err = terminal.ReadPassword(int(os.Stdin.Fd()))
 	return err, string(passwd)
 }
@@ -194,48 +193,48 @@ func rewriteBaseFile(path string, contents []byte) error {
 
 	var err error
 	var origFile string
-	
+
 	origFile = strings.TrimSuffix(path, filepath.Ext(path))
 	// Overwrite it
 	err = os.WriteFile(origFile, contents, 0644)
-	
+
 	return err
 }
 
 // Get color codes for console colors
 func getColor(code string) string {
 
-	colors := map[string]string {
-		"black": "\x1b[30m",
-		"blue": "\x1B[34m",
-		"red": "\x1B[31m",
-		"green": "\x1B[32m",
-		"yellow": "\x1B[33m",
+	colors := map[string]string{
+		"black":   "\x1b[30m",
+		"blue":    "\x1B[34m",
+		"red":     "\x1B[31m",
+		"green":   "\x1B[32m",
+		"yellow":  "\x1B[33m",
 		"magenta": "\x1B[35m",
- 		"cyan": "\x1B[36m",
-		"white": "\x1B[37m",
+		"cyan":    "\x1B[36m",
+		"white":   "\x1B[37m",
 
 		// From https://gist.github.com/abritinthebay/d80eb99b2726c83feb0d97eab95206c4
 		// esoteric options
-		"bright": "\x1b[1m",
-		"dim": "\x1b[2m",
+		"bright":     "\x1b[1m",
+		"dim":        "\x1b[2m",
 		"underscore": "\x1b[4m",
-		"blink": "\x1b[5m",
-		"reverse": "\x1b[7m",
-		"hidden": "\x1b[8m",
+		"blink":      "\x1b[5m",
+		"reverse":    "\x1b[7m",
+		"hidden":     "\x1b[8m",
 
 		// background color options
-		"bgblack":"\x1b[40m",
-		"bgred":"\x1b[41m",
-		"bggreen":"\x1b[42m",
-		"bgyellow":"\x1b[43m",
-		"bgblue":"\x1b[44m",
-		"bgmagenta":"\x1b[45m",
-		"bgcyan":"\x1b[46m",
-		"bgwhite":"\x1b[47m",
+		"bgblack":   "\x1b[40m",
+		"bgred":     "\x1b[41m",
+		"bggreen":   "\x1b[42m",
+		"bgyellow":  "\x1b[43m",
+		"bgblue":    "\x1b[44m",
+		"bgmagenta": "\x1b[45m",
+		"bgcyan":    "\x1b[46m",
+		"bgwhite":   "\x1b[47m",
 
 		// reset color code
-        "reset" : "\x1B[0m",
+		"reset":   "\x1B[0m",
 		"default": "\x1B[0m",
 	}
 
@@ -244,7 +243,7 @@ func getColor(code string) string {
 	} else {
 		return colors["default"]
 	}
-		
+
 }
 
 // Print the delimiter line for listings
@@ -261,7 +260,7 @@ func printDelim(delimChar string, color string) {
 		// slice it - take only the first
 		delimChar = string(delimChar[0])
 	}
-	for i :=0; i<DELIMSIZE; i++ {
+	for i := 0; i < DELIMSIZE; i++ {
 		delims = append(delims, delimChar)
 	}
 
@@ -280,7 +279,7 @@ func printEntry(entry *Entry, delim bool) error {
 		fmt.Printf("Error parsing config - \"%s\"\n", err.Error())
 		return err
 	}
-	
+
 	fmt.Printf("%s", getColor(strings.ToLower(settings.Color)))
 	if strings.HasPrefix(settings.BgColor, "bg") {
 		fmt.Printf("%s", getColor(strings.ToLower(settings.BgColor)))
@@ -289,26 +288,26 @@ func printEntry(entry *Entry, delim bool) error {
 	if delim {
 		printDelim(settings.Delim, settings.Color)
 	}
-		
+
 	fmt.Printf("ID: %d\n", entry.ID)
 	fmt.Printf("Title: %s\n", entry.Title)
 	fmt.Printf("User: %s\n", entry.User)
-	fmt.Printf("URL: %s\n", entry.Url)	
+	fmt.Printf("URL: %s\n", entry.Url)
 
 	if settings.ShowPasswords || settingsRider.ShowPasswords {
 		fmt.Printf("Password: %s\n", entry.Password)
 	} else {
 		var asterisks []string
 
-		for i:=0; i<len(entry.Password); i++ {
+		for i := 0; i < len(entry.Password); i++ {
 			asterisks = append(asterisks, "*")
 		}
 		fmt.Printf("Password: %s\n", strings.Join(asterisks, ""))
 	}
 	fmt.Printf("Notes: %s\n", entry.Notes)
 	fmt.Printf("Modified: %s\n", entry.Timestamp.Format("2006-06-02 15:04:05"))
-	printDelim(settings.Delim, settings.Color)	
-		
+	printDelim(settings.Delim, settings.Color)
+
 	// Reset
 	fmt.Printf("%s", getColor("default"))
 
@@ -321,7 +320,7 @@ func readInput(reader *bufio.Reader, prompt string) string {
 
 	var input string
 	fmt.Printf(prompt + ": ")
-	input, _ = reader.ReadString('\n')	
+	input, _ = reader.ReadString('\n')
 
 	return strings.TrimSpace(input)
 }

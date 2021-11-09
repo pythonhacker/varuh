@@ -2,25 +2,25 @@
 package main
 
 import (
-	"os"
-	"fmt"
-	"time"
-	"strings"
 	"database/sql"
-	"path/filepath"
+	"fmt"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
+	"os"
+	"path/filepath"
+	"strings"
+	"time"
 )
 
 // Structure representing an entry in the db
 type Entry struct {
-	ID int `gorm:"column:id;autoIncrement;primaryKey"`
-	Title string `gorm:"column:title"`
-	User string `gorm:"column:user"`
-	Url string `gorm:"column:url"`
-	Password string `gorm:"column:password"`
-	Notes string `gorm:"column:notes"`
+	ID        int       `gorm:"column:id;autoIncrement;primaryKey"`
+	Title     string    `gorm:"column:title"`
+	User      string    `gorm:"column:user"`
+	Url       string    `gorm:"column:url"`
+	Password  string    `gorm:"column:password"`
+	Notes     string    `gorm:"column:notes"`
 	Timestamp time.Time `gorm:"type:timestamp;default:(datetime('now','localtime'))"` // sqlite3
 }
 
@@ -60,12 +60,12 @@ func initNewDatabase(dbPath string) error {
 	var err error
 	var db *gorm.DB
 	var absPath string
-	
+
 	if hasActiveDatabase() {
 		// Has an active database - encrypt it before creating new one
 		_, activeDbPath := getActiveDatabase()
 		absPath, _ = filepath.Abs(dbPath)
-		
+
 		if absPath == activeDbPath {
 			fmt.Printf("Database already exists and is active - %s\n", dbPath)
 			return nil
@@ -75,7 +75,7 @@ func initNewDatabase(dbPath string) error {
 			encryptDatabase(activeDbPath)
 		}
 	}
-	
+
 	if _, err = os.Stat(dbPath); err == nil {
 		// filePath exists, remove it
 		os.Remove(dbPath)
@@ -91,7 +91,7 @@ func initNewDatabase(dbPath string) error {
 	if err != nil {
 		fmt.Printf("Error creating schema - \"%s\"\n", err.Error())
 		return err
-	}	
+	}
 
 	fmt.Printf("Created new database - %s\n", dbPath)
 
@@ -114,13 +114,13 @@ func openActiveDatabase() (error, *gorm.DB) {
 
 	var dbPath string
 	var err error
-	
+
 	err, dbPath = getActiveDatabase()
 	if err != nil {
 		fmt.Printf("Error getting active database path - %s\n", err.Error())
 		return err, nil
 	}
-	
+
 	err, db := openDatabase(dbPath)
 	if err != nil {
 		fmt.Printf("Error opening active database path - %s: %s\n", dbPath, err.Error())
@@ -136,13 +136,13 @@ func addNewDatabaseEntry(title, userName, url, passwd, notes string) error {
 	var entry Entry
 	var err error
 	var db *gorm.DB
-	
+
 	entry = Entry{Title: title, User: userName, Url: url, Password: passwd, Notes: notes}
 
 	err, db = openActiveDatabase()
 	if err == nil && db != nil {
 		//		result := db.Debug().Create(&entry)
-		result := db.Create(&entry)		
+		result := db.Create(&entry)
 		if result.Error == nil && result.RowsAffected == 1 {
 			fmt.Printf("Created new entry with id: %d\n.", entry.ID)
 			return nil
@@ -161,7 +161,7 @@ func updateDatabaseEntry(entry *Entry, title, userName, url, passwd, notes strin
 
 	updateMap = make(map[string]interface{})
 
-	keyValMap := map[string]string{"title":title, "user":userName, "url":url, "password":passwd, "notes":notes}
+	keyValMap := map[string]string{"title": title, "user": userName, "url": url, "password": passwd, "notes": notes}
 
 	for key, val := range keyValMap {
 		if len(val) > 0 {
@@ -176,7 +176,7 @@ func updateDatabaseEntry(entry *Entry, title, userName, url, passwd, notes strin
 
 	// Update timestamp also
 	updateMap["timestamp"] = time.Now()
-	
+
 	err, db := openActiveDatabase()
 
 	if err == nil && db != nil {
@@ -185,7 +185,7 @@ func updateDatabaseEntry(entry *Entry, title, userName, url, passwd, notes strin
 			return result.Error
 		}
 
-		fmt.Println("Updated entry.")		
+		fmt.Println("Updated entry.")
 		return nil
 	}
 
@@ -198,9 +198,9 @@ func getEntryById(id int) (error, *Entry) {
 	var entry Entry
 	var err error
 	var db *gorm.DB
-	
+
 	err, db = openActiveDatabase()
-	if err == nil && db != nil {	
+	if err == nil && db != nil {
 		result := db.First(&entry, id)
 		if result.Error == nil {
 			return nil, &entry
@@ -214,12 +214,12 @@ func getEntryById(id int) (error, *Entry) {
 
 // Search database for the given string and return all matches
 func searchDatabaseEntry(term string) (error, []Entry) {
-	
+
 	var entries []Entry
 	var err error
 	var db *gorm.DB
 	var searchTerm string
-	
+
 	err, db = openActiveDatabase()
 	if err == nil && db != nil {
 		var conditions []string
@@ -228,9 +228,9 @@ func searchDatabaseEntry(term string) (error, []Entry) {
 		searchTerm = fmt.Sprintf("%%%s%%", term)
 		// Search on fields title, user, url and notes
 		for _, field := range []string{"title", "user", "url", "notes"} {
-			conditions = append(conditions, field + " like ?")
+			conditions = append(conditions, field+" like ?")
 		}
-			
+
 		condition = strings.Join(conditions, " OR ")
 		query := db.Where(condition, searchTerm, searchTerm, searchTerm, searchTerm)
 		res := query.Find(&entries)
@@ -243,15 +243,15 @@ func searchDatabaseEntry(term string) (error, []Entry) {
 	}
 
 	return err, entries
-	
+
 }
 
 // Remove a given database entry
-func removeDatabaseEntry(entry* Entry) error {
+func removeDatabaseEntry(entry *Entry) error {
 
 	var err error
 	var db *gorm.DB
-	
+
 	err, db = openActiveDatabase()
 	if err == nil && db != nil {
 		res := db.Delete(entry)
@@ -271,18 +271,18 @@ func cloneEntry(entry *Entry) (error, *Entry) {
 	var entryNew Entry
 	var err error
 	var db *gorm.DB
-	
+
 	err, db = openActiveDatabase()
-	if err == nil && db != nil {	
+	if err == nil && db != nil {
 		entryNew.Copy(entry)
 
-		result := db.Create(&entryNew)		
+		result := db.Create(&entryNew)
 		if result.Error == nil && result.RowsAffected == 1 {
 			fmt.Printf("Cloned to new entry, id: %d\n.", entryNew.ID)
 			return nil, &entryNew
 		} else if result.Error != nil {
 			return result.Error, nil
-		}		
+		}
 	}
 
 	return err, nil
@@ -294,12 +294,12 @@ func iterateEntries(orderKey string, order string) (error, []Entry) {
 	var err error
 	var db *gorm.DB
 	var entries []Entry
-	
+
 	err, db = openActiveDatabase()
 
 	if err == nil && db != nil {
 		var rows *sql.Rows
-		
+
 		rows, err = db.Model(&Entry{}).Order(fmt.Sprintf("%s %s", orderKey, order)).Rows()
 		for rows.Next() {
 			var entry Entry

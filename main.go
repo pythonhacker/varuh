@@ -3,9 +3,9 @@
 package main
 
 import (
-	"os"
 	"fmt"
 	getopt "github.com/pborman/getopt/v2"
+	"os"
 )
 
 const VERSION = 0.1
@@ -35,25 +35,25 @@ func printVersionInfo() error {
 func performAction(optMap map[string]interface{}, optionMap map[string]interface{}) {
 
 	var flag bool
-	
+
 	boolActionsMap := map[string]voidFunc{
-		"add": addNewEntry,
-		"version": printVersionInfo,
-		"help": printUsage,
-		"path": showActiveDatabasePath,
+		"add":      addNewEntry,
+		"version":  printVersionInfo,
+		"help":     printUsage,
+		"path":     showActiveDatabasePath,
 		"list-all": listAllEntries,
-		"encrypt": encryptActiveDatabase,
+		"encrypt":  encryptActiveDatabase,
 	}
 
 	stringActionsMap := map[string]actionFunc{
-		"edit": editCurrentEntry,
-		"init": initNewDatabase,
+		"edit":       editCurrentEntry,
+		"init":       initNewDatabase,
 		"list-entry": listCurrentEntry,
-		"find": findCurrentEntry,
-		"remove": removeCurrentEntry,
-		"copy": copyCurrentEntry,
-		"use-db": setActiveDatabasePath,
-		"decrypt": decryptDatabase,		
+		"find":       findCurrentEntry,
+		"remove":     removeCurrentEntry,
+		"copy":       copyCurrentEntry,
+		"use-db":     setActiveDatabasePath,
+		"decrypt":    decryptDatabase,
 	}
 
 	flagsActionsMap := map[string]voidFunc{
@@ -72,7 +72,7 @@ func performAction(optMap map[string]interface{}, optionMap map[string]interface
 	for key, mappedFunc := range boolActionsMap {
 		if *optMap[key].(*bool) {
 			mappedFunc()
-			flag = true			
+			flag = true
 			break
 		}
 	}
@@ -80,10 +80,10 @@ func performAction(optMap map[string]interface{}, optionMap map[string]interface
 	if flag {
 		return
 	}
-	
+
 	for key, mappedFunc := range stringActionsMap {
 		option := optionMap[key].(Option)
-		
+
 		if *optMap[key].(*string) != option.Path {
 
 			var val = *(optMap[key].(*string))
@@ -91,8 +91,7 @@ func performAction(optMap map[string]interface{}, optionMap map[string]interface
 			break
 		}
 	}
-		
-	
+
 }
 
 // Main routine
@@ -100,14 +99,14 @@ func main() {
 	if len(os.Args) == 1 {
 		os.Args = append(os.Args, "-h")
 	}
-	
+
 	optMap, optionMap := initializeCommandLine()
 	getopt.SetUsage(func() {
 		usageString(optionMap)
 	})
-		
+
 	getopt.Parse()
 	getOrCreateLocalConfig(APP)
-	
+
 	performAction(optMap, optionMap)
 }
