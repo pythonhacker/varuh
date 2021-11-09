@@ -13,6 +13,7 @@ Table of Contents
 * [Configuration](#config)
 * [License](#license)
 * [Feedback](#feedback)
+* [Thanks](#thanks)
 
 About
 =====
@@ -21,7 +22,7 @@ About
 
 The name [Varuh](https://www.wordsense.eu/varuh/#Slovene) means *guardian* or *protector* in the Slovene language.
 
-Varuh is inspired by [ylva](https://github.com/nrosvall/ylva). It is written in `Go` and has been tested with Go versions 1.16 and 1.17 on Debian Linux (Antix). It should work on other versions of Linux and *BSD as well.
+Varuh is inspired by [ylva](https://github.com/nrosvall/ylva) but it is full re-implementation. It is written in `Go` and has been tested with Go versions 1.16 and 1.17 on Debian Linux (Antix). It should work on other versions of Linux and *BSD as well.
 
 Building the code
 =================
@@ -367,7 +368,7 @@ You can modify the following variables.
 
 Visit this [gist](https://gist.github.com/abritinthebay/d80eb99b2726c83feb0d97eab95206c4) to see the supported color options. All color values must be in lower-case.
 
-The fields `active_db` and `path` are used by the program for internal use. Please don't modify them!
+The fields `active_db` and `path` are for internal use. Suggest not to modify them.
 
 License
 =======
@@ -378,3 +379,8 @@ Feedback
 ========
 
 Please send your valuable feedback and suggestions to my email available in the program's usage listing.
+
+Thanks
+======
+
+Thanks to [Niko Rosvall](https://www.nrosvall.name/) for writing the excellent ylva and inspiring me to write this program. 
