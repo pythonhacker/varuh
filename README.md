@@ -9,7 +9,6 @@ Table of Contents
 * [Building the code](#building-the-code)
 * [Usage](#usage)
 * [Databases](#databases)
-* [Encryption](#encryption)
 * [Listing and Searching](#listing-and-searching)
 * [Configuration](#config)
 * [License](#license)
@@ -162,6 +161,13 @@ For more on listing see the [Listing and Searching](#listing-and-searching) sect
 
 (*-s* turns on visible passwords)
 
+## Copy an entry
+
+To copy or clone an entry,
+
+	$ $ varuh -C 1
+	Cloned to new entry, id: 2
+
 ## Remove an entry
 
 	$ varuh -R 1
@@ -169,6 +175,70 @@ For more on listing see the [Listing and Searching](#listing-and-searching) sect
 
 It is an error if the id does not exist.
 
-	$ varuh -R 2
-	No entry with id 2 was found
+	$ varuh -R 3
+	No entry with id 3 was found
 
+## Switch to a new database
+
+Once a database is active, creating another one automatically encrypts the current one and makes the new one the active database. The automatic encryption happens only if the configuration flag `auto_encrypt` is turned on (See section [Configuration](#config) below).
+
+	$ varuh -I mysecrets
+	Encrytping current database - /home/anand/mypasswds
+	Password: 
+	Password again: 
+	Encryption complete.
+	Created new database - mysecrets
+	Updating active db path - /home/anand/mysecrets
+
+The previous database is now encrypted with AES-256 cipher using the password. Please make sure you remember the password.
+
+## Switch back to previous database
+
+If you want to switch back to a previous database, you can use the `-U` option. The same process is repeated with the current database getting encrypted and the older one getting decrypted.
+
+	$ varuh -U mypasswds
+	Encrypting current active database - /home/anand/mysecrets
+	Password: 
+	Password again: 
+	Encryption complete.
+	Database /home/anand/mypasswds is encrypted, decrypting it
+	Password: 
+	Decryption complete.
+	Switched active database successfully.
+	
+## Manual encryption and decryption
+
+You can manually encrypt the current database using the `-e` option.
+
+	$ varuh -e
+	Password: 
+	Password again: 
+	Encryption complete.
+
+Note that once you encrypt the active database, you cannot use the listings any more unless it is decrypted.
+
+	$ varuh -l 2
+	No decrypted active database found.
+
+Manually decrypt the database using `-d` option.
+
+	$ varuh -d mypasswds 
+	Password: 
+	Decryption complete.
+	(anand) anand@antix1:~
+
+Now the database is active again and you can see the listings.
+
+	$ varuh -l 2
+	=====================================================================
+	ID: 2
+	Title: My Blog Login
+	User: myblog.name
+	URL: http://meblog
+	Password: *********
+	Notes: Website uses Apache
+	Modified: 2021-21-09 23:21:32
+	=====================================================================
+
+Listing and Searching
+=====================
