@@ -10,7 +10,7 @@ Table of Contents
 * [Usage](#usage)
 * [Databases](#databases)
 * [Listing and Searching](#listing-and-searching)
-* [Configuration](#config)
+* [Configuration](#configuration)
 * [License](#license)
 * [Feedback](#feedback)
 * [Thanks](#thanks)
@@ -182,7 +182,7 @@ It is an error if the id does not exist.
 
 ## Switch to a new database
 
-Once a database is active, creating another one automatically encrypts the current one and makes the new one the active database. The automatic encryption happens only if the configuration flag `auto_encrypt` is turned on (See section [Configuration](#config) below).
+Once a database is active, creating another one automatically encrypts the current one and makes the new one the active database. The automatic encryption happens only if the configuration flag `auto_encrypt` is turned on (See section [Configuration](#configuration) below).
 
 	$ varuh -I mysecrets
 	Encrytping current database - /home/anand/mypasswds
