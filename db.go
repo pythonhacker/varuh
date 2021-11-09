@@ -4,11 +4,9 @@ package main
 import (
 	"os"
 	"fmt"
-	"log"
 	"time"
 	"strings"
 	"database/sql"
-	//	"errors"
 	"path/filepath"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
@@ -85,17 +83,17 @@ func initNewDatabase(dbPath string) error {
 
 	err, db = openDatabase(dbPath)
 	if err != nil {
-		log.Fatal("Error creating new database - %s\n", err.Error())
+		fmt.Printf("Error creating new database - \"%s\"\n", err.Error())
 		return err
 	}
 
 	err = createNewEntry(db)
 	if err != nil {
-		log.Fatal("Error creating schema - %s\n", err.Error())
+		fmt.Printf("Error creating schema - \"%s\"\n", err.Error())
 		return err
 	}	
 
-	log.Printf("Created new database - %s\n", dbPath)
+	fmt.Printf("Created new database - %s\n", dbPath)
 
 	// Update config
 	absPath, err = filepath.Abs(dbPath)
