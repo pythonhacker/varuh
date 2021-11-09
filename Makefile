@@ -5,6 +5,7 @@ all: program
 
 program: $(wildcard *.go)
 	@echo "Building ${PROGRAM}"
+	@go mod tidy
 	@go build -o ${PROGRAM} *.go
 
 install: 
