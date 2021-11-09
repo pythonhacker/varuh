@@ -1,4 +1,4 @@
-// xkuz - command line encryption program written in Go.
+// varuh - command line encryption program written in Go.
 
 package main
 

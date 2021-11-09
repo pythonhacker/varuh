@@ -1,4 +1,4 @@
-module xkuz
+module varuh
 
 go 1.16
 

@@ -1,4 +1,4 @@
-// Database operations for xkuz
+// Database operations for varuh
 package main
 
 import (

@@ -157,7 +157,7 @@ func encryptFile(dbPath string, password string) error {
 	encText = append(encText, hmacHash...)
 	encText = append(encText, cipherText...)
 
-	encDbPath = dbPath + ".xkuz"
+	encDbPath = dbPath + ".varuh"
 
 	err = os.WriteFile(encDbPath, encText, 0644)
 	if err == nil {
