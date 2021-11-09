@@ -12,6 +12,7 @@ Table of Contents
 * [Listing and Searching](#listing-and-searching)
 * [Configuration](#config)
 * [License](#license)
+* [Feedback](#feedback)
 
 About
 =====
@@ -338,28 +339,28 @@ Configuration
 
 The config file is named *config.json*. It looks as follows.
 
-`{
-	"active_db": "/home/anand/mypasswds",
-	"auto_encrypt": true,
-	"visible_passwords": false,
-	"path": "/home/anand/.config/varuh/config.json",
-	"list_order": "id,asc",
-	"delimiter": "=",
-	"color": "default",
-	"bgcolor": "bgblack"
-}
-`
+	`{
+		"active_db": "/home/anand/mypasswds",
+		"auto_encrypt": true,
+		"visible_passwords": false,
+		"path": "/home/anand/.config/varuh/config.json",
+		"list_order": "id,asc",
+		"delimiter": "=",
+		"color": "default",
+		"bgcolor": "bgblack"
+	}
+	`
 You can modify the following variables.
 
 1. `auto_encrypt` - Set this to true to enable automatic encryption/decryption when switching databases. Otherwise you have to do this manually. The default is `true`.
 2. `visible_passwords` - Set this to true to always show passwords in clear text in listings. Otherwise passwords are masked using asterisks. This can be overridden with the `-s` flag.
 3. `list_order` - Ordering when using the `-a` option to view all listings. Supported fields are,
-   * id - Uses the `ID` field.
-   * timestamp - Uses the `Modified` timestamp field. Use this to show latest entries first.
-   * title - Uses the `Title` field.
-   * username - Uses the `User` field.
+   * `id` - Uses the `ID` field.
+   * `timestamp` - Uses the `Modified` timestamp field. Use this to show latest entries first.
+   * `title` - Uses the `Title` field.
+   * `username` - Uses the `User` field.
 
-	Always specify this field as `<field>,<order>`. Supported `<order>` are `asc` and `desc`.
+	Always specify this configuration as `<field>,<order>`. Supported `<order>` values are `asc` and `desc`.
 4. `delimiter` - This modifies the delimiter string when printing a listing. Only one character is allowed.
 5. `color` - The foreground color of the text when printing listings.
 6. `bgcolor` - The background color of the text when printing listings.
@@ -372,3 +373,8 @@ License
 =======
 
 `Varuh` is licensed under the [GNU GPL V3](https://www.gnu.org/licenses/gpl-3.0.html) license. See the LICENSE file for details.
+
+Feedback
+========
+
+Please send your valuable feedback and suggestions to my email available in the program's usage listing.
