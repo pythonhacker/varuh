@@ -151,12 +151,13 @@ func addNewEntry() error {
 	err, passwd = readPassword()
 
 	if len(passwd) == 0 {
-		fmt.Printf("Generating password ...")
+		fmt.Printf("\nGenerating password ...")
 		err, passwd = generateRandomPassword(16)
+		fmt.Printf("done")
 	}
 	//	fmt.Printf("Password => %s\n", passwd)
 
-	notes = readInput(reader, "Notes")
+	notes = readInput(reader, "\nNotes")
 	
 	// Title and username/password are mandatory
 	if len(title) == 0 {
