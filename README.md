@@ -134,7 +134,7 @@ Databases
 	Updating active db path - /home/anand/mypasswds
 
 	$ ls -lt mypasswds 
-	-rw-r--r-- 1 anand anand 8192 Nov  9 23:06 mypasswds
+	-rw------- 1 anand anand 8192 Nov  9 23:06 mypasswds
 
 The password database is created and is active now. You can start adding entries to it.
 
