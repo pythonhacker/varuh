@@ -569,7 +569,19 @@ func encryptDatabase(dbPath string, givenPasswd *string) error {
 		}
 	}
 
-	err = encryptFile(dbPath, passwd)
+	//	err = encryptFileAES(dbPath, passwd)
+	_, settings := getOrCreateLocalConfig(APP)
+
+	switch settings.Cipher {
+	case "aes":
+		err = encryptFileAES(dbPath, passwd)
+	case "xchacha", "chacha", "xchachapoly":
+		err = encryptFileXChachaPoly(dbPath, passwd)
+	default:
+		fmt.Println("No cipher set, defaulting to AES")
+		err = encryptFileAES(dbPath, passwd)
+	}
+
 	if err == nil {
 		fmt.Println("\nEncryption complete.")
 	}
@@ -597,7 +609,18 @@ func decryptDatabase(dbPath string) (error, string) {
 		return err, ""
 	}
 
-	err = decryptFile(dbPath, passwd)
+	_, settings := getOrCreateLocalConfig(APP)
+
+	switch settings.Cipher {
+	case "aes":
+		err = decryptFileAES(dbPath, passwd)
+	case "xchacha", "chacha", "xchachapoly":
+		err = decryptFileXChachaPoly(dbPath, passwd)
+	default:
+		fmt.Println("No cipher set, defaulting to AES")
+		err = decryptFileAES(dbPath, passwd)
+	}
+
 	if err == nil {
 		fmt.Println("\nDecryption complete.")
 	}
