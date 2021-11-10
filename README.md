@@ -400,7 +400,7 @@ The config file is named *config.json*. It looks as follows.
 		"encrypt_on": true,
 		"path": "/home/anand/.config/varuh/config.json",
 		"list_order": "id,asc",
-		"delimiter": "=",
+		"delimiter": "+",
 		"color": "default",
 		"bgcolor": "bgblack"
 	}
