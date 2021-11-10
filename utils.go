@@ -119,7 +119,7 @@ func getOrCreateLocalConfig(app string) (error, *Settings) {
 
 	} else {
 		//		fmt.Printf("Creating default configuration ...")
-		settings = Settings{"", "aes", true, true, false, configFile, "id,asc", "=", "default", "bgblack"}
+		settings = Settings{"", "aes", true, true, false, configFile, "id,asc", "+", "default", "bgblack"}
 
 		if err = writeSettings(&settings, configFile); err == nil {
 			// fmt.Println(" ...done")
