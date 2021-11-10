@@ -306,7 +306,7 @@ func encryptFileXChachaPoly(dbPath string, password string) error {
 		return err
 	}
 
-	err, key, salt = generateKey(password, nil)
+	err, key, salt = generateKeyArgon2(password, nil)
 
 	if err != nil {
 		fmt.Printf("Error - Key derivation failed -\"%s\"\n", err)
@@ -384,7 +384,7 @@ func decryptFileXChachaPoly(encDbPath string, password string) error {
 	// Read the hmac hash checksum
 	hmacHash, encText = encText[:HMAC_SHA512_SIZE], encText[HMAC_SHA512_SIZE:]
 
-	err, key, _ = generateKey(password, &salt)
+	err, key, _ = generateKeyArgon2(password, &salt)
 
 	if err != nil {
 		fmt.Printf("Error - Key derivation failed -\"%s\"\n", err)
