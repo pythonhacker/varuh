@@ -408,19 +408,19 @@ The config file is named *config.json*. It looks as follows.
 You can modify the following variables.
 
 1. `auto_encrypt` - Set this to true to enable automatic encryption/decryption when switching databases. Otherwise you have to do this manually. The default is `true`.
-2. "cipher" - The block cipher to use. This is `aes` by default. To switch to `xchacha20-poly1305` set this to `xchacha`,`chacha` or `xchachapoly`.
-2. `visible_passwords` - Set this to true to always show passwords in clear text in listings. Otherwise passwords are masked using asterisks. This can be overridden with the `-s` flag.
-3. `encrypt_on` - Set this to true for the program to always encrypt the database after every action. This makes sure that the database is never sitting in the unencrypted form on the disk and increases the security.
-4. `list_order` - Ordering when using the `-a` option to view all listings. Supported fields are,
+1. `cipher` - The block cipher to use. This is `aes` by default. To switch to `xchacha20-poly1305` set this to `xchacha`,`chacha` or `xchachapoly`.
+1. `visible_passwords` - Set this to true to always show passwords in clear text in listings. Otherwise passwords are masked using asterisks. This can be overridden with the `-s` flag.
+1. `encrypt_on` - Set this to true for the program to always encrypt the database after every action. This makes sure that the database is never sitting in the unencrypted form on the disk and increases the security.
+1. `list_order` - Ordering when using the `-a` option to view all listings. Supported fields are,
    * `id` - Uses the `ID` field.
    * `timestamp` - Uses the `Modified` timestamp field. Use this to show latest entries first.
    * `title` - Uses the `Title` field.
    * `username` - Uses the `User` field.
 
 	Always specify this configuration as `<field>,<order>`. Supported `<order>` values are `asc` and `desc`.
-5. `delimiter` - This modifies the delimiter string when printing a listing. Only one character is allowed.
-6. `color` - The foreground color of the text when printing listings.
-7. `bgcolor` - The background color of the text when printing listings.
+1. `delimiter` - This modifies the delimiter string when printing a listing. Only one character is allowed.
+1. `color` - The foreground color of the text when printing listings.
+1. `bgcolor` - The background color of the text when printing listings.
 
 Visit this [gist](https://gist.github.com/abritinthebay/d80eb99b2726c83feb0d97eab95206c4) to see the supported color options. All color values must be in lower-case.
 
