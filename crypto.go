@@ -8,6 +8,7 @@ import (
 	"crypto/sha512"
 	"errors"
 	"fmt"
+	chacha "golang.org/x/crypto/chacha20poly1305"
 	"golang.org/x/crypto/pbkdf2"
 	"io"
 	"math/big"
@@ -96,7 +97,7 @@ func isFileEncrypted(encDbPath string) (error, bool) {
 }
 
 // Encrypt the database path using AES
-func encryptFile(dbPath string, password string) error {
+func encryptFileAES(dbPath string, password string) error {
 
 	var err error
 	var key []byte
@@ -136,10 +137,12 @@ func encryptFile(dbPath string, password string) error {
 		return err
 	}
 
-	err, nonce = generateRandomBytes(aesGCM.NonceSize())
+	nonceSize := aesGCM.NonceSize()
+	//	fmt.Printf("%d\n", nonceSize)
+	err, nonce = generateRandomBytes(nonceSize)
 
 	if err != nil {
-		fmt.Printf("Error - Init vector generation failed -\"%s\"\n", err)
+		fmt.Printf("Error - Nonce generation failed -\"%s\"\n", err)
 		return err
 	}
 
@@ -159,9 +162,9 @@ func encryptFile(dbPath string, password string) error {
 
 	encDbPath = dbPath + ".varuh"
 
-	err = os.WriteFile(encDbPath, encText, 0644)
+	err = os.WriteFile(encDbPath, encText, 0600)
 	if err == nil {
-		err = os.WriteFile(dbPath, encText, 0644)
+		err = os.WriteFile(dbPath, encText, 0600)
 		if err == nil {
 			// Remove backup
 			os.Remove(encDbPath)
@@ -174,8 +177,8 @@ func encryptFile(dbPath string, password string) error {
 	return err
 }
 
-// Decrypt an already encrypted database file using given password
-func decryptFile(encDbPath string, password string) error {
+// Decrypt an already encrypted database file using given password using AES
+func decryptFileAES(encDbPath string, password string) error {
 
 	var encText []byte
 	var cipherText []byte
@@ -246,7 +249,155 @@ func decryptFile(encDbPath string, password string) error {
 		return err
 	}
 
-	err = rewriteBaseFile(encDbPath, plainText, 0600)
+	err, origFile = rewriteBaseFile(encDbPath, plainText, 0600)
+
+	if err != nil {
+		fmt.Printf("Error writing decrypted data to %s - \"%s\"\n", origFile, err.Error())
+	}
+
+	//	fmt.Printf("%s\n", string(plainText))
+	return err
+}
+
+// Encrypt a file using XChaCha20-Poly1305 cipher
+func encryptFileXChachaPoly(dbPath string, password string) error {
+
+	var err error
+	var key []byte
+	var nonce []byte
+	var salt []byte
+	var plainText []byte
+	var cipherText []byte
+	var magicBytes []byte
+	var encText []byte
+	var encDbPath string
+	var hmacHash []byte
+
+	plainText, err = os.ReadFile(dbPath)
+	if err != nil {
+		fmt.Printf("Error - Can't read database -\"%s\"\n", err)
+		return err
+	}
+
+	err, key, salt = generateKey(password, nil)
+
+	if err != nil {
+		fmt.Printf("Error - Key derivation failed -\"%s\"\n", err)
+		return err
+	}
+
+	aead, err := chacha.NewX(key)
+
+	if err != nil {
+		fmt.Printf("Error - AEAD creation failed - \"%s\"\n", err)
+		return err
+	}
+
+	nonce = make([]byte, aead.NonceSize(), aead.NonceSize()+len(plainText)+aead.Overhead())
+	if _, err = crand.Read(nonce); err != nil {
+		fmt.Printf("Error - Nonce generation failed -\"%s\"\n", err)
+		return err
+	}
+
+	magicBytes = []byte(fmt.Sprintf("%x", MAGIC_HEADER))
+	cipherText = aead.Seal(nonce, nonce, plainText, nil)
+
+	// Calculate hmac signature and write it
+	hCipher := hmac.New(sha512.New, key)
+	hCipher.Write(cipherText)
+
+	hmacHash = hCipher.Sum(nil)
+
+	// No need for salt in chacha
+	encText = append(magicBytes, salt...)
+	encText = append(encText, hmacHash...)
+	encText = append(encText, cipherText...)
+
+	encDbPath = dbPath + ".varuh"
+
+	err = os.WriteFile(encDbPath, encText, 0600)
+	if err == nil {
+		err = os.WriteFile(dbPath, encText, 0600)
+		if err == nil {
+			// Remove backup
+			os.Remove(encDbPath)
+		} else {
+			fmt.Printf("Error writing encrypted database - \"%s\"\n", err.Error())
+		}
+	}
+	//	fmt.Printf("%x\n", cipherText)
+
+	return err
+}
+
+// Decrypt an already encrypted database file using given password using AES
+func decryptFileXChachaPoly(encDbPath string, password string) error {
+
+	var encText []byte
+	var cipherText []byte
+	var plainText []byte
+	var salt []byte
+	var key []byte
+	var nonce []byte
+	var hmacHash []byte
+	var hmacSig []byte
+	var origFile string
+
+	var err error
+
+	encText, err = os.ReadFile(encDbPath)
+	if err != nil {
+		fmt.Printf("Error - Can't read database -\"%s\"\n", err)
+		return err
+	}
+
+	encText = encText[unsafe.Sizeof(MAGIC_HEADER):]
+	// Read the old salt
+	salt, encText = encText[:SALT_SIZE], encText[SALT_SIZE:]
+	// Read the hmac hash checksum
+	hmacHash, encText = encText[:HMAC_SHA512_SIZE], encText[HMAC_SHA512_SIZE:]
+
+	err, key, _ = generateKey(password, &salt)
+
+	if err != nil {
+		fmt.Printf("Error - Key derivation failed -\"%s\"\n", err)
+		return err
+	}
+
+	// verify the hmac
+	// Calculate hmac signature and write it
+	hCipher := hmac.New(sha512.New, key)
+	hCipher.Write(encText)
+
+	hmacSig = hCipher.Sum(nil)
+
+	// Compare
+	if !hmac.Equal(hmacSig, hmacHash) {
+		fmt.Println("Invalid password or tampered data. Aborted")
+		return errors.New("signature check failed")
+	}
+	//	fmt.Printf("\nsalt: %x\n", salt)
+	//	fmt.Printf("key: %x\n", key)
+
+	aead, err := chacha.NewX(key)
+	if err != nil {
+		fmt.Printf("Error - AEAD creation failed - \"%s\"\n", err)
+		return err
+	}
+
+	nonceSize := aead.NonceSize()
+
+	nonce, cipherText = encText[:nonceSize], encText[nonceSize:]
+	//	fmt.Printf("nonce: %x\n", nonce)
+	plainText, err = aead.Open(nil, nonce, cipherText, nil)
+
+	if err != nil {
+		fmt.Printf("Error - Decryption failed - \"%s\"\n", err)
+		return err
+	}
+
+	//	err = os.WriteFile("test.sqlite3", plainText, 0600)
+	err, origFile = rewriteBaseFile(encDbPath, plainText, 0600)
 
 	if err != nil {
 		fmt.Printf("Error writing decrypted data to %s - \"%s\"\n", origFile, err.Error())
