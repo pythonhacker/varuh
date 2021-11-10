@@ -24,7 +24,7 @@ About
 
 The name [Varuh](https://www.wordsense.eu/varuh/#Slovene) means *guardian* or *protector* in the Slovene language.
 
-Varuh is inspired by [ylva](https://github.com/nrosvall/ylva) but it is full re-implementation. It is written in `Go` and has been tested with Go versions 1.16 and 1.17 on Debian Linux (Antix). It should work on other versions of Linux and *BSD as well.
+Varuh is inspired by [ylva](https://github.com/nrosvall/ylva) but it is full re-implementation - with some major changes in the key derivation functions and ciphers. It is written in `Go` and has been tested with Go versions 1.16 and 1.17 on Debian Linux (Antix). It should work on other versions of Linux and *BSD as well.
 
 Why a rewrite
 =============
