@@ -74,26 +74,26 @@ Usage
 
 		EDIT/CREATE ACTIONS:
 
-		  -U --use-db          <path> Set as active database
-		  -E --edit            <id>   Edit entry by id
 		  -e --encrypt                Encrypt the current database
 		  -A --add                    Add a new entry
 		  -I --init            <path> Initialize a new database
-		  -d --decrypt         <path> Decrypt password database
 		  -C --copy            <id>   Copy an entry
 		  -R --remove          <id>   Remove an entry
+		  -d --decrypt         <path> Decrypt password database
+		  -U --use-db          <path> Set as active database
+		  -E --edit            <id>   Edit entry by id
 
 		FIND/LIST ACTIONS:
 
 		  -l --list-entry      <id>   List entry by id
-		  -f --find            <term> Search entries
 		  -p --path                   Show current database path
 		  -a --list-all               List all entries in current database
+		  -f --find            <term> Search entries
 
 		HELP ACTIONS:
 
-		  -h --help                   Print this help message and exit
 		  -v --version                Show version information and exit
+		  -h --help                   Print this help message and exit
 
 		FLAGS:
 
@@ -102,6 +102,7 @@ Usage
 
 	AUTHORS
 		Copyright (C) 2021 Anand B Pillai <anandpillai@alumni.iitm.ac.in>
+
 
 The command line flags are grouped into `Edit/Create`, `Find/List` and `Help` actions. The first group of actions allows you to work with password databases and perform create/edit as well as encrypt/decrypt actions. The second set of actions allows you to work with an active decrypted database and view/search/list entries.
 
