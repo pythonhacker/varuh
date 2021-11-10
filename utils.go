@@ -24,6 +24,7 @@ type SettingsOverride struct {
 // Settings structure for local config
 type Settings struct {
 	ActiveDB      string `json:"active_db"`
+	Cipher        string `json:"cipher"`
 	AutoEncrypt   bool   `json:"auto_encrypt"`
 	KeepEncrypted bool   `json:"encrypt_on"`
 	ShowPasswords bool   `json:"visible_passwords"`
@@ -118,7 +119,7 @@ func getOrCreateLocalConfig(app string) (error, *Settings) {
 
 	} else {
 		//		fmt.Printf("Creating default configuration ...")
-		settings = Settings{"", true, true, false, configFile, "id,asc", "=", "default", "bgblack"}
+		settings = Settings{"", "aes", true, true, false, configFile, "id,asc", "=", "default", "bgblack"}
 
 		if err = writeSettings(&settings, configFile); err == nil {
 			// fmt.Println(" ...done")
@@ -191,7 +192,7 @@ func readPassword() (error, string) {
 }
 
 // Rewrite the contents of the base file (path minus extension) with the new contents
-func rewriteBaseFile(path string, contents []byte, mode fs.FileMode) error {
+func rewriteBaseFile(path string, contents []byte, mode fs.FileMode) (error, string) {
 
 	var err error
 	var origFile string
@@ -205,7 +206,7 @@ func rewriteBaseFile(path string, contents []byte, mode fs.FileMode) error {
 		os.Chmod(origFile, mode)
 	}
 
-	return err
+	return err, origFile
 }
 
 // Get color codes for console colors
