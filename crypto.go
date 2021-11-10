@@ -20,7 +20,7 @@ import (
 )
 
 const KEY_SIZE = 32
-const SALT_SIZE = 64
+const SALT_SIZE = 128
 const KEY_N_ITER = 120000
 const HMAC_SHA512_SIZE = 64
 const MAGIC_HEADER = 0xcafebabe
