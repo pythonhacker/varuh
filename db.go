@@ -72,7 +72,7 @@ func initNewDatabase(dbPath string) error {
 		} else {
 			// TBD
 			fmt.Printf("Encrytping current database - %s\n", activeDbPath)
-			encryptDatabase(activeDbPath)
+			encryptDatabase(activeDbPath, nil)
 		}
 	}
 
@@ -97,6 +97,8 @@ func initNewDatabase(dbPath string) error {
 
 	// Update config
 	absPath, err = filepath.Abs(dbPath)
+	// Chmod it
+	os.Chmod(absPath, 0600)
 
 	if err == nil {
 		fmt.Printf("Updating active db path - %s\n", absPath)
@@ -144,7 +146,7 @@ func addNewDatabaseEntry(title, userName, url, passwd, notes string) error {
 		//		result := db.Debug().Create(&entry)
 		result := db.Create(&entry)
 		if result.Error == nil && result.RowsAffected == 1 {
-			fmt.Printf("Created new entry with id: %d\n.", entry.ID)
+			fmt.Printf("Created new entry with id: %d.\n", entry.ID)
 			return nil
 		} else if result.Error != nil {
 			return result.Error
@@ -278,7 +280,7 @@ func cloneEntry(entry *Entry) (error, *Entry) {
 
 		result := db.Create(&entryNew)
 		if result.Error == nil && result.RowsAffected == 1 {
-			fmt.Printf("Cloned to new entry, id: %d\n.", entryNew.ID)
+			fmt.Printf("Cloned to new entry, id: %d.\n", entryNew.ID)
 			return nil, &entryNew
 		} else if result.Error != nil {
 			return result.Error, nil

@@ -73,7 +73,6 @@ func setActiveDatabasePath(dbPath string) error {
 
 		// If autoencrypt is true - encrypt current DB automatically
 		if settings.AutoEncrypt {
-
 			if !activeEncrypted {
 				fmt.Printf("Encrypting current active database - %s\n", settings.ActiveDB)
 				err = encryptActiveDatabase()
@@ -85,7 +84,7 @@ func setActiveDatabasePath(dbPath string) error {
 			if newEncrypted {
 				// Decrypt new database if it is encrypted
 				fmt.Printf("Database %s is encrypted, decrypting it\n", fullPath)
-				err = decryptDatabase(fullPath)
+				err, _ = decryptDatabase(fullPath)
 				if err != nil {
 					fmt.Printf("Decryption Error - \"%s\", not switching databases\n", err.Error())
 					return err
@@ -132,6 +131,19 @@ func addNewEntry() error {
 	var notes string
 	var passwd string
 	var err error
+	var maxKrypt bool
+	var encPasswd string
+	var defaultDB string
+
+	maxKrypt, defaultDB = isActiveDatabaseEncryptedAndMaxKryptOn()
+
+	// If max krypt on - then autodecrypt on call and auto encrypt after call
+	if maxKrypt {
+		err, encPasswd = decryptDatabase(defaultDB)
+		if err != nil {
+			return err
+		}
+	}
 
 	if err = checkActiveDatabase(); err != nil {
 		return err
@@ -180,6 +192,11 @@ func addNewEntry() error {
 		fmt.Printf("Error adding entry - \"%s\"\n", err.Error())
 	}
 
+	// If max krypt on - then autodecrypt on call and auto encrypt after call
+	if maxKrypt {
+		err = encryptDatabase(defaultDB, &encPasswd)
+	}
+
 	return err
 }
 
@@ -193,7 +210,20 @@ func editCurrentEntry(idString string) error {
 	var passwd string
 	var err error
 	var entry *Entry
+	var maxKrypt bool
+	var defaultDB string
+	var encPasswd string
 	var id int
+
+	maxKrypt, defaultDB = isActiveDatabaseEncryptedAndMaxKryptOn()
+
+	// If max krypt on - then autodecrypt on call and auto encrypt after call
+	if maxKrypt {
+		err, encPasswd = decryptDatabase(defaultDB)
+		if err != nil {
+			return err
+		}
+	}
 
 	if err = checkActiveDatabase(); err != nil {
 		return err
@@ -241,6 +271,11 @@ func editCurrentEntry(idString string) error {
 		fmt.Printf("Error updating entry - \"%s\"\n", err.Error())
 	}
 
+	// If max krypt on - then autodecrypt on call and auto encrypt after call
+	if maxKrypt {
+		err = encryptDatabase(defaultDB, &encPasswd)
+	}
+
 	return err
 }
 
@@ -250,6 +285,19 @@ func listCurrentEntry(idString string) error {
 	var id int
 	var err error
 	var entry *Entry
+	var maxKrypt bool
+	var defaultDB string
+	var passwd string
+
+	maxKrypt, defaultDB = isActiveDatabaseEncryptedAndMaxKryptOn()
+
+	// If max krypt on - then autodecrypt on call and auto encrypt after call
+	if maxKrypt {
+		err, passwd = decryptDatabase(defaultDB)
+		if err != nil {
+			return err
+		}
+	}
 
 	if err = checkActiveDatabase(); err != nil {
 		return err
@@ -264,13 +312,33 @@ func listCurrentEntry(idString string) error {
 		return err
 	}
 
-	return printEntry(entry, true)
+	err = printEntry(entry, true)
+
+	// If max krypt on - then autodecrypt on call and auto encrypt after call
+	if maxKrypt {
+		err = encryptDatabase(defaultDB, &passwd)
+	}
+
+	return err
 }
 
 // List all entries
 func listAllEntries() error {
 
 	var err error
+	var maxKrypt bool
+	var defaultDB string
+	var passwd string
+
+	maxKrypt, defaultDB = isActiveDatabaseEncryptedAndMaxKryptOn()
+
+	// If max krypt on - then autodecrypt on call and auto encrypt after call
+	if maxKrypt {
+		err, passwd = decryptDatabase(defaultDB)
+		if err != nil {
+			return err
+		}
+	}
 
 	if err = checkActiveDatabase(); err != nil {
 		return err
@@ -300,7 +368,12 @@ func listAllEntries() error {
 		return err
 	}
 
-	return nil
+	// If max krypt on - then autodecrypt on call and auto encrypt after call
+	if maxKrypt {
+		err = encryptDatabase(defaultDB, &passwd)
+	}
+
+	return err
 }
 
 // Find current entry by term - prints all matches
@@ -308,6 +381,19 @@ func findCurrentEntry(term string) error {
 
 	var err error
 	var entries []Entry
+	var maxKrypt bool
+	var defaultDB string
+	var passwd string
+
+	maxKrypt, defaultDB = isActiveDatabaseEncryptedAndMaxKryptOn()
+
+	// If max krypt on - then autodecrypt on call and auto encrypt after call
+	if maxKrypt {
+		err, passwd = decryptDatabase(defaultDB)
+		if err != nil {
+			return err
+		}
+	}
 
 	if err = checkActiveDatabase(); err != nil {
 		return err
@@ -331,7 +417,12 @@ func findCurrentEntry(term string) error {
 		}
 	}
 
-	return nil
+	// If max krypt on - then autodecrypt on call and auto encrypt after call
+	if maxKrypt {
+		err = encryptDatabase(defaultDB, &passwd)
+	}
+
+	return err
 }
 
 // Remove current entry by id
@@ -340,6 +431,19 @@ func removeCurrentEntry(idString string) error {
 	var err error
 	var entry *Entry
 	var id int
+	var maxKrypt bool
+	var defaultDB string
+	var passwd string
+
+	maxKrypt, defaultDB = isActiveDatabaseEncryptedAndMaxKryptOn()
+
+	// If max krypt on - then autodecrypt on call and auto encrypt after call
+	if maxKrypt {
+		err, passwd = decryptDatabase(defaultDB)
+		if err != nil {
+			return err
+		}
+	}
 
 	if err = checkActiveDatabase(); err != nil {
 		return err
@@ -359,6 +463,11 @@ func removeCurrentEntry(idString string) error {
 		fmt.Printf("Entry with id %d was removed from the database\n", id)
 	}
 
+	// If max krypt on - then autodecrypt on call and auto encrypt after call
+	if maxKrypt {
+		err = encryptDatabase(defaultDB, &passwd)
+	}
+
 	return err
 }
 
@@ -368,6 +477,19 @@ func copyCurrentEntry(idString string) error {
 	var err error
 	var entry *Entry
 	var id int
+	var maxKrypt bool
+	var defaultDB string
+	var passwd string
+
+	maxKrypt, defaultDB = isActiveDatabaseEncryptedAndMaxKryptOn()
+
+	// If max krypt on - then autodecrypt on call and auto encrypt after call
+	if maxKrypt {
+		err, passwd = decryptDatabase(defaultDB)
+		if err != nil {
+			return err
+		}
+	}
 
 	if err = checkActiveDatabase(); err != nil {
 		return err
@@ -387,7 +509,12 @@ func copyCurrentEntry(idString string) error {
 		return err
 	}
 
-	return nil
+	// If max krypt on - then autodecrypt on call and auto encrypt after call
+	if maxKrypt {
+		err = encryptDatabase(defaultDB, &passwd)
+	}
+
+	return err
 }
 
 // Encrypt the active database
@@ -406,33 +533,40 @@ func encryptActiveDatabase() error {
 		return err
 	}
 
-	return encryptDatabase(dbPath)
+	return encryptDatabase(dbPath, nil)
 }
 
 // Encrypt the database using AES
-func encryptDatabase(dbPath string) error {
+func encryptDatabase(dbPath string, givenPasswd *string) error {
 
 	var err error
 	var passwd string
 	var passwd2 string
 
-	fmt.Printf("Password: ")
-	err, passwd = readPassword()
-
-	if err == nil {
-		fmt.Printf("\nPassword again: ")
-		err, passwd2 = readPassword()
-		if err == nil {
-			if passwd != passwd2 {
-				fmt.Println("\nPassword mismatch.")
-				return errors.New("mismatched passwords")
-			}
-		}
+	// If password is given, use it
+	if givenPasswd != nil {
+		passwd = *givenPasswd
 	}
 
-	if err != nil {
-		fmt.Printf("Error reading password - \"%s\"\n", err.Error())
-		return err
+	if len(passwd) == 0 {
+		fmt.Printf("Password: ")
+		err, passwd = readPassword()
+
+		if err == nil {
+			fmt.Printf("\nPassword again: ")
+			err, passwd2 = readPassword()
+			if err == nil {
+				if passwd != passwd2 {
+					fmt.Println("\nPassword mismatch.")
+					return errors.New("mismatched passwords")
+				}
+			}
+		}
+
+		if err != nil {
+			fmt.Printf("Error reading password - \"%s\"\n", err.Error())
+			return err
+		}
 	}
 
 	err = encryptFile(dbPath, passwd)
@@ -444,7 +578,7 @@ func encryptDatabase(dbPath string) error {
 }
 
 // Decrypt an encrypted database
-func decryptDatabase(dbPath string) error {
+func decryptDatabase(dbPath string) (error, string) {
 
 	var err error
 	var passwd string
@@ -452,7 +586,7 @@ func decryptDatabase(dbPath string) error {
 
 	if err, flag = isFileEncrypted(dbPath); !flag {
 		fmt.Println(err.Error())
-		return err
+		return err, ""
 	}
 
 	fmt.Printf("Password: ")
@@ -460,7 +594,7 @@ func decryptDatabase(dbPath string) error {
 
 	if err != nil {
 		fmt.Printf("\nError reading password - \"%s\"\n", err.Error())
-		return err
+		return err, ""
 	}
 
 	err = decryptFile(dbPath, passwd)
@@ -468,5 +602,5 @@ func decryptDatabase(dbPath string) error {
 		fmt.Println("\nDecryption complete.")
 	}
 
-	return err
+	return err, passwd
 }

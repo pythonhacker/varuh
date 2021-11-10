@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"github.com/kirsle/configdir"
 	"golang.org/x/crypto/ssh/terminal"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"strings"
@@ -24,6 +25,7 @@ type SettingsOverride struct {
 type Settings struct {
 	ActiveDB      string `json:"active_db"`
 	AutoEncrypt   bool   `json:"auto_encrypt"`
+	KeepEncrypted bool   `json:"encrypt_on"`
 	ShowPasswords bool   `json:"visible_passwords"`
 	ConfigPath    string `json:"path"`
 	// Key to order listings when using -a option
@@ -116,7 +118,7 @@ func getOrCreateLocalConfig(app string) (error, *Settings) {
 
 	} else {
 		//		fmt.Printf("Creating default configuration ...")
-		settings = Settings{"", true, false, configFile, "id,asc", "=", "default", "bgblack"}
+		settings = Settings{"", true, true, false, configFile, "id,asc", "=", "default", "bgblack"}
 
 		if err = writeSettings(&settings, configFile); err == nil {
 			// fmt.Println(" ...done")
@@ -189,7 +191,7 @@ func readPassword() (error, string) {
 }
 
 // Rewrite the contents of the base file (path minus extension) with the new contents
-func rewriteBaseFile(path string, contents []byte) error {
+func rewriteBaseFile(path string, contents []byte, mode fs.FileMode) error {
 
 	var err error
 	var origFile string
@@ -197,6 +199,11 @@ func rewriteBaseFile(path string, contents []byte) error {
 	origFile = strings.TrimSuffix(path, filepath.Ext(path))
 	// Overwrite it
 	err = os.WriteFile(origFile, contents, 0644)
+
+	if err == nil {
+		// Chmod it
+		os.Chmod(origFile, mode)
+	}
 
 	return err
 }
@@ -334,6 +341,43 @@ func checkActiveDatabase() error {
 	}
 
 	return nil
+}
+
+// Return true if active database is encrypted
+func isActiveDatabaseEncrypted() bool {
+
+	err, settings := getOrCreateLocalConfig(APP)
+	if err == nil && settings.ActiveDB != "" {
+		if _, err := os.Stat(settings.ActiveDB); err == nil {
+			if _, flag := isFileEncrypted(settings.ActiveDB); flag {
+				return true
+			}
+		}
+	}
+
+	return false
+}
+
+// Return true if always encrypt is on
+func isEncryptOn() bool {
+
+	_, settings := getOrCreateLocalConfig(APP)
+	return settings.KeepEncrypted
+}
+
+// Combination of above 2 logic plus auto encryption on (a play on CryptOn)
+func isActiveDatabaseEncryptedAndMaxKryptOn() (bool, string) {
+
+	err, settings := getOrCreateLocalConfig(APP)
+	if err == nil && settings.ActiveDB != "" {
+		if _, err := os.Stat(settings.ActiveDB); err == nil {
+			if _, flag := isFileEncrypted(settings.ActiveDB); flag && settings.KeepEncrypted && settings.AutoEncrypt {
+				return true, settings.ActiveDB
+			}
+		}
+	}
+
+	return false, ""
 }
 
 // (Temporarily) enable showing of passwords

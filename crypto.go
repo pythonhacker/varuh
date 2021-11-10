@@ -19,7 +19,7 @@ import (
 
 const KEY_SIZE = 32
 const SALT_SIZE = 64
-const KEY_N_ITER = 4096
+const KEY_N_ITER = 50000
 const HMAC_SHA512_SIZE = 64
 const MAGIC_HEADER = 0xcafebabe
 
@@ -246,7 +246,7 @@ func decryptFile(encDbPath string, password string) error {
 		return err
 	}
 
-	err = rewriteBaseFile(encDbPath, plainText)
+	err = rewriteBaseFile(encDbPath, plainText, 0600)
 
 	if err != nil {
 		fmt.Printf("Error writing decrypted data to %s - \"%s\"\n", origFile, err.Error())

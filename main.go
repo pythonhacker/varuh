@@ -13,6 +13,7 @@ const APP = "varuh"
 const AUTHOR_EMAIL = "Anand B Pillai <anandpillai@alumni.iitm.ac.in>"
 
 type actionFunc func(string) error
+type actionFunc2 func(string) (error, string)
 type voidFunc func() error
 
 // Print the program's usage string and exit
@@ -53,7 +54,10 @@ func performAction(optMap map[string]interface{}, optionMap map[string]interface
 		"remove":     removeCurrentEntry,
 		"copy":       copyCurrentEntry,
 		"use-db":     setActiveDatabasePath,
-		"decrypt":    decryptDatabase,
+	}
+
+	stringActions2Map := map[string]actionFunc2{
+		"decrypt": decryptDatabase,
 	}
 
 	flagsActionsMap := map[string]voidFunc{
@@ -82,6 +86,22 @@ func performAction(optMap map[string]interface{}, optionMap map[string]interface
 	}
 
 	for key, mappedFunc := range stringActionsMap {
+		option := optionMap[key].(Option)
+
+		if *optMap[key].(*string) != option.Path {
+
+			var val = *(optMap[key].(*string))
+			mappedFunc(val)
+			flag = true
+			break
+		}
+	}
+
+	if flag {
+		return
+	}
+
+	for key, mappedFunc := range stringActions2Map {
 		option := optionMap[key].(Option)
 
 		if *optMap[key].(*string) != option.Path {
