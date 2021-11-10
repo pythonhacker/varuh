@@ -8,6 +8,7 @@ import (
 	"crypto/sha512"
 	"errors"
 	"fmt"
+	"golang.org/x/crypto/argon2"
 	chacha "golang.org/x/crypto/chacha20poly1305"
 	"golang.org/x/crypto/pbkdf2"
 	"io"
@@ -41,7 +42,33 @@ func generateRandomBytes(size int) (error, []byte) {
 }
 
 // Generate a key from the given passphrase and (optional) salt
-// If 2nd argument is nil, salt will be generated.
+// If 2nd argument is nil, salt will be generated. Uses argon2
+func generateKeyArgon2(passPhrase string, oldSalt *[]byte) (error, []byte, []byte) {
+
+	var salt []byte
+	var key []byte
+	var err error
+
+	if oldSalt == nil {
+		err, salt = generateRandomBytes(SALT_SIZE)
+	} else {
+		salt = *oldSalt
+	}
+
+	if err != nil {
+		return err, key, salt
+	}
+	if len(salt) == 0 {
+		return errors.New("invalid salt"), key, salt
+	}
+
+	// key = argon2.IDKey([]byte(passPhrase), salt, 1, 64*1024, 4, KEY_SIZE)
+	key = argon2.Key([]byte(passPhrase), salt, 3, 32*1024, 4, KEY_SIZE)
+	return nil, key, salt
+}
+
+// Generate a key from the given passphrase and (optional) salt
+// If 2nd argument is nil, salt will be generated. Uses pbkdf2
 func generateKey(passPhrase string, oldSalt *[]byte) (error, []byte, []byte) {
 
 	var salt []byte
@@ -116,7 +143,7 @@ func encryptFileAES(dbPath string, password string) error {
 		return err
 	}
 
-	err, key, salt = generateKey(password, nil)
+	err, key, salt = generateKeyArgon2(password, nil)
 
 	if err != nil {
 		fmt.Printf("Error - Key derivation failed -\"%s\"\n", err)
@@ -204,7 +231,7 @@ func decryptFileAES(encDbPath string, password string) error {
 	// Read the hmac hash checksum
 	hmacHash, encText = encText[:HMAC_SHA512_SIZE], encText[HMAC_SHA512_SIZE:]
 
-	err, key, _ = generateKey(password, &salt)
+	err, key, _ = generateKeyArgon2(password, &salt)
 
 	if err != nil {
 		fmt.Printf("Error - Key derivation failed -\"%s\"\n", err)
