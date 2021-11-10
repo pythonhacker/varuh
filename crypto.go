@@ -330,7 +330,7 @@ func encryptFileXChachaPoly(dbPath string, password string) error {
 	return err
 }
 
-// Decrypt an already encrypted database file using given password using AES
+// Decrypt an already encrypted database file using given password using XChaCha20-Poly1305
 func decryptFileXChachaPoly(encDbPath string, password string) error {
 
 	var encText []byte
