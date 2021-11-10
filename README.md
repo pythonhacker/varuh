@@ -221,7 +221,7 @@ Once a database is active, creating another one automatically encrypts the curre
 	Created new database - mysecrets
 	Updating active db path - /home/anand/mysecrets
 
-The previous database is now encrypted with AES-256 cipher using the password. Please make sure you remember the password.
+The previous database is now encrypted with the configured block cipher using the password. Please make sure you remember the password.
 
 ## Switch back to previous database
 
