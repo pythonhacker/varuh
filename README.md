@@ -41,7 +41,13 @@ Building the code
 
 You need the [Go compiler](https://golang.org/dl/) to build the code. (This can be usually installed on \*nix machines by the native package managers like *apt-get*).
 
-If you have `make` installed,
+Install `make` by using your native package manager. Something like,
+
+	$ sudo apt install make -y
+
+should work.
+
+Then,
 
 	$ make
 	go: downloading github.com/kirsle/configdir v0.0.0-20170128060238-e45d2f54772f
@@ -55,11 +61,6 @@ If you have `make` installed,
 
 The binary will be installed in `/usr/local/bin` folder.
 
-If you don't have `make`,
-
-	$ go mod tidy
-	$ go build -o varuh *.go
-	$ sudo cp varuh /usr/local/bin/
 
 Usage
 =====
