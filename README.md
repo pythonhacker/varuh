@@ -9,8 +9,8 @@ Table of Contents
 * [Why a rewrite](#why-a-rewrite)
 * [Building the code](#building-the-code)
 * [Usage](#usage)
-* [Databases](#databases)
 * [Encryption and Security](#encryption-and-security)
+* [Databases](#databases)
 * [Listing and Searching](#listing-and-searching)
 * [Configuration](#configuration)
 * [License](#license)
@@ -20,7 +20,7 @@ Table of Contents
 About
 =====
 
-`Varuh` is a command line password manager that allows you to keep your passwords and other sensitive data using the power of the shell and Unix. It uses `sqlite` databases to store the information and encrypts it with [AES-256](https://en.wikipedia.org/wiki/Advanced_Encryption_Standard) block encryption.
+`Varuh` is a command line password manager that allows you to keep your passwords and other sensitive data using the power of the shell and Unix. It uses `sqlite` databases to store the information and encrypts it with symmetric block encryption ciphers like [AES-256](https://en.wikipedia.org/wiki/Advanced_Encryption_Standard) and [XChaCha20-Poly1305](https://www.cryptopp.com/wiki/XChaCha20) .
 
 The name [Varuh](https://www.wordsense.eu/varuh/#Slovene) means *guardian* or *protector* in the Slovene language.
 
@@ -34,7 +34,7 @@ If you ask - `"Why a rewrite, why not contribute to the original repo ?"`, it is
 2. `ylva` does not have a proper configuration file that keeps with the freedesktop specifications.
 3. The fact that ylva keeps decrypted databases on disk when in regular use without an automatic {decrypt-encrypt}-on-use option was a problem. If I encrypt the database, I have to keep decrypting it to use the program which is a problem. Hence the `encrypt_on` flag was added to `varuh` (see below).
 4. C is a venerable language but this is 2021 and I would rather program (and contribute) in a modern system programming language like `Go` or `Rust` which takes care of the memory handling tasks and leaves me to focus on the application code. Also I felt it is easier to get contributors to a project if it is in one of these languages as a lot of the Gen Z programmers don't know C. You will appreciate this more if you look at an open source repo written in C/C++ and find that 30% of all code are operations allocating/de-allocating memory.
-
+5. Support for more ciphers and crypto systems - `Varuh` already supports the `XChacha20-Poly1305` cipher. OpenPGP encryption is in the pipeline. 
 
 Building the code
 =================
@@ -107,10 +107,25 @@ Usage
 
 The command line flags are grouped into `Edit/Create`, `Find/List` and `Help` actions. The first group of actions allows you to work with password databases and perform create/edit as well as encrypt/decrypt actions. The second set of actions allows you to work with an active decrypted database and view/search/list entries.
 
+Encryption and Security
+=======================
+
+Varuh gives the option of two block ciphers - AES (default) and XChacha20-Poly1305.
+
+AES is supported with 256-bit key size for encryption. The encryption uses PBKDF2 with SHA-512 as the hash function with [120,000 iterations](https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html) and a random cryptographic salt.
+
+XChacha20-Poly1305 is a block cipher with a longer nonce (192 bits) which makes the cipher more resistant to timing attacks than AES-GCM. It also supports 256-bit key size.
+
+Databases are created and decrypted with owner `rw` mode (0600). This makes sure the databases are read/write - able only by the owner.
+
+When the `auto_encrypt` and `encrypt_on` flags are turned on, the database is always encrypted after an operation so the passwords remain in the clear in memory as well as in disk for a very short time. This increases the security of the data.
+
+For maximum security, the default settings `auto_encrypt` and `encrypt_on` to true and `visible_passwords` to false is suggested.
+
 Databases
 =========
 
-`Varuh` works with password databases. Each password database is an sqlite3 file. You can create any number of databases but at any given time there is only one active database which is in decrypted mode. When `auto_encrypt` is turned on (default), the program takes care of automatically encrypting and decrypting databases.
+`Varuh` works with password databases. Each password database is a sqlite3 file. You can create any number of databases but at any given time there is only one active database which is in decrypted mode. When `auto_encrypt` is turned on (default), the program takes care of automatically encrypting and decrypting databases.
 
 ## Create a database
 
@@ -278,17 +293,6 @@ If the config param `encrypt_on` is set to `true` along with `auto_encrypt` (def
 
 In this mode, your data is provided maximum safety as the database remains decrypted only for a short while on the disk while the data is being read and once done is encrypted back again.
 
-Encryption and Security
-=======================
-
-Varuh uses AES with 256-bit keys for encryption. The encrypted database uses HMAC with SHA-512 checksums for authentication. The encryption uses PBKDF2 with SHA-512 as the hash function with [120,000 iterations](https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html) and a random cryptographic salt.
-
-Databases are created and decrypted with owner `rw` mode (0600). This makes sure the databases are read/write - able only by the owner.
-
-When the `auto_encrypt` and `encrypt_on` flags are turned on, the database is always encrypted after an operation so the passwords remain in the clear in memory as well as in disk for a very short time. This increases the security of the data.
-
-For maximum security, the default settings `auto_encrypt` and `encrypt_on` to true and `visible_passwords` to false is suggested.
-
 Listing and Searching
 =====================
 
@@ -390,6 +394,7 @@ The config file is named *config.json*. It looks as follows.
 
 	`{
 		"active_db": "/home/anand/mypasswds",
+		"cipher": "aes",
 		"auto_encrypt": true,
 		"visible_passwords": false,
 		"encrypt_on": true,
@@ -403,6 +408,7 @@ The config file is named *config.json*. It looks as follows.
 You can modify the following variables.
 
 1. `auto_encrypt` - Set this to true to enable automatic encryption/decryption when switching databases. Otherwise you have to do this manually. The default is `true`.
+2. "cipher" - The block cipher to use. This is `aes` by default. To switch to `xchacha20-poly1305` set this to `xchacha`,`chacha` or `xchachapoly`.
 2. `visible_passwords` - Set this to true to always show passwords in clear text in listings. Otherwise passwords are masked using asterisks. This can be overridden with the `-s` flag.
 3. `encrypt_on` - Set this to true for the program to always encrypt the database after every action. This makes sure that the database is never sitting in the unencrypted form on the disk and increases the security.
 4. `list_order` - Ordering when using the `-a` option to view all listings. Supported fields are,
