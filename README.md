@@ -12,6 +12,7 @@ Table of Contents
 * [Encryption and Security](#encryption-and-security)
 * [Databases](#databases)
 * [Listing and Searching](#listing-and-searching)
+* [Export](#export)
 * [Configuration](#configuration)
 * [License](#license)
 * [Feedback](#feedback)
@@ -75,35 +76,35 @@ Usage
 
 		EDIT/CREATE ACTIONS:
 
-		  -e --encrypt                Encrypt the current database
-		  -A --add                    Add a new entry
-		  -I --init            <path> Initialize a new database
-		  -C --copy            <id>   Copy an entry
-		  -R --remove          <id>   Remove an entry
-		  -d --decrypt         <path> Decrypt password database
-		  -U --use-db          <path> Set as active database
-		  -E --edit            <id>   Edit entry by id
+		  -E --edit            <id>       Edit entry by id
+		  -e --encrypt                    Encrypt the current database
+		  -U --use-db          <path>     Set as active database
+		  -d --decrypt         <path>     Decrypt password database
+		  -C --copy            <id>       Copy an entry
+		  -R --remove          <id>       Remove an entry
+		  -A --add                        Add a new entry
+		  -I --init            <path>     Initialize a new database
 
 		FIND/LIST ACTIONS:
 
-		  -l --list-entry      <id>   List entry by id
-		  -p --path                   Show current database path
-		  -a --list-all               List all entries in current database
-		  -f --find            <term> Search entries
+		  -f --find            <term>     Search entries
+		  -x --export          <filename> Export all entries to <filename>
+		  -p --path                       Show current database path
+		  -a --list-all                   List all entries in current database
+		  -l --list-entry      <id>       List entry by id
 
 		HELP ACTIONS:
 
-		  -v --version                Show version information and exit
-		  -h --help                   Print this help message and exit
+		  -v --version                    Show version information and exit
+		  -h --help                       Print this help message and exit
 
 		FLAGS:
 
-		  -s --show                   Show passwords when listing entries
+		  -s --show                       Show passwords when listing entries
 
 
-	AUTHORS
-		Copyright (C) 2021 Anand B Pillai <anandpillai@alumni.iitm.ac.in>
-
+AUTHORS
+    Copyright (C) 2021 Anand B Pillai <anandpillai@alumni.iitm.ac.in>
 
 The command line flags are grouped into `Edit/Create`, `Find/List` and `Help` actions. The first group of actions allows you to work with password databases and perform create/edit as well as encrypt/decrypt actions. The second set of actions allows you to work with an active decrypted database and view/search/list entries.
 
@@ -386,6 +387,49 @@ To turn on visible passwords, modify the configuration setting (see below) or us
 
 	$ varuh -p
 	/home/anand/mypasswds
+
+Export
+======
+
+`Varuh` allows to export password databases to the following formats.
+
+1. `csv`
+2. `markdown`
+3. `html`
+4. `pdf`
+
+To export use the `-x` option. The type of file is automatically figured out from the filename extension.
+
+	$ varuh -x passwds.csv
+	!WARNING: Passwords are stored in plain-text!
+	Exported 14 records to passwds.csv .
+	Exported to passwds.csv.
+
+	$ varuh -x passwds.html
+	Exported to passwds.html.
+
+PDF export is supported if `pandoc` is installed along with the required `pdflatex` packages. The following command (on `Debian` and derived systems) should install the required dependencies.
+
+	$ sudo apt-get install pandoc texlive-latex-base texlive-fonts-recommended texlive-fonts-extra texlive-latex-extra texlive-xetex lmodern -y
+
+	$ varuh -x passwds.pdf
+	pdftk not found, PDF won't be secure!
+
+	File passwds.pdf created without password.
+	Exported to passwds.pdf.
+
+PDF files are exported in landscape mode with 150 dpi and 600 columns. To avoid the data not fitting into one page the fields `Notes` and `URL` are not exported.
+
+If `pdftk` is installed, the PDF files will be encrypted with an (optional) password.
+
+	$ sudo apt-get install pdftk -y
+
+	$ varuh -x passwds.pdf
+	Password: 
+	File passwds.pdf created without password.
+	Added password to passwds.pdf.
+	Exported to passwds.pdf.
+
 
 Configuration
 =============
