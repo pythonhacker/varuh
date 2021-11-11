@@ -3,6 +3,7 @@ package main
 
 import (
 	"bufio"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -386,4 +387,11 @@ func setShowPasswords() error {
 	//	fmt.Printf("Setting show passwords to true\n")
 	settingsRider.ShowPasswords = true
 	return nil
+}
+
+// Generate a random file name
+func randomFileName(folder string, suffix string) string {
+
+	_, name := generateRandomBytes(16)
+	return filepath.Join(folder, hex.EncodeToString(name)+suffix)
 }
