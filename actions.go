@@ -634,9 +634,25 @@ func decryptDatabase(dbPath string) (error, string) {
 func exportToFile(fileName string) error {
 
 	var err error
-	ext := filepath.Ext(fileName)
+	var maxKrypt bool
+	var defaultDB string
+	var passwd string
 
-	switch strings.ToLower(ext) {
+	maxKrypt, defaultDB = isActiveDatabaseEncryptedAndMaxKryptOn()
+
+	ext := strings.ToLower(filepath.Ext(fileName))
+
+	if ext == ".csv" || ext == ".md" || ext == ".html" || ext == ".pdf" {
+		// If max krypt on - then autodecrypt on call and auto encrypt after call
+		if maxKrypt {
+			err, passwd = decryptDatabase(defaultDB)
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	switch ext {
 	case ".csv":
 		err = exportToCsv(fileName)
 	case ".md":
@@ -657,7 +673,13 @@ func exportToFile(fileName string) error {
 			fmt.Printf("Exported to %s.\n", fileName)
 			// Chmod 600
 			os.Chmod(fileName, 0600)
-			return nil
+
+			// If max krypt on - then autodecrypt on call and auto encrypt after call
+			if maxKrypt {
+				err = encryptDatabase(defaultDB, &passwd)
+			}
+
+			return err
 		}
 	}
 
@@ -760,7 +782,7 @@ func exportToPDF(fileName string) error {
 	}
 
 	if pdfTkFound {
-		fmt.Printf("Password: ")
+		fmt.Printf("PDF Encryption Password: ")
 		err, passwd = readPassword()
 	}
 
