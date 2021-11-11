@@ -119,9 +119,9 @@ func initializeCommandLine() (map[string]interface{}, map[string]interface{}) {
 		{'R', "remove", "<id>", "Remove an entry", 0},
 		{'U', "use-db", "<path>", "Set as active database", 0},
 		{'f', "find", "<term>", "Search entries", 1},
-		//		{'r',"regex","<term>","Search entries using regular expressions", 1},
 		{'E', "edit", "<id>", "Edit entry by id", 0},
 		{'l', "list-entry", "<id>", "List entry by id", 1},
+		{'x', "export", "<filename>", "Export all entries to <filename>", 1},
 	}
 
 	for _, opt := range stringOptions {
