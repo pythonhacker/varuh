@@ -412,6 +412,8 @@ PDF export is supported if `pandoc` is installed along with the required `pdflat
 
 	$ sudo apt-get install pandoc texlive-latex-base texlive-fonts-recommended texlive-fonts-extra texlive-latex-extra texlive-xetex lmodern -y
 
+Then,
+
 	$ varuh -x passwds.pdf
 	pdftk not found, PDF won't be secure!
 
