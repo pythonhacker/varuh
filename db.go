@@ -9,6 +9,7 @@ import (
 	"gorm.io/gorm/logger"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -314,5 +315,42 @@ func iterateEntries(orderKey string, order string) (error, []Entry) {
 	}
 
 	return err, nil
+}
 
+// Export all entries to string array
+func entriesToStringArray(skipLongFields bool) (error, [][]string) {
+
+	var err error
+	var db *gorm.DB
+	var dataArray [][]string
+
+	err, db = openActiveDatabase()
+
+	if err == nil && db != nil {
+		var rows *sql.Rows
+		var count int64
+
+		db.Model(&Entry{}).Count(&count)
+
+		dataArray = make([][]string, 0, count)
+
+		rows, err = db.Model(&Entry{}).Order("id asc").Rows()
+		for rows.Next() {
+			var entry Entry
+			var entryData []string
+
+			db.ScanRows(rows, &entry)
+
+			if skipLongFields {
+				// Skip Notes
+				entryData = []string{strconv.Itoa(entry.ID), entry.Title, entry.User, entry.Url, entry.Password, entry.Timestamp.Format("2006-06-02 15:04:05")}
+			} else {
+				entryData = []string{strconv.Itoa(entry.ID), entry.Title, entry.User, entry.Url, entry.Password, entry.Notes, entry.Timestamp.Format("2006-06-02 15:04:05")}
+			}
+
+			dataArray = append(dataArray, entryData)
+		}
+	}
+
+	return err, dataArray
 }
