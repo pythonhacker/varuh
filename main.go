@@ -54,6 +54,7 @@ func performAction(optMap map[string]interface{}, optionMap map[string]interface
 		"remove":     removeCurrentEntry,
 		"copy":       copyCurrentEntry,
 		"use-db":     setActiveDatabasePath,
+		"export":     exportToFile,
 	}
 
 	stringActions2Map := map[string]actionFunc2{
