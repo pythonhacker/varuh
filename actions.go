@@ -780,7 +780,7 @@ func exportToPDF(fileName string) error {
 		if _, err = os.Stat(fileName); err == nil {
 			fmt.Printf("\nFile %s created without password.\n", fileName)
 
-			if pdfTkFound {
+			if pdfTkFound && len(passwd) > 0 {
 				tmpFile = randomFileName(".", ".pdf")
 				//				fmt.Printf("pdf file => %s\n", tmpFile)
 				args = []string{fileName, "output", tmpFile, "user_pw", passwd}
