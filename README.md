@@ -427,7 +427,7 @@ If `pdftk` is installed, the PDF files will be encrypted with an (optional) pass
 	$ sudo apt-get install pdftk -y
 
 	$ varuh -x passwds.pdf
-	Password: 
+	PDF Encryption Password: ******
 	File passwds.pdf created without password.
 	Added password to passwds.pdf.
 	Exported to passwds.pdf.
