@@ -343,7 +343,7 @@ func entriesToStringArray(skipLongFields bool) (error, [][]string) {
 
 			if skipLongFields {
 				// Skip Notes
-				entryData = []string{strconv.Itoa(entry.ID), entry.Title, entry.User, entry.Url, entry.Password, entry.Timestamp.Format("2006-06-02 15:04:05")}
+				entryData = []string{strconv.Itoa(entry.ID), entry.Title, entry.User, entry.Password, entry.Timestamp.Format("2006-06-02 15:04:05")}
 			} else {
 				entryData = []string{strconv.Itoa(entry.ID), entry.Title, entry.User, entry.Url, entry.Password, entry.Notes, entry.Timestamp.Format("2006-06-02 15:04:05")}
 			}
