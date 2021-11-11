@@ -152,7 +152,7 @@ The password database is created and is active now. You can start adding entries
 You can now list the entry with one of the list options.
 
 	$ varuh -l 1
-	=====================================================================
+	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	ID: 1
 	Title: My Website Login
 	User: mememe
@@ -160,7 +160,7 @@ You can now list the entry with one of the list options.
 	Password: ****************
 	Notes: Website uses Nginx auth
 	Modified: 2021-21-09 23:12:35
-	=====================================================================
+	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 For more on listing see the [Listing and Searching](#listing-and-searching) section below.
 
@@ -180,7 +180,7 @@ For more on listing see the [Listing and Searching](#listing-and-searching) sect
 	Updated entry.
 
 	$ varuh -l 1 -s
-	=====================================================================
+	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	ID: 1
 	Title: My Blog Login
 	User: meblog
@@ -188,7 +188,7 @@ For more on listing see the [Listing and Searching](#listing-and-searching) sect
 	Password: myblog123
 	Notes: Website uses Apache
 	Modified: 2021-21-09 23:15:29
-	=====================================================================
+	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 (*-s* turns on visible passwords)
 
@@ -260,7 +260,7 @@ Manually decrypt the database using `-d` option.
 Now the database is active again and you can see the listings.
 
 	$ varuh -l 2
-	=====================================================================
+	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	ID: 2
 	Title: My Blog Login
 	User: myblog.name
@@ -268,7 +268,7 @@ Now the database is active again and you can see the listings.
 	Password: *********
 	Notes: Website uses Apache
 	Modified: 2021-21-09 23:21:32
-	=====================================================================
+	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 ## Always on encryption
 
@@ -279,7 +279,7 @@ If the config param `encrypt_on` is set to `true` along with `auto_encrypt` (def
 	$ varuh -f my -s
 	Password: 
 	Decryption complete.
-	=====================================================================
+	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	ID: 2
 	Title: MY LOCAL BANK
 	User: banklogin
@@ -287,7 +287,7 @@ If the config param `encrypt_on` is set to `true` along with `auto_encrypt` (def
 	Password: bankpass123
 	Notes: 
 	Modified: 2021-21-18 12:44:10
-	=====================================================================
+	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 	Encryption complete.
 
@@ -301,7 +301,7 @@ Listing and Searching
 To list an entry using its id,
 
 	$ varuh -l 8
-	=====================================================================
+	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	ID: 8
 	Title: Google account
 	User: anandpillai@alumni.iitm.ac.in
@@ -309,14 +309,14 @@ To list an entry using its id,
 	Password: ***********
 	Notes: 
 	Modified: 2021-21-25 15:02:50
-	=====================================================================
+	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 ## To search an entry
 
 An entry can be searched on its title, username, URL or notes. Search is case-insensitive.
 
 	$ varuh -f google
-	=====================================================================
+	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	ID: 8
 	Title: Google account
 	User: anandpillai@alumni.iitm.ac.in
@@ -324,7 +324,7 @@ An entry can be searched on its title, username, URL or notes. Search is case-in
 	Password: **********
 	Notes: 
 	Modified: 2021-21-25 15:02:50
-	=====================================================================
+	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	ID: 9
 	Title: Google account
 	User: xyz@gmail.com
@@ -332,7 +332,7 @@ An entry can be searched on its title, username, URL or notes. Search is case-in
 	Password: ********
 	Notes: 
 	Modified: 2021-21-25 15:05:36
-	=====================================================================
+	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	ID: 10
 	Title: Google account
 	User: somethingaboutme@gmail.com
@@ -340,14 +340,14 @@ An entry can be searched on its title, username, URL or notes. Search is case-in
 	Password: ***********
 	Notes: 
 	Modified: 2021-21-25 15:09:51
-	=====================================================================
+	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 ## To list all entries
 
 To list all entries, use the option `-a`.
 
 	$ varuh -a
-	=====================================================================
+	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	ID: 1
 	Title: My Bank #1
 	User: myusername1
@@ -355,7 +355,7 @@ To list all entries, use the option `-a`.
 	Password: ***********
 	Notes: 
 	Modified: 2021-21-15 15:40:29
-	=====================================================================
+	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	ID: 2
 	Title: My Digital Locker #1
 	User: mylockerusername
@@ -363,7 +363,7 @@ To list all entries, use the option `-a`.
 	Password: **********
 	Notes: 
 	Modified: 2021-21-18 12:44:10
-	=====================================================================
+	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	ID: 3
 	Title: My Bank Login #2
 	User: mybankname2
@@ -371,7 +371,7 @@ To list all entries, use the option `-a`.
 	Password: **********
 	Notes: 
 	Modified: 2021-21-19 14:16:33
-	=====================================================================
+	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	...
 
 By default the listing is in ascending ID order. This can be changed in the configuration (see below).
