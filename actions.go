@@ -809,8 +809,8 @@ func exportToMarkdownLimited(fileName string) error {
 	var err error
 	var dataArray [][]string
 	var fh *os.File
-	var maxLengths [6]int
-	var headers []string = []string{" ID ", " Title ", " User ", " URL ", " Password ", " Modified "}
+	var maxLengths [5]int
+	var headers []string = []string{" ID ", " Title ", " User ", " Password ", " Modified "}
 
 	err, dataArray = entriesToStringArray(true)
 
