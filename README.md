@@ -113,8 +113,8 @@ Usage
 		  -s --show                       Show passwords when listing entries
 
 
-AUTHORS
-    Copyright (C) 2021 Anand B Pillai <anandpillai@alumni.iitm.ac.in>
+	AUTHORS
+		Copyright (C) 2021 Anand B Pillai <anandpillai@alumni.iitm.ac.in>
 
 The command line flags are grouped into `Edit/Create`, `Find/List` and `Help` actions. The first group of actions allows you to work with password databases and perform create/edit as well as encrypt/decrypt actions. The second set of actions allows you to work with an active decrypted database and view/search/list entries.
 
