@@ -7,7 +7,7 @@ Table of Contents
 
 * [About](#about)
 * [Why a rewrite](#why-a-rewrite)
-* [Building the code](#building-the-code)
+* [Install](#install)
 * [Usage](#usage)
 * [Encryption and Security](#encryption-and-security)
 * [Databases](#databases)
@@ -37,8 +37,18 @@ If you ask - `"Why a rewrite, why not contribute to the original repo ?"`, it is
 4. C is a venerable language but this is 2021 and I would rather program (and contribute) in a modern system programming language like `Go` or `Rust` which takes care of the memory handling tasks and leaves me to focus on the application code. Also I felt it is easier to get contributors to a project if it is in one of these languages as a lot of the Gen Z programmers don't know C. You will appreciate this more if you look at an open source repo written in C/C++ and find that 30% of all code are operations allocating/de-allocating memory.
 5. Support for more ciphers and crypto systems - `Varuh` already supports the `XChacha20-Poly1305` stream cipher and uses `Argon2` (Argon2i variant) instead of the older `pbkdf2` as the key derivation function. OpenPGP encryption is in the pipeline. 
 
-Building the code
-=================
+Install
+=======
+
+## Binary Release
+
+If you are on a Debian or Debian derived system, you can directly download and install the 0.1 version. Check out the [releases](https://github.com/pythonhacker/varuh/releases) page and use `dpkg` to install the binary.
+
+	$ sudo dpkg -i varuh-${VERSION}_amd64.deb
+
+The binary will be installed in `/usr/bin` folder.
+
+## Building from Source
 
 You need the [Go compiler](https://golang.org/dl/) to build the code. (This can be usually installed on \*nix machines by the native package managers like *apt-get*).
 
