@@ -15,7 +15,7 @@ Table of Contents
 * [Configuration](#configuration)
 * [License](#license)
 * [Feedback](#feedback)
-* [Thanks](#thanks)
+
 
 About
 =====
@@ -482,8 +482,3 @@ Feedback
 ========
 
 Please send your valuable feedback and suggestions to my email available in the program's usage listing.
-
-Thanks
-======
-
-Thanks to [Niko Rosvall](https://www.nrosvall.name/) for writing the excellent ylva and inspiring me to write this program. 
