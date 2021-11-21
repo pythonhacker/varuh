@@ -6,7 +6,6 @@ Table of Contents
 =================
 
 * [About](#about)
-* [Why a rewrite](#why-a-rewrite)
 * [Install](#install)
 * [Usage](#usage)
 * [Encryption and Security](#encryption-and-security)
@@ -26,16 +25,6 @@ About
 The name [Varuh](https://www.wordsense.eu/varuh/#Slovene) means *guardian* or *protector* in the Slovene language.
 
 Varuh is inspired by [ylva](https://github.com/nrosvall/ylva) but it is full re-implementation - with some major changes in the key derivation functions and ciphers. It is written in `Go` and has been tested with Go versions 1.16 and 1.17 on Debian Linux (Antix). It should work on other versions of Linux and *BSD as well.
-
-Why a rewrite
-=============
-If you ask - `"Why a rewrite, why not contribute to the original repo ?"`, it is a valid question. These are the some of the reasons.
-
-1. I have been a regular user of `ylva` for a while but found its usage of flags confusing. For auto-encryption one needs to keep passing `--auto-encrypt` on the command line which I always tend to forget. The flag `--force` which is an override is also a bit confusing. The fact that to see passwords I have to type `--show-passwords` was another issue (no short option). I also felt these are better handled in configuration file than as flags on the command line.
-2. `ylva` does not have a proper configuration file that keeps with the freedesktop specifications.
-3. The fact that ylva keeps decrypted databases on disk when in regular use without an automatic {decrypt-encrypt}-on-use option was a problem. If I encrypt the database, I have to keep decrypting it to use the program which is a problem. Hence the `encrypt_on` flag was added to `varuh` (see below).
-4. C is a venerable language but this is 2021 and I would rather program (and contribute) in a modern system programming language like `Go` or `Rust` which takes care of the memory handling tasks and leaves me to focus on the application code. Also I felt it is easier to get contributors to a project if it is in one of these languages as a lot of the Gen Z programmers don't know C. You will appreciate this more if you look at an open source repo written in C/C++ and find that 30% of all code are operations allocating/de-allocating memory.
-5. Support for more ciphers and crypto systems - `Varuh` already supports the `XChacha20-Poly1305` stream cipher and uses `Argon2` (Argon2i variant) instead of the older `pbkdf2` as the key derivation function. OpenPGP encryption is in the pipeline. 
 
 Install
 =======
