@@ -38,21 +38,21 @@ func performAction(optMap map[string]interface{}, optionMap map[string]interface
 	var flag bool
 
 	boolActionsMap := map[string]voidFunc{
-		"add":      addNewEntry,
+		"add":      WrapperMaxKryptVoidFunc(addNewEntry),
 		"version":  printVersionInfo,
 		"help":     printUsage,
 		"path":     showActiveDatabasePath,
-		"list-all": listAllEntries,
+		"list-all": WrapperMaxKryptVoidFunc(listAllEntries),
 		"encrypt":  encryptActiveDatabase,
 	}
 
 	stringActionsMap := map[string]actionFunc{
-		"edit":       editCurrentEntry,
+		"edit":       WrapperMaxKryptStringFunc(editCurrentEntry),
 		"init":       initNewDatabase,
-		"list-entry": listCurrentEntry,
-		"find":       findCurrentEntry,
-		"remove":     removeCurrentEntry,
-		"copy":       copyCurrentEntry,
+		"list-entry": WrapperMaxKryptStringFunc(listCurrentEntry),
+		"find":       WrapperMaxKryptStringFunc(findCurrentEntry),
+		"remove":     WrapperMaxKryptStringFunc(removeCurrentEntry),
+		"copy":       WrapperMaxKryptStringFunc(copyCurrentEntry),
 		"use-db":     setActiveDatabasePath,
 		"export":     exportToFile,
 	}
