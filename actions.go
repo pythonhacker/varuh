@@ -8,10 +8,96 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"os/signal"
 	"path/filepath"
 	"strconv"
 	"strings"
+	"syscall"
 )
+
+// Wrappers (closures) for functions accepting strings as input for in/out encryption
+func WrapperMaxKryptStringFunc(fn actionFunc) actionFunc {
+
+	return func(inputStr string) error {
+		var maxKrypt bool
+		var defaultDB string
+		var encPasswd string
+		var err error
+
+		maxKrypt, defaultDB = isActiveDatabaseEncryptedAndMaxKryptOn()
+
+		// If max krypt on - then autodecrypt on call and auto encrypt after call
+		if maxKrypt {
+			err, encPasswd = decryptDatabase(defaultDB)
+			if err != nil {
+				return err
+			}
+
+			sigChan := make(chan os.Signal, 1)
+			signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
+
+			go func() {
+				sig := <-sigChan
+				fmt.Println("Received signal", sig)
+				// Reencrypt
+				encryptDatabase(defaultDB, &encPasswd)
+				os.Exit(1)
+			}()
+		}
+
+		err = fn(inputStr)
+
+		// If max krypt on - then autodecrypt on call and auto encrypt after call
+		if maxKrypt {
+			encryptDatabase(defaultDB, &encPasswd)
+		}
+
+		return err
+	}
+
+}
+
+// Wrappers (closures) for functions accepting no input for in/out encryption
+func WrapperMaxKryptVoidFunc(fn voidFunc) voidFunc {
+
+	return func() error {
+		var maxKrypt bool
+		var defaultDB string
+		var encPasswd string
+		var err error
+
+		maxKrypt, defaultDB = isActiveDatabaseEncryptedAndMaxKryptOn()
+
+		// If max krypt on - then autodecrypt on call and auto encrypt after call
+		if maxKrypt {
+			err, encPasswd = decryptDatabase(defaultDB)
+			if err != nil {
+				return err
+			}
+
+			sigChan := make(chan os.Signal, 1)
+			signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
+
+			go func() {
+				sig := <-sigChan
+				fmt.Println("Received signal", sig)
+				// Reencrypt
+				encryptDatabase(defaultDB, &encPasswd)
+				os.Exit(1)
+			}()
+		}
+
+		err = fn()
+
+		// If max krypt on - then autodecrypt on call and auto encrypt after call
+		if maxKrypt {
+			encryptDatabase(defaultDB, &encPasswd)
+		}
+
+		return err
+	}
+
+}
 
 // Print the current active database path
 func showActiveDatabasePath() error {
@@ -133,19 +219,6 @@ func addNewEntry() error {
 	var notes string
 	var passwd string
 	var err error
-	var maxKrypt bool
-	var encPasswd string
-	var defaultDB string
-
-	maxKrypt, defaultDB = isActiveDatabaseEncryptedAndMaxKryptOn()
-
-	// If max krypt on - then autodecrypt on call and auto encrypt after call
-	if maxKrypt {
-		err, encPasswd = decryptDatabase(defaultDB)
-		if err != nil {
-			return err
-		}
-	}
 
 	if err = checkActiveDatabase(); err != nil {
 		return err
@@ -194,11 +267,6 @@ func addNewEntry() error {
 		fmt.Printf("Error adding entry - \"%s\"\n", err.Error())
 	}
 
-	// If max krypt on - then autodecrypt on call and auto encrypt after call
-	if maxKrypt {
-		err = encryptDatabase(defaultDB, &encPasswd)
-	}
-
 	return err
 }
 
@@ -212,20 +280,7 @@ func editCurrentEntry(idString string) error {
 	var passwd string
 	var err error
 	var entry *Entry
-	var maxKrypt bool
-	var defaultDB string
-	var encPasswd string
 	var id int
-
-	maxKrypt, defaultDB = isActiveDatabaseEncryptedAndMaxKryptOn()
-
-	// If max krypt on - then autodecrypt on call and auto encrypt after call
-	if maxKrypt {
-		err, encPasswd = decryptDatabase(defaultDB)
-		if err != nil {
-			return err
-		}
-	}
 
 	if err = checkActiveDatabase(); err != nil {
 		return err
@@ -273,11 +328,6 @@ func editCurrentEntry(idString string) error {
 		fmt.Printf("Error updating entry - \"%s\"\n", err.Error())
 	}
 
-	// If max krypt on - then autodecrypt on call and auto encrypt after call
-	if maxKrypt {
-		err = encryptDatabase(defaultDB, &encPasswd)
-	}
-
 	return err
 }
 
@@ -287,19 +337,6 @@ func listCurrentEntry(idString string) error {
 	var id int
 	var err error
 	var entry *Entry
-	var maxKrypt bool
-	var defaultDB string
-	var passwd string
-
-	maxKrypt, defaultDB = isActiveDatabaseEncryptedAndMaxKryptOn()
-
-	// If max krypt on - then autodecrypt on call and auto encrypt after call
-	if maxKrypt {
-		err, passwd = decryptDatabase(defaultDB)
-		if err != nil {
-			return err
-		}
-	}
 
 	if err = checkActiveDatabase(); err != nil {
 		return err
@@ -315,11 +352,6 @@ func listCurrentEntry(idString string) error {
 	}
 
 	err = printEntry(entry, true)
-
-	// If max krypt on - then autodecrypt on call and auto encrypt after call
-	if maxKrypt {
-		err = encryptDatabase(defaultDB, &passwd)
-	}
 
 	return err
 }
@@ -383,19 +415,6 @@ func findCurrentEntry(term string) error {
 
 	var err error
 	var entries []Entry
-	var maxKrypt bool
-	var defaultDB string
-	var passwd string
-
-	maxKrypt, defaultDB = isActiveDatabaseEncryptedAndMaxKryptOn()
-
-	// If max krypt on - then autodecrypt on call and auto encrypt after call
-	if maxKrypt {
-		err, passwd = decryptDatabase(defaultDB)
-		if err != nil {
-			return err
-		}
-	}
 
 	if err = checkActiveDatabase(); err != nil {
 		return err
@@ -419,11 +438,6 @@ func findCurrentEntry(term string) error {
 		}
 	}
 
-	// If max krypt on - then autodecrypt on call and auto encrypt after call
-	if maxKrypt {
-		err = encryptDatabase(defaultDB, &passwd)
-	}
-
 	return err
 }
 
@@ -433,19 +447,6 @@ func removeCurrentEntry(idString string) error {
 	var err error
 	var entry *Entry
 	var id int
-	var maxKrypt bool
-	var defaultDB string
-	var passwd string
-
-	maxKrypt, defaultDB = isActiveDatabaseEncryptedAndMaxKryptOn()
-
-	// If max krypt on - then autodecrypt on call and auto encrypt after call
-	if maxKrypt {
-		err, passwd = decryptDatabase(defaultDB)
-		if err != nil {
-			return err
-		}
-	}
 
 	if err = checkActiveDatabase(); err != nil {
 		return err
@@ -465,11 +466,6 @@ func removeCurrentEntry(idString string) error {
 		fmt.Printf("Entry with id %d was removed from the database\n", id)
 	}
 
-	// If max krypt on - then autodecrypt on call and auto encrypt after call
-	if maxKrypt {
-		err = encryptDatabase(defaultDB, &passwd)
-	}
-
 	return err
 }
 
@@ -479,19 +475,6 @@ func copyCurrentEntry(idString string) error {
 	var err error
 	var entry *Entry
 	var id int
-	var maxKrypt bool
-	var defaultDB string
-	var passwd string
-
-	maxKrypt, defaultDB = isActiveDatabaseEncryptedAndMaxKryptOn()
-
-	// If max krypt on - then autodecrypt on call and auto encrypt after call
-	if maxKrypt {
-		err, passwd = decryptDatabase(defaultDB)
-		if err != nil {
-			return err
-		}
-	}
 
 	if err = checkActiveDatabase(); err != nil {
 		return err
@@ -509,11 +492,6 @@ func copyCurrentEntry(idString string) error {
 	if err != nil {
 		fmt.Printf("Error cloning entry: \"%s\"\n", err.Error())
 		return err
-	}
-
-	// If max krypt on - then autodecrypt on call and auto encrypt after call
-	if maxKrypt {
-		err = encryptDatabase(defaultDB, &passwd)
 	}
 
 	return err
@@ -638,9 +616,9 @@ func exportToFile(fileName string) error {
 	var defaultDB string
 	var passwd string
 
-	maxKrypt, defaultDB = isActiveDatabaseEncryptedAndMaxKryptOn()
-
 	ext := strings.ToLower(filepath.Ext(fileName))
+
+	maxKrypt, defaultDB = isActiveDatabaseEncryptedAndMaxKryptOn()
 
 	if ext == ".csv" || ext == ".md" || ext == ".html" || ext == ".pdf" {
 		// If max krypt on - then autodecrypt on call and auto encrypt after call
@@ -662,6 +640,7 @@ func exportToFile(fileName string) error {
 	case ".pdf":
 		err = exportToPDF(fileName)
 	default:
+		fmt.Printf("Error - extn %s not supported\n", ext)
 		return fmt.Errorf("format %s not supported", ext)
 	}
 
