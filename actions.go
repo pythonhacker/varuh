@@ -432,9 +432,12 @@ func findCurrentEntry(term string) error {
 		return err
 	} else {
 		var delim bool
+		var pcopy bool
 
 		if len(entries) == 1 {
 			delim = true
+			pcopy = true
+			// Single entry means copy password can be enabled
 		} else {
 			_, settings := getOrCreateLocalConfig(APP)
 			fmt.Printf("%s", getColor(strings.ToLower(settings.Color)))
@@ -443,6 +446,11 @@ func findCurrentEntry(term string) error {
 
 		for _, entry := range entries {
 			printEntry(&entry, delim)
+		}
+
+		if pcopy {
+			// Single entry
+			copyPasswordToClipboard(entries[0].Password)
 		}
 	}
 
