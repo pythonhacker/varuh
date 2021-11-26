@@ -115,7 +115,7 @@ func initializeCommandLine() (map[string]interface{}, map[string]interface{}) {
 	stringOptions := []Option{
 		{'I', "init", "<path>", "Initialize a new database", 0},
 		{'d', "decrypt", "<path>", "Decrypt password database", 0},
-		{'C', "copy", "<id>", "Copy an entry", 0},
+		{'C', "clone", "<id>", "Clone an entry", 0},
 		{'R', "remove", "<id>", "Remove an entry", 0},
 		{'U', "use-db", "<path>", "Set as active database", 0},
 		{'f', "find", "<term>", "Search entries", 1},
@@ -135,6 +135,7 @@ func initializeCommandLine() (map[string]interface{}, map[string]interface{}) {
 		{'p', "path", "", "Show current database path", 1},
 		{'a', "list-all", "", "List all entries in current database", 1},
 		{'s', "show", "", "Show passwords when listing entries", 3},
+		{'c', "copy", "", "Copy password to clipboard", 3},
 		{'v', "version", "", "Show version information and exit", 2},
 		{'h', "help", "", "Print this help message and exit", 2},
 	}
