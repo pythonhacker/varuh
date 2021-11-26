@@ -52,7 +52,7 @@ func performAction(optMap map[string]interface{}, optionMap map[string]interface
 		"list-entry": WrapperMaxKryptStringFunc(listCurrentEntry),
 		"find":       WrapperMaxKryptStringFunc(findCurrentEntry),
 		"remove":     WrapperMaxKryptStringFunc(removeCurrentEntry),
-		"copy":       WrapperMaxKryptStringFunc(copyCurrentEntry),
+		"clone":      WrapperMaxKryptStringFunc(copyCurrentEntry),
 		"use-db":     setActiveDatabasePath,
 		"export":     exportToFile,
 	}
@@ -63,6 +63,7 @@ func performAction(optMap map[string]interface{}, optionMap map[string]interface
 
 	flagsActionsMap := map[string]voidFunc{
 		"show": setShowPasswords,
+		"copy": setCopyPasswordToClipboard,
 	}
 
 	// Flag actions - always done
