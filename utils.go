@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/atotto/clipboard"
 	"github.com/kirsle/configdir"
 	"golang.org/x/crypto/ssh/terminal"
 	"io/fs"
@@ -20,6 +21,7 @@ const DELIMSIZE int = 69
 // Over-ride settings via cmd line
 type SettingsOverride struct {
 	ShowPasswords bool
+	CopyPassword  bool
 }
 
 // Settings structure for local config
@@ -387,6 +389,16 @@ func setShowPasswords() error {
 	//	fmt.Printf("Setting show passwords to true\n")
 	settingsRider.ShowPasswords = true
 	return nil
+}
+
+// Copy the password to clipboard - only for single listings or single search results
+func setCopyPasswordToClipboard() error {
+	settingsRider.CopyPassword = true
+	return nil
+}
+
+func copyPasswordToClipboard(passwd string) {
+	clipboard.WriteAll(passwd)
 }
 
 // Generate a random file name
