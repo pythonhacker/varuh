@@ -353,6 +353,11 @@ func listCurrentEntry(idString string) error {
 
 	err = printEntry(entry, true)
 
+	if err == nil && settingsRider.CopyPassword {
+		//		fmt.Printf("Copying password " + entry.Password + " to clipboard\n")
+		copyPasswordToClipboard(entry.Password)
+	}
+
 	return err
 }
 
