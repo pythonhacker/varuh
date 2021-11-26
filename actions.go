@@ -390,7 +390,8 @@ func listAllEntries() error {
 
 	if err == nil {
 		if len(entries) > 0 {
-			fmt.Println("=====================================================================")
+			fmt.Printf("%s", getColor(strings.ToLower(settings.Color)))
+			printDelim(settings.Delim, settings.Color)
 			for _, entry := range entries {
 				printEntry(&entry, false)
 			}
@@ -430,7 +431,9 @@ func findCurrentEntry(term string) error {
 		if len(entries) == 1 {
 			delim = true
 		} else {
-			fmt.Println("=====================================================================")
+			_, settings := getOrCreateLocalConfig(APP)
+			fmt.Printf("%s", getColor(strings.ToLower(settings.Color)))
+			printDelim(settings.Delim, settings.Color)
 		}
 
 		for _, entry := range entries {
