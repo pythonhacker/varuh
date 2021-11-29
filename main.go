@@ -8,7 +8,7 @@ import (
 	"os"
 )
 
-const VERSION = 0.1
+const VERSION = 0.2
 const APP = "varuh"
 const AUTHOR_EMAIL = "Anand B Pillai <anandpillai@alumni.iitm.ac.in>"
 
