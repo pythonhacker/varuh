@@ -1,0 +1,5 @@
+Package: varuh
+Version: VERSION
+Architecture: amd64
+Maintainer: Anand B Pillai <anandpillai@alumni.iitm.ac.in>
+Description: Password manager for the command line for Unix like operating systems
