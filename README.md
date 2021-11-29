@@ -75,36 +75,37 @@ Usage
 
 		EDIT/CREATE ACTIONS:
 
-		  -E --edit            <id>       Edit entry by id
-		  -e --encrypt                    Encrypt the current database
-		  -U --use-db          <path>     Set as active database
-		  -d --decrypt         <path>     Decrypt password database
 		  -C --clone           <id>       Clone an entry
-		  -R --remove          <id>       Remove an entry
+		  -U --use-db          <path>     Set as active database
+		  -E --edit            <id>       Edit entry by id
 		  -A --add                        Add a new entry
 		  -I --init            <path>     Initialize a new database
+		  -d --decrypt         <path>     Decrypt password database
+		  -e --encrypt                    Encrypt the current database
+		  -R --remove          <id>       Remove an entry
 
 		FIND/LIST ACTIONS:
 
-		  -f --find            <term>     Search entries
 		  -x --export          <filename> Export all entries to <filename>
-		  -p --path                       Show current database path
 		  -a --list-all                   List all entries in current database
+		  -p --path                       Show current database path
+		  -f --find            <term>     Search entries
 		  -l --list-entry      <id>       List entry by id
 
 		HELP ACTIONS:
 
-		  -v --version                    Show version information and exit
 		  -h --help                       Print this help message and exit
+		  -v --version                    Show version information and exit
 
 		FLAGS:
 
-          -c --copy                       Copy password to clipboard
 		  -s --show                       Show passwords when listing entries
+		  -c --copy                       Copy password to clipboard
 
 
 	AUTHORS
 		Copyright (C) 2021 Anand B Pillai <anandpillai@alumni.iitm.ac.in>
+
 
 The command line flags are grouped into `Edit/Create`, `Find/List` and `Help` actions. The first group of actions allows you to work with password databases and perform create/edit as well as encrypt/decrypt actions. The second set of actions allows you to work with an active decrypted database and view/search/list entries.
 
