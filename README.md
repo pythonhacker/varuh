@@ -31,7 +31,7 @@ Install
 
 ## Binary Release
 
-If you are on a Debian or Debian derived system, you can directly download and install the 0.1 version. Check out the [releases](https://github.com/pythonhacker/varuh/releases) page and use `dpkg` to install the binary.
+If you are on a Debian or Debian derived system, you can directly download and install the latest version. Check out the [releases](https://github.com/pythonhacker/varuh/releases) page and use `dpkg` to install the binary.
 
 	$ sudo dpkg -i varuh-${VERSION}_amd64.deb
 
