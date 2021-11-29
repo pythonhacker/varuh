@@ -448,7 +448,7 @@ func findCurrentEntry(term string) error {
 			printEntry(&entry, delim)
 		}
 
-		if pcopy {
+		if pcopy && settingsRider.CopyPassword {
 			// Single entry
 			copyPasswordToClipboard(entries[0].Password)
 		}
