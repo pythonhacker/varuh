@@ -79,7 +79,7 @@ Usage
 		  -e --encrypt                    Encrypt the current database
 		  -U --use-db          <path>     Set as active database
 		  -d --decrypt         <path>     Decrypt password database
-		  -C --copy            <id>       Copy an entry
+		  -C --clone           <id>       Clone an entry
 		  -R --remove          <id>       Remove an entry
 		  -A --add                        Add a new entry
 		  -I --init            <path>     Initialize a new database
@@ -99,6 +99,7 @@ Usage
 
 		FLAGS:
 
+          -c --copy                       Copy password to clipboard
 		  -s --show                       Show passwords when listing entries
 
 
@@ -194,9 +195,9 @@ For more on listing see the [Listing and Searching](#listing-and-searching) sect
 
 (*-s* turns on visible passwords)
 
-## Copy an entry
+## Clone an entry
 
-To copy or clone an entry,
+To clone (copy) an entry,
 
 	$ $ varuh -C 1
 	Cloned to new entry, id: 2
@@ -381,6 +382,12 @@ By default the listing is in ascending ID order. This can be changed in the conf
 ## Turn on visible passwords
 
 To turn on visible passwords, modify the configuration setting (see below) or use the `-s` flag.
+
+## Copy password to clipboard
+
+To copy a password to clipboard, use the `-c` or `--copy` flag. This works *only if* the result for a listing is single. For example this will work when listing an entry by id or when a search results in a single hit. It *will not work* when listing all entries or when a search results in multiple hits.
+
+This is useful to copy the password to a password input field in the browser for example.
 
 ## See current active database path
 
