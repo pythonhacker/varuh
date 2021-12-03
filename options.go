@@ -33,6 +33,10 @@ OPTIONS
 
 %s
 
+    MISC ACTIONS:
+
+%s
+
     HELP ACTIONS:
 
 %s
@@ -53,6 +57,7 @@ func usageString(optMap map[string]interface{}) {
 	var findActions []string
 	var helpActions []string
 	var flagActions []string
+	var miscActions []string
 
 	var maxLen1 int
 	var maxLen2 int
@@ -95,12 +100,18 @@ func usageString(optMap map[string]interface{}) {
 			helpActions = append(helpActions, fmt.Sprintf(usageTemplate, "-"+string(option.Short), option.Long, option.Path, option.Help))
 		case 3:
 			flagActions = append(flagActions, fmt.Sprintf(usageTemplate, "-"+string(option.Short), option.Long, option.Path, option.Help))
+		case 4:
+			miscActions = append(miscActions, fmt.Sprintf(usageTemplate, "-"+string(option.Short), option.Long, option.Path, option.Help))
 		}
 	}
 
-	fmt.Println(fmt.Sprintf(HELP_STRING, APP, strings.Join(editActions, "\n"),
-		strings.Join(findActions, "\n"), strings.Join(helpActions, "\n"),
-		strings.Join(flagActions, "\n"), AUTHOR_EMAIL))
+	fmt.Println(fmt.Sprintf(HELP_STRING, APP,
+		strings.Join(editActions, "\n"),
+		strings.Join(findActions, "\n"),
+		strings.Join(miscActions, "\n"),
+		strings.Join(helpActions, "\n"),
+		strings.Join(flagActions, "\n"),
+		AUTHOR_EMAIL))
 
 }
 
@@ -122,6 +133,7 @@ func initializeCommandLine() (map[string]interface{}, map[string]interface{}) {
 		{'E', "edit", "<id>", "Edit entry by id", 0},
 		{'l', "list-entry", "<id>", "List entry by id", 1},
 		{'x', "export", "<filename>", "Export all entries to <filename>", 1},
+		{'g', "genpass", "<length>", "Generate password of given length", 4},				
 	}
 
 	for _, opt := range stringOptions {
