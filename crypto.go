@@ -438,7 +438,7 @@ func decryptFileXChachaPoly(encDbPath string, password string) error {
 func generateRandomPassword(length int) (error, string) {
 
 	var data []byte
-	const source = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#!+$@~"
+	const source = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789?)(/%#!?)="
 
 	data = make([]byte, length)
 
