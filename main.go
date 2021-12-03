@@ -4,13 +4,14 @@ package main
 
 import (
 	"fmt"
+	"strconv"
 	getopt "github.com/pborman/getopt/v2"
 	"os"
 )
 
 const VERSION = 0.2
 const APP = "varuh"
-const AUTHOR_EMAIL = "Anand B Pillai <anandpillai@alumni.iitm.ac.in>"
+const AUTHOR_EMAIL = "Anand B Pillai <abpillai@gmail.com>"
 
 type actionFunc func(string) error
 type actionFunc2 func(string) (error, string)
@@ -30,6 +31,30 @@ func printVersionInfo() error {
 	os.Exit(0)
 
 	return nil
+}
+
+// Command-line wrapper to generateRandomPassword
+func generatePassword(length string) (error, string) {
+	var iLength int
+	var err error
+	var passwd string
+	
+	iLength, _ = strconv.Atoi(length)
+	err, passwd = generateRandomPassword(iLength)
+
+	if err != nil {
+		fmt.Printf("Error generating password - \"%s\"\n", err.Error())
+		return err, ""
+	}
+
+	fmt.Println(passwd)
+
+	if settingsRider.CopyPassword {
+		copyPasswordToClipboard(passwd)
+		fmt.Println("Password copied to clipboard")
+	}
+	
+	return nil, passwd
 }
 
 // Perform an action by using the command line options map
@@ -59,6 +84,7 @@ func performAction(optMap map[string]interface{}, optionMap map[string]interface
 
 	stringActions2Map := map[string]actionFunc2{
 		"decrypt": decryptDatabase,
+		"genpass": generatePassword,		
 	}
 
 	flagsActionsMap := map[string]voidFunc{
@@ -70,7 +96,6 @@ func performAction(optMap map[string]interface{}, optionMap map[string]interface
 	for key, mappedFunc := range flagsActionsMap {
 		if *optMap[key].(*bool) {
 			mappedFunc()
-			break
 		}
 	}
 
