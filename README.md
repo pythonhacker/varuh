@@ -11,6 +11,7 @@ Table of Contents
 * [Encryption and Security](#encryption-and-security)
 * [Databases](#databases)
 * [Listing and Searching](#listing-and-searching)
+* [Misc](#misc)
 * [Export](#export)
 * [Configuration](#configuration)
 * [License](#license)
@@ -67,6 +68,7 @@ Usage
 
 	$ varuh -h
 
+
 	SYNOPSIS
 
 		varuh [options] [flags]
@@ -75,22 +77,26 @@ Usage
 
 		EDIT/CREATE ACTIONS:
 
+		  -A --add                        Add a new entry
+		  -I --init            <path>     Initialize a new database
+		  -R --remove          <id>       Remove an entry
+		  -e --encrypt                    Encrypt the current database
+		  -d --decrypt         <path>     Decrypt password database
 		  -C --clone           <id>       Clone an entry
 		  -U --use-db          <path>     Set as active database
 		  -E --edit            <id>       Edit entry by id
-		  -A --add                        Add a new entry
-		  -I --init            <path>     Initialize a new database
-		  -d --decrypt         <path>     Decrypt password database
-		  -e --encrypt                    Encrypt the current database
-		  -R --remove          <id>       Remove an entry
 
 		FIND/LIST ACTIONS:
 
-		  -x --export          <filename> Export all entries to <filename>
-		  -a --list-all                   List all entries in current database
-		  -p --path                       Show current database path
 		  -f --find            <term>     Search entries
 		  -l --list-entry      <id>       List entry by id
+		  -x --export          <filename> Export all entries to <filename>
+		  -p --path                       Show current database path
+		  -a --list-all                   List all entries in current database
+
+		MISC ACTIONS:
+
+		  -g --genpass         <length>   Generate password of given length
 
 		HELP ACTIONS:
 
@@ -104,10 +110,10 @@ Usage
 
 
 	AUTHORS
-		Copyright (C) 2021 Anand B Pillai <anandpillai@alumni.iitm.ac.in>
+		Copyright (C) 2021 Anand B Pillai <abpillai@gmail.com>
 
 
-The command line flags are grouped into `Edit/Create`, `Find/List` and `Help` actions. The first group of actions allows you to work with password databases and perform create/edit as well as encrypt/decrypt actions. The second set of actions allows you to work with an active decrypted database and view/search/list entries.
+The command line flags are grouped into `Edit/Create`, `Find/List`, `Misc` and `Help` actions. The first group of actions allows you to work with password databases and perform create/edit as well as encrypt/decrypt actions. The second set of actions allows you to work with an active decrypted database and view/search/list entries.
 
 Encryption and Security
 =======================
@@ -438,6 +444,22 @@ If `pdftk` is installed, the PDF files will be encrypted with an (optional) pass
 	File passwds.pdf created without password.
 	Added password to passwds.pdf.
 	Exported to passwds.pdf.
+
+Misc
+====
+
+The following miscellaneous actions are supported.
+
+Generate a secure password of given length.
+
+	$ varuh -g
+	7nhga7tkk9LNafz
+
+	By passing the `-c` option, the password is also copied to the clipboard.
+
+	$ varuh -g 15 -c 
+	yeXlLlk??IOsvL6
+	Password copied to clipboard
 
 
 Configuration
