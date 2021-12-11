@@ -5,7 +5,8 @@ package main
 import (
 	"fmt"
 	"strconv"
-	getopt "github.com/pborman/getopt/v2"
+	//	getopt "github.com/pborman/getopt/v2"
+	"github.com/akamensky/argparse"	
 	"os"
 )
 
@@ -17,9 +18,17 @@ type actionFunc func(string) error
 type actionFunc2 func(string) (error, string)
 type voidFunc func() error
 
+// Structure to keep the options data
+type CmdOption struct {
+	Short string
+	Long  string
+	Help  string
+	Default string
+}
+
 // Print the program's usage string and exit
 func printUsage() error {
-	getopt.Usage()
+	//	getopt.Usage()
 	os.Exit(0)
 
 	return nil
@@ -57,8 +66,8 @@ func generatePassword(length string) (error, string) {
 	return nil, passwd
 }
 
-// Perform an action by using the command line options map
-func performAction(optMap map[string]interface{}, optionMap map[string]interface{}) {
+// // Perform an action by using the command line options map
+func performAction(optMap map[string]interface{}) {
 
 	var flag bool
 
@@ -99,6 +108,7 @@ func performAction(optMap map[string]interface{}, optionMap map[string]interface
 		}
 	}
 
+	
 	// One of bool or string actions
 	for key, mappedFunc := range boolActionsMap {
 		if *optMap[key].(*bool) {
@@ -113,9 +123,7 @@ func performAction(optMap map[string]interface{}, optionMap map[string]interface
 	}
 
 	for key, mappedFunc := range stringActionsMap {
-		option := optionMap[key].(Option)
-
-		if *optMap[key].(*string) != option.Path {
+		if *optMap[key].(*string) != "" {
 
 			var val = *(optMap[key].(*string))
 			mappedFunc(val)
@@ -129,10 +137,7 @@ func performAction(optMap map[string]interface{}, optionMap map[string]interface
 	}
 
 	for key, mappedFunc := range stringActions2Map {
-		option := optionMap[key].(Option)
-
-		if *optMap[key].(*string) != option.Path {
-
+		if *optMap[key].(*string) != "" {
 			var val = *(optMap[key].(*string))
 			mappedFunc(val)
 			break
@@ -141,19 +146,66 @@ func performAction(optMap map[string]interface{}, optionMap map[string]interface
 
 }
 
+func initializeCmdLine(parser *argparse.Parser) map[string]interface{} {
+	var optMap map[string]interface{}
+
+	optMap = make(map[string]interface{})
+
+	boolOptions := []CmdOption{
+		{"e", "encrypt", "Encrypt the current database", ""},
+		{"A", "add", "Add a new entry", ""},
+		{"p", "path", "Show current database path", ""},
+		{"a", "list-all", "List all entries in current database", ""},
+		{"s", "show", "Show passwords when listing entries", ""},
+		{"c", "copy", "Copy password to clipboard", ""},
+		{"v", "version", "Show version information and exit", ""},
+		{"h", "help", "Print this help message and exit", ""},
+	}
+
+	for _, opt := range boolOptions {
+		optMap[opt.Long] = parser.Flag(string(opt.Short), opt.Long, &argparse.Options{Help: opt.Help})
+	}	
+
+	stringOptions := []CmdOption{
+		{"I", "init", "Initialize a new database", ""},
+		{"d", "decrypt", "Decrypt password database", ""},
+		{"C", "clone", "Clone an entry", ""},
+		{"R", "remove", "Remove an entry", ""},
+		{"U", "use-db", "Set as active database", ""},
+		{"f", "find", "Search entries", ""},
+		{"E", "edit", "Edit entry by id", ""},
+		{"l", "list-entry", "List entry by id", ""},
+		{"x", "export", "Export all entries to <filename>", ""},
+		{"g", "genpass", "Generate password of given length", "12"},				
+	}
+
+	for _, opt := range stringOptions {
+		optMap[opt.Long] = parser.String(opt.Short, opt.Long, &argparse.Options{Help: opt.Help, Default: opt.Default})
+	}
+	
+	return optMap
+}
+
 // Main routine
 func main() {
 	if len(os.Args) == 1 {
 		os.Args = append(os.Args, "-h")
 	}
 
-	optMap, optionMap := initializeCommandLine()
-	getopt.SetUsage(func() {
-		usageString(optionMap)
-	})
+	parser := argparse.NewParser("varuh", "Password manager for the command line for Unix like operating systems")
+		
+	//	optMap, optionMap := initializeCommandLine(parser)
 
-	getopt.Parse()
+	//	versionFlag := parser.Flag("v", "version", &argparse.Options{Help: "Show version information and exit"})
+	optMap := initializeCmdLine(parser)
+	
+	err := parser.Parse(os.Args)
+
+	if err != nil {
+		fmt.Println(parser.Usage(err))
+	}
+	
 	getOrCreateLocalConfig(APP)
 
-	performAction(optMap, optionMap)
+	performAction(optMap)
 }
