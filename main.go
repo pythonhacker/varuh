@@ -185,7 +185,7 @@ func initializeCmdLine(parser *argparse.Parser) map[string]interface{} {
 		{"A", "add", "Add a new entry", "", ""},
 		{"p", "path", "Show current database path", "", ""},
 		{"a", "list-all", "List all entries in current database", "", ""},
-		{"g", "genpass", "Generate a strong password of length from 8 - 12", "", ""},
+		{"g", "genpass", "Generate a strong password of length from 12 - 16", "", ""},
 		{"s", "show", "Show passwords when listing entries", "", ""},
 		{"c", "copy", "Copy password to clipboard", "", ""},
 		{"v", "version", "Show version information and exit", "", ""},
