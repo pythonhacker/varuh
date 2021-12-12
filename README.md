@@ -106,9 +106,6 @@ Usage
 		Copyright (C) 2021 Anand B Pillai <abpillai@gmail.com>
 
 
-
-The command line flags are grouped into `Edit/Create`, `Find/List`, `Misc` and `Help` actions. The first group of actions allows you to work with password databases and perform create/edit as well as encrypt/decrypt actions. The second set of actions allows you to work with an active decrypted database and view/search/list entries.
-
 Encryption and Security
 =======================
 
