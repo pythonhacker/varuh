@@ -73,9 +73,9 @@ Usage
 	usage: varuh [-h|--help] [-I|--init "<value>"] [-d|--decrypt "<value>"]
 				 [-C|--clone "<value>"] [-R|--remove "<value>"] [-U|--use-db
 				 "<value>"] [-f|--find "<value>"] [-E|--edit "<value>"]
-				 [-l|--list-entry "<value>"] [-x|--export "<value>"] [-g|--genpass
-				 "<value>"] [-e|--encrypt] [-A|--add] [-p|--path] [-a|--list-all]
-				 [-s|--show] [-c|--copy] [-v|--version]
+				 [-l|--list-entry "<value>"] [-x|--export "<value>"] [-e|--encrypt]
+				 [-A|--add] [-p|--path] [-a|--list-all] [-g|--genpass] [-s|--show]
+				 [-c|--copy] [-v|--version]
 
 				 Password manager for the command line for Unix like operating
 				 systems
@@ -92,11 +92,11 @@ Usage
 	  -E  --edit        <id>       Edit entry by <id>
 	  -l  --list-entry  <id>       List entry by <id>
 	  -x  --export      <filename> Export all entries to <filename>
-	  -g  --genpass     <length>   Generate password of given <length>
 	  -e  --encrypt                Encrypt the current database
 	  -A  --add                    Add a new entry
 	  -p  --path                   Show current database path
 	  -a  --list-all               List all entries in current database
+	  -g  --genpass                Generate a strong password of length from 8 - 12
 	  -s  --show                   Show passwords when listing entries
 	  -c  --copy                   Copy password to clipboard
 	  -v  --version                Show version information and exit
