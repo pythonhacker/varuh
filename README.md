@@ -148,6 +148,7 @@ The password database is created and is active now. You can start adding entries
 	Password (enter to generate new): 
 	Generating password ...done
 	Notes: Website uses Nginx auth
+	Do you want to add custom fields [y/N]: 
 	Created new entry with id: 1
 
 You can now list the entry with one of the list options.
@@ -162,6 +163,36 @@ You can now list the entry with one of the list options.
 	Notes: Website uses Nginx auth
 	Modified: 2021-21-09 23:12:35
 	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+## Add an entry with custom fields
+
+From version 0.3 onwards, custom fields are supported.
+
+	$ varuh -A
+	Title: Github token
+	URL: https://github.com/mydev/myproject
+	Username: mydev
+	Password (enter to generate new): ghp_ipQrStuVwxYz1a2b3cdEF10ghI689kLaMnOp
+	Notes: Never Expires
+	Do you want to add custom fields [y/N]: y
+	Field Name: Domain
+	Value for Domain: github.com
+	Field Name: Type
+	Value for Type: Auth Token
+	Field Name:
+	Created new entry with id: 6
+
+	$ varuh -l 6
+	ID: 6
+	Title: Github token
+	User: mydev
+	URL: https://github.com/mydev/myproject
+	Password: ghp_ipQrStuVwxYz1a2b3cdEF10ghI689kLaMnOp
+	Notes: Never Expires
+	Domain: github.com
+	Type: Auth Token
+	Modified: 2021-21-13 00:07:18
+
 
 For more on listing see the [Listing and Searching](#listing-and-searching) section below.
 
@@ -178,6 +209,7 @@ For more on listing see the [Listing and Searching](#listing-and-searching) sect
 	New Password ([y/Y] to generate new, enter will keep old one): 
 	Current Notes: Website uses Nginx auth
 	New Notes: Website uses Apache
+	Do you want to add custom fields [y/N]:
 	Updated entry.
 
 	$ varuh -l 1 -s
@@ -191,6 +223,42 @@ For more on listing see the [Listing and Searching](#listing-and-searching) sect
 	Modified: 2021-21-09 23:15:29
 	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+## Edit an entry with custom fields
+
+When you edit an entry with custom fields, you get the option to change the name of the fields or delete the fields entirely.
+
+	$ varuh -E 6
+	Current Title: Github token
+	New Title:
+	Current URL: https://github.com/mydev/myproject
+	New URL:
+	Current Username: mydev
+	New Username: 
+	Current Password: ghp_ipQrStuVwxYz1a2b3cdEF10ghI689kLaMnOp
+	New Password ([y/Y] to generate new, enter will keep old one): 
+	Current Notes: Never Expires
+	New Notes:
+	Editing/deleting custom fields
+	Field Name: Domain
+		New Field Name (Enter to keep, "x" to delete): x
+	Field Name: Type
+		New Field Name (Enter to keep, "x" to delete): Token Type
+	Field Value: Auth Token
+        New Field Value (Enter to keep): 
+	Do you want to add custom fields [y/N]: 
+	Created 1 custom entries for entry: 21.
+	Updated entry.
+
+	$ varuh -l 6 -s
+	ID: 6
+	Title: Github token
+	User: mydev
+	URL: https://github.com/mydev/myproject
+	Password: ghp_ipQrStuVwxYz1a2b3cdEF10ghI689kLaMnOp
+	Notes: Never Expires
+	Token Type: Auth Token
+	Modified: 2021-21-13 00:16:41
+
 (*-s* turns on visible passwords)
 
 ## Clone an entry
@@ -198,7 +266,7 @@ For more on listing see the [Listing and Searching](#listing-and-searching) sect
 To clone (copy) an entry,
 
 	$ $ varuh -C 1
-	Cloned to new entry, id: 2
+	Cloned to new entry, id: 3
 
 ## Remove an entry
 
@@ -207,8 +275,8 @@ To clone (copy) an entry,
 
 It is an error if the id does not exist.
 
-	$ varuh -R 3
-	No entry with id 3 was found
+	$ varuh -R 4
+	No entry with id 4 was found
 
 ## Switch to a new database
 
@@ -260,7 +328,7 @@ Manually decrypt the database using `-d` option.
 
 Now the database is active again and you can see the listings.
 
-	$ varuh -l 2
+	$ varuh -l 3
 	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	ID: 2
 	Title: My Blog Login
