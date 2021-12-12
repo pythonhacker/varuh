@@ -13,7 +13,9 @@ import (
 	"golang.org/x/crypto/pbkdf2"
 	"io"
 	"math/big"
+	"math/rand"
 	"os"
+	"time"
 	"unsafe"
 
 	crand "crypto/rand"
@@ -435,10 +437,10 @@ func decryptFileXChachaPoly(encDbPath string, password string) error {
 }
 
 // Generate a random password - for adding listings
-func generateRandomPassword(length int) (error, string) {
+func generatePassword(length int) (error, string) {
 
 	var data []byte
-	const source = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789?)(/%#!?)="
+	const source = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789=+_()$#@!~:/%"
 
 	data = make([]byte, length)
 
@@ -449,6 +451,100 @@ func generateRandomPassword(length int) (error, string) {
 		}
 
 		data[i] = source[num.Int64()]
+	}
+
+	return nil, string(data)
+}
+
+// Generate a "strong" password
+// A strong password is defined as,
+// A mix of upper and lower case alphabets
+// at least one number [0-9]
+// at least one upper case alphabet [A-Z]
+// at least one punctuation character
+// at least length 12
+func generateStrongPassword() (error, string) {
+
+	var data []byte
+	var length int
+
+	const sourceAlpha = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	const sourceLargeAlpha = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	const sourceNum = "0123456789"
+	const sourcePunct = "=+_()$#@!~:/%"
+	const source = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789=+_()$#@!~:/%"
+
+	// Generate in range 12 - 16
+	rand.Seed(time.Now().UnixNano())
+
+	length = rand.Intn(4) + 12
+
+	data = make([]byte, length)
+
+	var lengthAlpha int
+	var i, j, k, l int
+
+	// Alpha chars is at least length 3-5
+	lengthAlpha = rand.Intn(2) + 3
+
+	for i = 0; i < lengthAlpha; i++ {
+		num, err := crand.Int(crand.Reader, big.NewInt(int64(len(sourceAlpha))))
+		if err != nil {
+			return err, ""
+		}
+
+		data[i] = sourceAlpha[num.Int64()]
+	}
+
+	// Add in numbers 1 or 2
+	var lengthNum int
+
+	lengthNum = rand.Intn(2) + 1
+
+	for j = i; j < i+lengthNum; j++ {
+		num, err := crand.Int(crand.Reader, big.NewInt(int64(len(sourceNum))))
+		if err != nil {
+			return err, ""
+		}
+
+		data[j] = sourceNum[num.Int64()]
+	}
+
+	// Add in punctuations 1 or 2
+	var lengthPunc int
+
+	lengthPunc = rand.Intn(2) + 1
+
+	for k = j; k < j+lengthPunc; k++ {
+		num, err := crand.Int(crand.Reader, big.NewInt(int64(len(sourcePunct))))
+		if err != nil {
+			return err, ""
+		}
+
+		data[k] = sourcePunct[num.Int64()]
+	}
+
+	// Fill in the rest
+	var lengthRem int
+
+	lengthRem = length - k
+
+	if lengthRem > 0 {
+		for l = k; l < k+lengthRem; l++ {
+			num, err := crand.Int(crand.Reader, big.NewInt(int64(len(source))))
+			if err != nil {
+				return err, ""
+			}
+
+			data[l] = source[num.Int64()]
+		}
+	}
+
+	// Shuffle a few times
+	for i = 0; i < 5; i++ {
+		rand.Shuffle(len(data), func(i, j int) {
+			data[i], data[j] = data[j], data[i]
+		})
 	}
 
 	return nil, string(data)

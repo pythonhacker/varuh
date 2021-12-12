@@ -4,22 +4,35 @@ package main
 
 import (
 	"fmt"
-	"strconv"
-	getopt "github.com/pborman/getopt/v2"
+	"github.com/pythonhacker/argparse"
 	"os"
 )
 
-const VERSION = 0.2
+const VERSION = 0.3
 const APP = "varuh"
-const AUTHOR_EMAIL = "Anand B Pillai <abpillai@gmail.com>"
+
+const AUTHOR_INFO = `
+AUTHORS
+    Copyright (C) 2021 Anand B Pillai <abpillai@gmail.com>
+`
 
 type actionFunc func(string) error
 type actionFunc2 func(string) (error, string)
 type voidFunc func() error
+type voidFunc2 func() (error, string)
+
+// Structure to keep the options data
+type CmdOption struct {
+	Short   string
+	Long    string
+	Help    string
+	Path    string
+	Default string
+}
 
 // Print the program's usage string and exit
 func printUsage() error {
-	getopt.Usage()
+	//	getopt.Usage()
 	os.Exit(0)
 
 	return nil
@@ -34,13 +47,11 @@ func printVersionInfo() error {
 }
 
 // Command-line wrapper to generateRandomPassword
-func generatePassword(length string) (error, string) {
-	var iLength int
+func genPass() (error, string) {
 	var err error
 	var passwd string
-	
-	iLength, _ = strconv.Atoi(length)
-	err, passwd = generateRandomPassword(iLength)
+
+	err, passwd = generateStrongPassword()
 
 	if err != nil {
 		fmt.Printf("Error generating password - \"%s\"\n", err.Error())
@@ -53,12 +64,12 @@ func generatePassword(length string) (error, string) {
 		copyPasswordToClipboard(passwd)
 		fmt.Println("Password copied to clipboard")
 	}
-	
+
 	return nil, passwd
 }
 
-// Perform an action by using the command line options map
-func performAction(optMap map[string]interface{}, optionMap map[string]interface{}) {
+// // Perform an action by using the command line options map
+func performAction(optMap map[string]interface{}) {
 
 	var flag bool
 
@@ -84,7 +95,10 @@ func performAction(optMap map[string]interface{}, optionMap map[string]interface
 
 	stringActions2Map := map[string]actionFunc2{
 		"decrypt": decryptDatabase,
-		"genpass": generatePassword,		
+	}
+
+	flagsActions2Map := map[string]voidFunc2{
+		"genpass": genPass,
 	}
 
 	flagsActionsMap := map[string]voidFunc{
@@ -96,6 +110,15 @@ func performAction(optMap map[string]interface{}, optionMap map[string]interface
 	for key, mappedFunc := range flagsActionsMap {
 		if *optMap[key].(*bool) {
 			mappedFunc()
+		}
+	}
+
+	// Flag 2 actions
+	for key, mappedFunc := range flagsActions2Map {
+		if *optMap[key].(*bool) {
+			mappedFunc()
+			flag = true
+			break
 		}
 	}
 
@@ -113,9 +136,7 @@ func performAction(optMap map[string]interface{}, optionMap map[string]interface
 	}
 
 	for key, mappedFunc := range stringActionsMap {
-		option := optionMap[key].(Option)
-
-		if *optMap[key].(*string) != option.Path {
+		if *optMap[key].(*string) != "" {
 
 			var val = *(optMap[key].(*string))
 			mappedFunc(val)
@@ -129,10 +150,7 @@ func performAction(optMap map[string]interface{}, optionMap map[string]interface
 	}
 
 	for key, mappedFunc := range stringActions2Map {
-		option := optionMap[key].(Option)
-
-		if *optMap[key].(*string) != option.Path {
-
+		if *optMap[key].(*string) != "" {
 			var val = *(optMap[key].(*string))
 			mappedFunc(val)
 			break
@@ -141,19 +159,66 @@ func performAction(optMap map[string]interface{}, optionMap map[string]interface
 
 }
 
+func initializeCmdLine(parser *argparse.Parser) map[string]interface{} {
+	var optMap map[string]interface{}
+
+	optMap = make(map[string]interface{})
+
+	stringOptions := []CmdOption{
+		{"I", "init", "Initialize a new database", "<path>", ""},
+		{"d", "decrypt", "Decrypt password database", "<path>", ""},
+		{"C", "clone", "Clone an entry with <id>", "<id>", ""},
+		{"R", "remove", "Remove an entry with <id>", "<id>", ""},
+		{"U", "use-db", "Set <path> as active database", "<path>", ""},
+		{"f", "find", "Search entries with <term>", "<term>", ""},
+		{"E", "edit", "Edit entry by <id>", "<id>", ""},
+		{"l", "list-entry", "List entry by <id>", "<id>", ""},
+		{"x", "export", "Export all entries to <filename>", "<filename>", ""},
+	}
+
+	for _, opt := range stringOptions {
+		optMap[opt.Long] = parser.String(opt.Short, opt.Long, &argparse.Options{Help: opt.Help, Path: opt.Path})
+	}
+
+	boolOptions := []CmdOption{
+		{"e", "encrypt", "Encrypt the current database", "", ""},
+		{"A", "add", "Add a new entry", "", ""},
+		{"p", "path", "Show current database path", "", ""},
+		{"a", "list-all", "List all entries in current database", "", ""},
+		{"g", "genpass", "Generate a strong password of length from 12 - 16", "", ""},
+		{"s", "show", "Show passwords when listing entries", "", ""},
+		{"c", "copy", "Copy password to clipboard", "", ""},
+		{"v", "version", "Show version information and exit", "", ""},
+		{"h", "help", "Print this help message and exit", "", ""},
+	}
+
+	for _, opt := range boolOptions {
+		optMap[opt.Long] = parser.Flag(string(opt.Short), opt.Long, &argparse.Options{Help: opt.Help})
+	}
+
+	return optMap
+}
+
 // Main routine
 func main() {
 	if len(os.Args) == 1 {
 		os.Args = append(os.Args, "-h")
 	}
 
-	optMap, optionMap := initializeCommandLine()
-	getopt.SetUsage(func() {
-		usageString(optionMap)
-	})
+	parser := argparse.NewParser("varuh",
+		"Password manager for the command line for Unix like operating systems",
+		AUTHOR_INFO,
+	)
 
-	getopt.Parse()
+	optMap := initializeCmdLine(parser)
+
+	err := parser.Parse(os.Args)
+
+	if err != nil {
+		fmt.Println(parser.Usage(err))
+	}
+
 	getOrCreateLocalConfig(APP)
 
-	performAction(optMap, optionMap)
+	performAction(optMap)
 }
