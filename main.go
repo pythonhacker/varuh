@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"github.com/pythonhacker/argparse"
 	"os"
-	"strconv"
 )
 
 const VERSION = 0.3
@@ -20,6 +19,7 @@ AUTHORS
 type actionFunc func(string) error
 type actionFunc2 func(string) (error, string)
 type voidFunc func() error
+type voidFunc2 func() (error, string)
 
 // Structure to keep the options data
 type CmdOption struct {
@@ -47,13 +47,11 @@ func printVersionInfo() error {
 }
 
 // Command-line wrapper to generateRandomPassword
-func genPass(length string) (error, string) {
-	var iLength int
+func genPass() (error, string) {
 	var err error
 	var passwd string
 
-	iLength, _ = strconv.Atoi(length)
-	err, passwd = generatePassword(iLength)
+	err, passwd = generateStrongPassword()
 
 	if err != nil {
 		fmt.Printf("Error generating password - \"%s\"\n", err.Error())
@@ -97,6 +95,9 @@ func performAction(optMap map[string]interface{}) {
 
 	stringActions2Map := map[string]actionFunc2{
 		"decrypt": decryptDatabase,
+	}
+
+	flagsActions2Map := map[string]voidFunc2{
 		"genpass": genPass,
 	}
 
@@ -109,6 +110,15 @@ func performAction(optMap map[string]interface{}) {
 	for key, mappedFunc := range flagsActionsMap {
 		if *optMap[key].(*bool) {
 			mappedFunc()
+		}
+	}
+
+	// Flag 2 actions
+	for key, mappedFunc := range flagsActions2Map {
+		if *optMap[key].(*bool) {
+			mappedFunc()
+			flag = true
+			break
 		}
 	}
 
@@ -164,7 +174,6 @@ func initializeCmdLine(parser *argparse.Parser) map[string]interface{} {
 		{"E", "edit", "Edit entry by <id>", "<id>", ""},
 		{"l", "list-entry", "List entry by <id>", "<id>", ""},
 		{"x", "export", "Export all entries to <filename>", "<filename>", ""},
-		{"g", "genpass", "Generate password of given <length>", "<length>", ""},
 	}
 
 	for _, opt := range stringOptions {
@@ -176,6 +185,7 @@ func initializeCmdLine(parser *argparse.Parser) map[string]interface{} {
 		{"A", "add", "Add a new entry", "", ""},
 		{"p", "path", "Show current database path", "", ""},
 		{"a", "list-all", "List all entries in current database", "", ""},
+		{"g", "genpass", "Generate a strong password of length from 8 - 12", "", ""},
 		{"s", "show", "Show passwords when listing entries", "", ""},
 		{"c", "copy", "Copy password to clipboard", "", ""},
 		{"v", "version", "Show version information and exit", "", ""},
