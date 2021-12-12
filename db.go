@@ -29,6 +29,21 @@ func (e *Entry) TableName() string {
 	return "entries"
 }
 
+// Structure representing an extended entry in the db - for custom fields
+type ExtendedEntry struct {
+	ID         int       `gorm:"column:id;autoIncrement;primaryKey"`
+	FieldName  string    `gorm:"column:field_name"`
+	FieldValue string    `gorm:"column:field_value"`
+	Timestamp  time.Time `gorm:"type:timestamp;default:(datetime('now','localtime'))"` // sqlite3
+
+	Entry   Entry `gorm:"foreignKey:EntryID"`
+	EntryID int
+}
+
+func (ex *ExtendedEntry) TableName() string {
+	return "exentries"
+}
+
 // Clone an entry
 func (e1 *Entry) Copy(e2 *Entry) {
 
@@ -53,6 +68,11 @@ func openDatabase(filePath string) (error, *gorm.DB) {
 // Create a new table for Entries in the database
 func createNewEntry(db *gorm.DB) error {
 	return db.AutoMigrate(&Entry{})
+}
+
+// Create a new table for Extended Entries in the database
+func createNewExEntry(db *gorm.DB) error {
+	return db.AutoMigrate(&ExtendedEntry{})
 }
 
 // Init new database including tables
@@ -89,6 +109,12 @@ func initNewDatabase(dbPath string) error {
 	}
 
 	err = createNewEntry(db)
+	if err != nil {
+		fmt.Printf("Error creating schema - \"%s\"\n", err.Error())
+		return err
+	}
+
+	err = createNewExEntry(db)
 	if err != nil {
 		fmt.Printf("Error creating schema - \"%s\"\n", err.Error())
 		return err
@@ -133,8 +159,67 @@ func openActiveDatabase() (error, *gorm.DB) {
 	return nil, db
 }
 
+// Add custom entries to a database entry
+func addCustomEntries(db *gorm.DB, entry *Entry, customEntries []CustomEntry) error {
+
+	var count int
+	var err error
+
+	err = createNewExEntry(db)
+	if err != nil {
+		fmt.Printf("Error creating schema - \"%s\"\n", err.Error())
+		return err
+	}
+
+	for _, customEntry := range customEntries {
+		var exEntry ExtendedEntry
+
+		exEntry = ExtendedEntry{FieldName: customEntry.fieldName, FieldValue: customEntry.fieldValue,
+			EntryID: entry.ID}
+
+		resultEx := db.Create(&exEntry)
+		if resultEx.Error == nil && resultEx.RowsAffected == 1 {
+			count += 1
+		}
+	}
+
+	fmt.Printf("Created %d custom entries for entry: %d.\n", count, entry.ID)
+	return nil
+}
+
+// Replace custom entries to a database entry (Drop existing and add fresh)
+func replaceCustomEntries(db *gorm.DB, entry *Entry, updatedEntries []CustomEntry) error {
+
+	var count int
+	var err error
+	var customEntries []ExtendedEntry
+
+	err = createNewExEntry(db)
+	if err != nil {
+		fmt.Printf("Error creating schema - \"%s\"\n", err.Error())
+		return err
+	}
+
+	db.Where("entry_id = ?", entry.ID).Delete(&customEntries)
+
+	for _, customEntry := range updatedEntries {
+		var exEntry ExtendedEntry
+
+		exEntry = ExtendedEntry{FieldName: customEntry.fieldName, FieldValue: customEntry.fieldValue,
+			EntryID: entry.ID}
+
+		resultEx := db.Create(&exEntry)
+		if resultEx.Error == nil && resultEx.RowsAffected == 1 {
+			count += 1
+		}
+	}
+
+	fmt.Printf("Created %d custom entries for entry: %d.\n", count, entry.ID)
+	return nil
+}
+
 // Add a new entry to current database
-func addNewDatabaseEntry(title, userName, url, passwd, notes string) error {
+func addNewDatabaseEntry(title, userName, url, passwd, notes string, customEntries []CustomEntry) error {
 
 	var entry Entry
 	var err error
@@ -147,7 +232,11 @@ func addNewDatabaseEntry(title, userName, url, passwd, notes string) error {
 		//		result := db.Debug().Create(&entry)
 		result := db.Create(&entry)
 		if result.Error == nil && result.RowsAffected == 1 {
+			// Add custom fields if given
 			fmt.Printf("Created new entry with id: %d.\n", entry.ID)
+			if len(customEntries) > 0 {
+				return addCustomEntries(db, &entry, customEntries)
+			}
 			return nil
 		} else if result.Error != nil {
 			return result.Error
@@ -158,7 +247,7 @@ func addNewDatabaseEntry(title, userName, url, passwd, notes string) error {
 }
 
 // Update current database entry with new values
-func updateDatabaseEntry(entry *Entry, title, userName, url, passwd, notes string) error {
+func updateDatabaseEntry(entry *Entry, title, userName, url, passwd, notes string, customEntries []CustomEntry, flag bool) error {
 
 	var updateMap map[string]interface{}
 
@@ -172,7 +261,7 @@ func updateDatabaseEntry(entry *Entry, title, userName, url, passwd, notes strin
 		}
 	}
 
-	if len(updateMap) == 0 {
+	if len(updateMap) == 0 && !flag {
 		fmt.Printf("Nothing to update\n")
 		return nil
 	}
@@ -188,6 +277,9 @@ func updateDatabaseEntry(entry *Entry, title, userName, url, passwd, notes strin
 			return result.Error
 		}
 
+		if flag {
+			replaceCustomEntries(db, entry, customEntries)
+		}
 		fmt.Println("Updated entry.")
 		return nil
 	}
@@ -353,4 +445,20 @@ func entriesToStringArray(skipLongFields bool) (error, [][]string) {
 	}
 
 	return err, dataArray
+}
+
+// Get extended entries associated to an entry
+func getExtendedEntries(entry *Entry) []ExtendedEntry {
+
+	var err error
+	var db *gorm.DB
+	var customEntries []ExtendedEntry
+
+	err, db = openActiveDatabase()
+
+	if err == nil && db != nil {
+		db.Where("entry_id = ?", entry.ID).Find(&customEntries)
+	}
+
+	return customEntries
 }
