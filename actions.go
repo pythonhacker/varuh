@@ -15,6 +15,11 @@ import (
 	"syscall"
 )
 
+type CustomEntry struct {
+	fieldName  string
+	fieldValue string
+}
+
 // Wrappers (closures) for functions accepting strings as input for in/out encryption
 func WrapperMaxKryptStringFunc(fn actionFunc) actionFunc {
 
@@ -219,6 +224,7 @@ func addNewEntry() error {
 	var notes string
 	var passwd string
 	var err error
+	var customEntries []CustomEntry
 
 	if err = checkActiveDatabase(); err != nil {
 		return err
@@ -260,14 +266,96 @@ func addNewEntry() error {
 		return errors.New("invalid input")
 	}
 
+	customEntries = addCustomFields(reader)
+
 	// Trim spaces
-	err = addNewDatabaseEntry(title, userName, url, passwd, notes)
+	err = addNewDatabaseEntry(title, userName, url, passwd, notes, customEntries)
 
 	if err != nil {
 		fmt.Printf("Error adding entry - \"%s\"\n", err.Error())
 	}
 
 	return err
+}
+
+// Function to update existing custom entries and add new ones
+// The bool part of the return value indicates whether to take action
+func addOrUpdateCustomFields(reader *bufio.Reader, entry *Entry) ([]CustomEntry, bool) {
+
+	var customEntries []ExtendedEntry
+	var editedCustomEntries []CustomEntry
+	var newCustomEntries []CustomEntry
+	var flag bool
+
+	customEntries = getExtendedEntries(entry)
+
+	if len(customEntries) > 0 {
+
+		fmt.Println("Editing/deleting custom fields")
+		for _, customEntry := range customEntries {
+			var fieldName string
+			var fieldValue string
+
+			fmt.Println("Field Name: " + customEntry.FieldName)
+			fieldName = readInput(reader, "\tNew Field Name (Enter to keep, \"x\" to delete)")
+			if strings.ToLower(strings.TrimSpace(fieldName)) == "x" {
+				fmt.Println("Deleting field " + fieldName)
+			} else {
+				if strings.TrimSpace(fieldName) == "" {
+					fieldName = customEntry.FieldName
+				}
+
+				fmt.Println("Field Value: " + customEntry.FieldValue)
+				fieldValue = readInput(reader, "\tNew Field Value (Enter to keep)")
+				if strings.TrimSpace(fieldValue) == "" {
+					fieldValue = customEntry.FieldValue
+				}
+
+				editedCustomEntries = append(editedCustomEntries, CustomEntry{fieldName, fieldValue})
+			}
+		}
+	}
+
+	newCustomEntries = addCustomFields(reader)
+
+	editedCustomEntries = append(editedCustomEntries, newCustomEntries...)
+
+	// Cases where length == 0
+	// 1. Existing entries - all deleted
+	flag = len(customEntries) > 0 || len(editedCustomEntries) > 0
+
+	return editedCustomEntries, flag
+}
+
+// Function to add custom fields to an entry
+func addCustomFields(reader *bufio.Reader) []CustomEntry {
+
+	// Custom fields
+	var custom string
+	var customEntries []CustomEntry
+
+	custom = readInput(reader, "Do you want to add custom fields [y/N]")
+	if strings.ToLower(custom) == "y" {
+
+		fmt.Println("Keep entering custom field name followed by the value. Press return with no input once done.")
+		for true {
+			var customFieldName string
+			var customFieldValue string
+
+			customFieldName = strings.TrimSpace(readInput(reader, "Field Name"))
+			if customFieldName != "" {
+				customFieldValue = strings.TrimSpace(readInput(reader, "Value for "+customFieldName))
+			}
+
+			if customFieldName == "" && customFieldValue == "" {
+				break
+			}
+
+			customEntries = append(customEntries, CustomEntry{customFieldName, customFieldValue})
+		}
+	}
+
+	return customEntries
 }
 
 // Edit a current entry by id
@@ -322,8 +410,10 @@ func editCurrentEntry(idString string) error {
 	fmt.Printf("\nCurrent Notes: %s\n", entry.Notes)
 	notes = readInput(reader, "New Notes")
 
+	customEntries, flag := addOrUpdateCustomFields(reader, entry)
+
 	// Update
-	err = updateDatabaseEntry(entry, title, userName, url, passwd, notes)
+	err = updateDatabaseEntry(entry, title, userName, url, passwd, notes, customEntries, flag)
 	if err != nil {
 		fmt.Printf("Error updating entry - \"%s\"\n", err.Error())
 	}
