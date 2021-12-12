@@ -283,6 +283,7 @@ func printEntry(entry *Entry, delim bool) error {
 
 	var err error
 	var settings *Settings
+	var customEntries []ExtendedEntry
 
 	err, settings = getOrCreateLocalConfig(APP)
 
@@ -316,7 +317,17 @@ func printEntry(entry *Entry, delim bool) error {
 		fmt.Printf("Password: %s\n", strings.Join(asterisks, ""))
 	}
 	fmt.Printf("Notes: %s\n", entry.Notes)
+	// Query extended entries
+	customEntries = getExtendedEntries(entry)
+
+	if len(customEntries) > 0 {
+		for _, customEntry := range customEntries {
+			fmt.Printf("%s: %s\n", customEntry.FieldName, customEntry.FieldValue)
+		}
+	}
+
 	fmt.Printf("Modified: %s\n", entry.Timestamp.Format("2006-06-02 15:04:05"))
+
 	printDelim(settings.Delim, settings.Color)
 
 	// Reset
