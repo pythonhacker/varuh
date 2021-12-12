@@ -443,6 +443,8 @@ The following miscellaneous actions are supported.
 
 Generate a strong password of length ranging from 12 - 16.
 
+A `strong` password is defined as a cryptographically secure string contaning at least one upper-case letter, one punctuation character and one number.
+
 	$ varuh -g
 	7%zv/uzIgpqexJ
 
