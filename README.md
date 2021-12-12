@@ -50,12 +50,15 @@ should work.
 
 Then,
 
-	$ make
-	go: downloading github.com/kirsle/configdir v0.0.0-20170128060238-e45d2f54772f
-	go: downloading github.com/pborman/getopt/v2 v2.1.0
-	go: downloading golang.org/x/crypto v0.0.0-20210921155107-089bfa567519
-	go: downloading gorm.io/driver/sqlite v1.2.3
-	...
+	 $ make
+	 Building varuh
+	 go: downloading github.com/akamensky/argparse v1.3.1
+	 go: downloading golang.org/x/crypto v0.0.0-20210921155107-089bfa567519
+	 go: downloading github.com/atotto/clipboard v0.1.4
+	 go: downloading github.com/kirsle/configdir v0.0.0-20170128060238-e45d2f54772f
+	 go: downloading github.com/pythonhacker/argparse v1.3.2
+	 go: downloading gorm.io/driver/sqlite v1.2.3
+	 ...
 
 	$ sudo make install
 	Installing varuh...done
@@ -66,51 +69,42 @@ The binary will be installed in `/usr/local/bin` folder.
 Usage
 =====
 
-	$ varuh -h
+	$ ./varuh -h
+	usage: varuh [-h|--help] [-I|--init "<value>"] [-d|--decrypt "<value>"]
+				 [-C|--clone "<value>"] [-R|--remove "<value>"] [-U|--use-db
+				 "<value>"] [-f|--find "<value>"] [-E|--edit "<value>"]
+				 [-l|--list-entry "<value>"] [-x|--export "<value>"] [-g|--genpass
+				 "<value>"] [-e|--encrypt] [-A|--add] [-p|--path] [-a|--list-all]
+				 [-s|--show] [-c|--copy] [-v|--version]
 
+				 Password manager for the command line for Unix like operating
+				 systems
 
-	SYNOPSIS
+	Options:
 
-		varuh [options] [flags]
-
-	OPTIONS
-
-		EDIT/CREATE ACTIONS:
-
-		  -A --add                        Add a new entry
-		  -I --init            <path>     Initialize a new database
-		  -R --remove          <id>       Remove an entry
-		  -e --encrypt                    Encrypt the current database
-		  -d --decrypt         <path>     Decrypt password database
-		  -C --clone           <id>       Clone an entry
-		  -U --use-db          <path>     Set as active database
-		  -E --edit            <id>       Edit entry by id
-
-		FIND/LIST ACTIONS:
-
-		  -f --find            <term>     Search entries
-		  -l --list-entry      <id>       List entry by id
-		  -x --export          <filename> Export all entries to <filename>
-		  -p --path                       Show current database path
-		  -a --list-all                   List all entries in current database
-
-		MISC ACTIONS:
-
-		  -g --genpass         <length>   Generate password of given length
-
-		HELP ACTIONS:
-
-		  -h --help                       Print this help message and exit
-		  -v --version                    Show version information and exit
-
-		FLAGS:
-
-		  -s --show                       Show passwords when listing entries
-		  -c --copy                       Copy password to clipboard
+	  -h  --help                   Print help information
+	  -I  --init        <path>     Initialize a new database
+	  -d  --decrypt     <path>     Decrypt password database
+	  -C  --clone       <id>       Clone an entry with <id>
+	  -R  --remove      <id>       Remove an entry with <id>
+	  -U  --use-db      <path>     Set <path> as active database
+	  -f  --find        <term>     Search entries with <term>
+	  -E  --edit        <id>       Edit entry by <id>
+	  -l  --list-entry  <id>       List entry by <id>
+	  -x  --export      <filename> Export all entries to <filename>
+	  -g  --genpass     <length>   Generate password of given <length>
+	  -e  --encrypt                Encrypt the current database
+	  -A  --add                    Add a new entry
+	  -p  --path                   Show current database path
+	  -a  --list-all               List all entries in current database
+	  -s  --show                   Show passwords when listing entries
+	  -c  --copy                   Copy password to clipboard
+	  -v  --version                Show version information and exit
 
 
 	AUTHORS
 		Copyright (C) 2021 Anand B Pillai <abpillai@gmail.com>
+
 
 
 The command line flags are grouped into `Edit/Create`, `Find/List`, `Misc` and `Help` actions. The first group of actions allows you to work with password databases and perform create/edit as well as encrypt/decrypt actions. The second set of actions allows you to work with an active decrypted database and view/search/list entries.
