@@ -239,7 +239,7 @@ func addNewEntry() error {
 
 	if len(passwd) == 0 {
 		fmt.Printf("\nGenerating password ...")
-		err, passwd = generateRandomPassword(16)
+		err, passwd = generateStrongPassword()
 		fmt.Printf("done")
 	}
 	//	fmt.Printf("Password => %s\n", passwd)
@@ -315,7 +315,7 @@ func editCurrentEntry(idString string) error {
 
 	if strings.ToLower(passwd) == "y" {
 		fmt.Printf("\nGenerating new password ...")
-		err, passwd = generateRandomPassword(16)
+		err, passwd = generateStrongPassword()
 	}
 	//	fmt.Printf("Password => %s\n", passwd)
 
