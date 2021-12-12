@@ -441,15 +441,17 @@ Misc
 
 The following miscellaneous actions are supported.
 
-Generate a secure password of given length.
+Generate a strong password of length ranging from 12 - 16.
+
+A `strong` password is defined as a cryptographically secure string contaning at least one upper-case letter, one punctuation character and one number.
 
 	$ varuh -g
-	7nhga7tkk9LNafz
+	7%zv/uzIgpqexJ
 
 	By passing the `-c` option, the password is also copied to the clipboard.
 
-	$ varuh -g 15 -c 
-	yeXlLlk??IOsvL6
+	$ varuh -g -c 
+	y6UpD$~uBI#8
 	Password copied to clipboard
 
 
