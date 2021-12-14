@@ -22,6 +22,7 @@ const DELIMSIZE int = 69
 type SettingsOverride struct {
 	ShowPasswords bool
 	CopyPassword  bool
+	AssumeYes     bool
 }
 
 // Settings structure for local config
@@ -441,6 +442,11 @@ func setShowPasswords() error {
 // Copy the password to clipboard - only for single listings or single search results
 func setCopyPasswordToClipboard() error {
 	settingsRider.CopyPassword = true
+	return nil
+}
+
+func setAssumeYes() error {
+	settingsRider.AssumeYes = true
 	return nil
 }
 
