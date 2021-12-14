@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/pythonhacker/argparse"
 	"os"
+	"strings"
 )
 
 const VERSION = 0.3
@@ -86,11 +87,14 @@ func performAction(optMap map[string]interface{}) {
 		"edit":       WrapperMaxKryptStringFunc(editCurrentEntry),
 		"init":       initNewDatabase,
 		"list-entry": WrapperMaxKryptStringFunc(listCurrentEntry),
-		"find":       WrapperMaxKryptStringFunc(findCurrentEntry),
 		"remove":     WrapperMaxKryptStringFunc(removeCurrentEntry),
 		"clone":      WrapperMaxKryptStringFunc(copyCurrentEntry),
 		"use-db":     setActiveDatabasePath,
 		"export":     exportToFile,
+	}
+
+	stringListActionsMap := map[string]actionFunc{
+		"find": WrapperMaxKryptStringFunc(findCurrentEntry),
 	}
 
 	stringActions2Map := map[string]actionFunc2{
@@ -146,6 +150,18 @@ func performAction(optMap map[string]interface{}) {
 		}
 	}
 
+	for key, mappedFunc := range stringListActionsMap {
+		if len(*optMap[key].(*[]string)) > 0 {
+
+			var vals = *(optMap[key].(*[]string))
+			// Convert to single string
+			var singleVal = strings.Join(vals, " ")
+			mappedFunc(singleVal)
+			flag = true
+			break
+		}
+	}
+
 	if flag {
 		return
 	}
@@ -171,7 +187,6 @@ func initializeCmdLine(parser *argparse.Parser) map[string]interface{} {
 		{"C", "clone", "Clone an entry with <id>", "<id>", ""},
 		{"R", "remove", "Remove an entry with <id> or <id-range>", "<id>", ""},
 		{"U", "use-db", "Set <path> as active database", "<path>", ""},
-		{"f", "find", "Search entries with <term>", "<term>", ""},
 		{"E", "edit", "Edit entry by <id>", "<id>", ""},
 		{"l", "list-entry", "List entry by <id>", "<id>", ""},
 		{"x", "export", "Export all entries to <filename>", "<filename>", ""},
@@ -179,6 +194,14 @@ func initializeCmdLine(parser *argparse.Parser) map[string]interface{} {
 
 	for _, opt := range stringOptions {
 		optMap[opt.Long] = parser.String(opt.Short, opt.Long, &argparse.Options{Help: opt.Help, Path: opt.Path})
+	}
+
+	stringListOptions := []CmdOption{
+		{"f", "find", "Search entries with terms", "<t1> <t2> ...", ""},
+	}
+
+	for _, opt := range stringListOptions {
+		optMap[opt.Long] = parser.StringList(opt.Short, opt.Long, &argparse.Options{Help: opt.Help, Path: opt.Path})
 	}
 
 	boolOptions := []CmdOption{
