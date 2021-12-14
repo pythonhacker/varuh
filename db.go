@@ -229,7 +229,7 @@ func addNewDatabaseEntry(title, userName, url, passwd, notes string, customEntri
 
 	err, db = openActiveDatabase()
 	if err == nil && db != nil {
-		//		result := db.Debug().Create(&entry)
+		//      result := db.Debug().Create(&entry)
 		result := db.Create(&entry)
 		if result.Error == nil && result.RowsAffected == 1 {
 			// Add custom fields if given
@@ -339,6 +339,73 @@ func searchDatabaseEntry(term string) (error, []Entry) {
 
 	return err, entries
 
+}
+
+// Union of two entry arrays
+func union(entry1 []Entry, entry2 []Entry) []Entry {
+
+	m := make(map[int]bool)
+
+	for _, item := range entry1 {
+		m[item.ID] = true
+	}
+
+	for _, item := range entry2 {
+		if _, ok := m[item.ID]; !ok {
+			entry1 = append(entry1, item)
+		}
+	}
+
+	return entry1
+}
+
+// Intersection of two entry arrays
+func intersection(entry1 []Entry, entry2 []Entry) []Entry {
+
+	var common []Entry
+
+	m := make(map[int]bool)
+
+	for _, item := range entry1 {
+		m[item.ID] = true
+	}
+
+	for _, item := range entry2 {
+		if _, ok := m[item.ID]; ok {
+			common = append(common, item)
+		}
+	}
+
+	return common
+}
+
+// Search database for the given terms and returns matches according to operator
+func searchDatabaseEntries(terms []string, operator string) (error, []Entry) {
+
+	var err error
+	var finalEntries []Entry
+
+	for idx, term := range terms {
+		var entries []Entry
+
+		err, entries = searchDatabaseEntry(term)
+		if err != nil {
+			fmt.Printf("Error searching for term: %s - \"%s\"\n", term, err.Error())
+			return err, entries
+		}
+
+		if idx == 0 {
+			finalEntries = entries
+		} else {
+			if operator == "AND" {
+				finalEntries = intersection(finalEntries, entries)
+			} else if operator == "OR" {
+				finalEntries = union(finalEntries, entries)
+			}
+		}
+	}
+
+	return nil, finalEntries
 }
 
 // Remove a given database entry
