@@ -34,7 +34,7 @@ Install
 
 If you are on a Debian or Debian derived system, you can directly download and install the latest version. Check out the [releases](https://github.com/pythonhacker/varuh/releases) page and use `dpkg` to install the binary.
 
-	$ sudo dpkg -i varuh-${VERSION}_amd64.deb
+    $ sudo dpkg -i varuh-${VERSION}_amd64.deb
 
 The binary will be installed in `/usr/bin` folder.
 
@@ -44,24 +44,24 @@ You need the [Go compiler](https://golang.org/dl/) to build the code. (This can 
 
 Install `make` by using your native package manager. Something like,
 
-	$ sudo apt install make -y
+    $ sudo apt install make -y
 
 should work.
 
 Then,
 
-	 $ make
-	 Building varuh
-	 go: downloading github.com/akamensky/argparse v1.3.1
-	 go: downloading golang.org/x/crypto v0.0.0-20210921155107-089bfa567519
-	 go: downloading github.com/atotto/clipboard v0.1.4
-	 go: downloading github.com/kirsle/configdir v0.0.0-20170128060238-e45d2f54772f
-	 go: downloading github.com/pythonhacker/argparse v1.3.2
-	 go: downloading gorm.io/driver/sqlite v1.2.3
-	 ...
+     $ make
+     Building varuh
+     go: downloading github.com/akamensky/argparse v1.3.1
+     go: downloading golang.org/x/crypto v0.0.0-20210921155107-089bfa567519
+     go: downloading github.com/atotto/clipboard v0.1.4
+     go: downloading github.com/kirsle/configdir v0.0.0-20170128060238-e45d2f54772f
+     go: downloading github.com/pythonhacker/argparse v1.3.2
+     go: downloading gorm.io/driver/sqlite v1.2.3
+     ...
 
-	$ sudo make install
-	Installing varuh...done
+    $ sudo make install
+    Installing varuh...done
 
 The binary will be installed in `/usr/local/bin` folder.
 
@@ -69,41 +69,42 @@ The binary will be installed in `/usr/local/bin` folder.
 Usage
 =====
 
-	$ ./varuh -h
-	usage: varuh [-h|--help] [-I|--init "<value>"] [-d|--decrypt "<value>"]
-				 [-C|--clone "<value>"] [-R|--remove "<value>"] [-U|--use-db
-				 "<value>"] [-f|--find "<value>"] [-E|--edit "<value>"]
-				 [-l|--list-entry "<value>"] [-x|--export "<value>"] [-e|--encrypt]
-				 [-A|--add] [-p|--path] [-a|--list-all] [-g|--genpass] [-s|--show]
-				 [-c|--copy] [-v|--version]
+    $ ./varuh -h
+    usage: varuh [-h|--help] [-I|--init "<value>"] [-d|--decrypt "<value>"]
+                 [-C|--clone "<value>"] [-R|--remove "<value>"] [-U|--use-db
+                 "<value>"] [-f|--find "<value>"] [-E|--edit "<value>"]
+                 [-l|--list-entry "<value>"] [-x|--export "<value>"] [-e|--encrypt]
+                 [-A|--add] [-p|--path] [-a|--list-all] [-g|--genpass] [-s|--show]
+                 [-c|--copy] [-y|--assume-yes] [-v|--version]
 
-				 Password manager for the command line for Unix like operating
-				 systems
+                 Password manager for the command line for Unix like operating
+                 systems
 
-	Options:
+    Options:
 
-	  -h  --help                   Print help information
-	  -I  --init        <path>     Initialize a new database
-	  -d  --decrypt     <path>     Decrypt password database
-	  -C  --clone       <id>       Clone an entry with <id>
-	  -R  --remove      <id>       Remove an entry with <id>
-	  -U  --use-db      <path>     Set <path> as active database
-	  -f  --find        <term>     Search entries with <term>
-	  -E  --edit        <id>       Edit entry by <id>
-	  -l  --list-entry  <id>       List entry by <id>
-	  -x  --export      <filename> Export all entries to <filename>
-	  -e  --encrypt                Encrypt the current database
-	  -A  --add                    Add a new entry
-	  -p  --path                   Show current database path
-	  -a  --list-all               List all entries in current database
-	  -g  --genpass                Generate a strong password of length from 12 - 16
-	  -s  --show                   Show passwords when listing entries
-	  -c  --copy                   Copy password to clipboard
-	  -v  --version                Show version information and exit
+      -h  --help                   Print help information
+      -I  --init        <path>     Initialize a new database
+      -d  --decrypt     <path>     Decrypt password database
+      -C  --clone       <id>       Clone an entry with <id>
+      -R  --remove      <id>       Remove an entry with <id> or <id-range>
+      -U  --use-db      <path>     Set <path> as active database
+      -f  --find        <term>     Search entries with <term>
+      -E  --edit        <id>       Edit entry by <id>
+      -l  --list-entry  <id>       List entry by <id>
+      -x  --export      <filename> Export all entries to <filename>
+      -e  --encrypt                Encrypt the current database
+      -A  --add                    Add a new entry
+      -p  --path                   Show current database path
+      -a  --list-all               List all entries in current database
+      -g  --genpass                Generate a strong password (length: 12 - 16)
+      -s  --show                   Show passwords when listing entries
+      -c  --copy                   Copy password to clipboard
+      -y  --assume-yes             Assume yes to actions requiring confirmation
+      -v  --version                Show version information and exit
 
 
-	AUTHORS
-		Copyright (C) 2021 Anand B Pillai <abpillai@gmail.com>
+    AUTHORS
+        Copyright (C) 2021 Anand B Pillai <abpillai@gmail.com>
 
 
 Encryption and Security
@@ -130,134 +131,134 @@ Databases
 
 ## Create a database
 
-	$ varuh -I mypasswds
-	Created new database - mypasswds
-	Updating active db path - /home/anand/mypasswds
+    $ varuh -I mypasswds
+    Created new database - mypasswds
+    Updating active db path - /home/anand/mypasswds
 
-	$ ls -lt mypasswds 
-	-rw------- 1 anand anand 8192 Nov  9 23:06 mypasswds
+    $ ls -lt mypasswds 
+    -rw------- 1 anand anand 8192 Nov  9 23:06 mypasswds
 
 The password database is created and is active now. You can start adding entries to it.
 
 ## Add an entry
 
-	$ varuh -A
-	Title: My Website Login
-	URL: mywebsite.name
-	Username: mememe
-	Password (enter to generate new): 
-	Generating password ...done
-	Notes: Website uses Nginx auth
-	Do you want to add custom fields [y/N]: 
-	Created new entry with id: 1
+    $ varuh -A
+    Title: My Website Login
+    URL: mywebsite.name
+    Username: mememe
+    Password (enter to generate new): 
+    Generating password ...done
+    Notes: Website uses Nginx auth
+    Do you want to add custom fields [y/N]: 
+    Created new entry with id: 1
 
 You can now list the entry with one of the list options.
 
-	$ varuh -l 1
-	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-	ID: 1
-	Title: My Website Login
-	User: mememe
-	URL: http://mywebsite.name
-	Password: ****************
-	Notes: Website uses Nginx auth
-	Modified: 2021-21-09 23:12:35
-	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    $ varuh -l 1
+    +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    ID: 1
+    Title: My Website Login
+    User: mememe
+    URL: http://mywebsite.name
+    Password: ****************
+    Notes: Website uses Nginx auth
+    Modified: 2021-21-09 23:12:35
+    +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 ## Add an entry with custom fields
 
 From version 0.3 onwards, custom fields are supported.
 
-	$ varuh -A
-	Title: Github token
-	URL: https://github.com/mydev/myproject
-	Username: mydev
-	Password (enter to generate new): ghp_ipQrStuVwxYz1a2b3cdEF10ghI689kLaMnOp
-	Notes: Never Expires
-	Do you want to add custom fields [y/N]: y
-	Field Name: Domain
-	Value for Domain: github.com
-	Field Name: Type
-	Value for Type: Auth Token
-	Field Name:
-	Created new entry with id: 6
+    $ varuh -A
+    Title: Github token
+    URL: https://github.com/mydev/myproject
+    Username: mydev
+    Password (enter to generate new): ghp_ipQrStuVwxYz1a2b3cdEF10ghI689kLaMnOp
+    Notes: Never Expires
+    Do you want to add custom fields [y/N]: y
+    Field Name: Domain
+    Value for Domain: github.com
+    Field Name: Type
+    Value for Type: Auth Token
+    Field Name:
+    Created new entry with id: 6
 
-	$ varuh -l 6
-	ID: 6
-	Title: Github token
-	User: mydev
-	URL: https://github.com/mydev/myproject
-	Password: ghp_ipQrStuVwxYz1a2b3cdEF10ghI689kLaMnOp
-	Notes: Never Expires
-	Domain: github.com
-	Type: Auth Token
-	Modified: 2021-21-13 00:07:18
+    $ varuh -l 6
+    ID: 6
+    Title: Github token
+    User: mydev
+    URL: https://github.com/mydev/myproject
+    Password: ghp_ipQrStuVwxYz1a2b3cdEF10ghI689kLaMnOp
+    Notes: Never Expires
+    Domain: github.com
+    Type: Auth Token
+    Modified: 2021-21-13 00:07:18
 
 
 For more on listing see the [Listing and Searching](#listing-and-searching) section below.
 
 ## Edit an entry
 
-	$ varuh -E 1
-	Current Title: My Website Login
-	New Title: My Blog Login
-	Current URL: http://mywebsite.name
-	New URL: myblog.name
-	Current Username: mememe
-	New Username: meblog
-	Current Password: lTzC2z9kRppnYsYl
-	New Password ([y/Y] to generate new, enter will keep old one): 
-	Current Notes: Website uses Nginx auth
-	New Notes: Website uses Apache
-	Do you want to add custom fields [y/N]:
-	Updated entry.
+    $ varuh -E 1
+    Current Title: My Website Login
+    New Title: My Blog Login
+    Current URL: http://mywebsite.name
+    New URL: myblog.name
+    Current Username: mememe
+    New Username: meblog
+    Current Password: lTzC2z9kRppnYsYl
+    New Password ([y/Y] to generate new, enter will keep old one): 
+    Current Notes: Website uses Nginx auth
+    New Notes: Website uses Apache
+    Do you want to add custom fields [y/N]:
+    Updated entry.
 
-	$ varuh -l 1 -s
-	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-	ID: 1
-	Title: My Blog Login
-	User: meblog
-	URL: http://myblog.name
-	Password: myblog123
-	Notes: Website uses Apache
-	Modified: 2021-21-09 23:15:29
-	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    $ varuh -l 1 -s
+    +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    ID: 1
+    Title: My Blog Login
+    User: meblog
+    URL: http://myblog.name
+    Password: myblog123
+    Notes: Website uses Apache
+    Modified: 2021-21-09 23:15:29
+    +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 ## Edit an entry with custom fields
 
 When you edit an entry with custom fields, you get the option to change the name of the fields or delete the fields entirely.
 
-	$ varuh -E 6
-	Current Title: Github token
-	New Title:
-	Current URL: https://github.com/mydev/myproject
-	New URL:
-	Current Username: mydev
-	New Username: 
-	Current Password: ghp_ipQrStuVwxYz1a2b3cdEF10ghI689kLaMnOp
-	New Password ([y/Y] to generate new, enter will keep old one): 
-	Current Notes: Never Expires
-	New Notes:
-	Editing/deleting custom fields
-	Field Name: Domain
-		New Field Name (Enter to keep, "x" to delete): x
-	Field Name: Type
-		New Field Name (Enter to keep, "x" to delete): Token Type
-	Field Value: Auth Token
+    $ varuh -E 6
+    Current Title: Github token
+    New Title:
+    Current URL: https://github.com/mydev/myproject
+    New URL:
+    Current Username: mydev
+    New Username: 
+    Current Password: ghp_ipQrStuVwxYz1a2b3cdEF10ghI689kLaMnOp
+    New Password ([y/Y] to generate new, enter will keep old one): 
+    Current Notes: Never Expires
+    New Notes:
+    Editing/deleting custom fields
+    Field Name: Domain
+        New Field Name (Enter to keep, "x" to delete): x
+    Field Name: Type
+        New Field Name (Enter to keep, "x" to delete): Token Type
+    Field Value: Auth Token
         New Field Value (Enter to keep): 
-	Do you want to add custom fields [y/N]: 
-	Created 1 custom entries for entry: 21.
-	Updated entry.
+    Do you want to add custom fields [y/N]: 
+    Created 1 custom entries for entry: 21.
+    Updated entry.
 
-	$ varuh -l 6 -s
-	ID: 6
-	Title: Github token
-	User: mydev
-	URL: https://github.com/mydev/myproject
-	Password: ghp_ipQrStuVwxYz1a2b3cdEF10ghI689kLaMnOp
-	Notes: Never Expires
-	Token Type: Auth Token
-	Modified: 2021-21-13 00:16:41
+    $ varuh -l 6 -s
+    ID: 6
+    Title: Github token
+    User: mydev
+    URL: https://github.com/mydev/myproject
+    Password: ghp_ipQrStuVwxYz1a2b3cdEF10ghI689kLaMnOp
+    Notes: Never Expires
+    Token Type: Auth Token
+    Modified: 2021-21-13 00:16:41
 
 (*-s* turns on visible passwords)
 
@@ -265,30 +266,59 @@ When you edit an entry with custom fields, you get the option to change the name
 
 To clone (copy) an entry,
 
-	$ $ varuh -C 1
-	Cloned to new entry, id: 3
+    $ $ varuh -C 1
+    Cloned to new entry, id: 3
 
 ## Remove an entry
 
-	$ varuh -R 1
-	Entry with id 1 was removed from the database
+    $ varuh -R 1
+    +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Title: My Website Login
+    User: mememe
+    URL: https://mywebsite.name
+    Modified: 2021-21-09 23:12:35
+    +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Please confirm removal [Y/n]: 
+    Entry with id 1 was removed from the database
 
 It is an error if the id does not exist.
 
-	$ varuh -R 4
-	No entry with id 4 was found
+    $ varuh -R 4
+    No entry with id 4 was found
+
+## Remove a range of entries
+
+You can remove a range of entry ids from id1-id2 using the following command.
+
+    $ varuh -R id1-id2
+
+Example:
+
+    $ varuh -R 1-4
+
+This will remove entries from 1 to 4 inclusive, asking for confirmation from the user every time.
+
+## Removal without confirmation
+
+If you are very sure, you can avoid the confirmation prompt by passing the `-y` flag which will remove the entry without confirmation.
+
+    $ varuh -R 2 -y
+    ...
+    ...
+    ...
+    Entry with id 2 was removed from the database
 
 ## Switch to a new database
 
 Once a database is active, creating another one automatically encrypts the current one and makes the new one the active database. The automatic encryption happens only if the configuration flag `auto_encrypt` is turned on (See section [Configuration](#configuration) below).
 
-	$ varuh -I mysecrets
-	Encrytping current database - /home/anand/mypasswds
-	Password: 
-	Password again: 
-	Encryption complete.
-	Created new database - mysecrets
-	Updating active db path - /home/anand/mysecrets
+    $ varuh -I mysecrets
+    Encrytping current database - /home/anand/mypasswds
+    Password: 
+    Password again: 
+    Encryption complete.
+    Created new database - mysecrets
+    Updating active db path - /home/anand/mysecrets
 
 The previous database is now encrypted with the configured block cipher using the password. Please make sure you remember the password.
 
@@ -296,48 +326,48 @@ The previous database is now encrypted with the configured block cipher using th
 
 If you want to switch back to a previous database, you can use the `-U` option. The same process is repeated with the current database getting encrypted and the older one getting decrypted.
 
-	$ varuh -U mypasswds
-	Encrypting current active database - /home/anand/mysecrets
-	Password: 
-	Password again: 
-	Encryption complete.
-	Database /home/anand/mypasswds is encrypted, decrypting it
-	Password: 
-	Decryption complete.
-	Switched active database successfully.
-	
+    $ varuh -U mypasswds
+    Encrypting current active database - /home/anand/mysecrets
+    Password: 
+    Password again: 
+    Encryption complete.
+    Database /home/anand/mypasswds is encrypted, decrypting it
+    Password: 
+    Decryption complete.
+    Switched active database successfully.
+    
 ## Manual encryption and decryption
 
 You can manually encrypt the current database using the `-e` option.
 
-	$ varuh -e
-	Password: 
-	Password again: 
-	Encryption complete.
+    $ varuh -e
+    Password: 
+    Password again: 
+    Encryption complete.
 
 Note that once you encrypt the active database, you cannot use the listings any more unless it is decrypted.
 
-	$ varuh -l 2
-	No decrypted active database found.
+    $ varuh -l 2
+    No decrypted active database found.
 
 Manually decrypt the database using `-d` option.
 
-	$ varuh -d mypasswds 
-	Password: 
-	Decryption complete.
+    $ varuh -d mypasswds 
+    Password: 
+    Decryption complete.
 
 Now the database is active again and you can see the listings.
 
-	$ varuh -l 3
-	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-	ID: 2
-	Title: My Blog Login
-	User: myblog.name
-	URL: http://meblog
-	Password: *********
-	Notes: Website uses Apache
-	Modified: 2021-21-09 23:21:32
-	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    $ varuh -l 3
+    +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    ID: 2
+    Title: My Blog Login
+    User: myblog.name
+    URL: http://meblog
+    Password: *********
+    Notes: Website uses Apache
+    Modified: 2021-21-09 23:21:32
+    +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 ## Always on encryption
 
@@ -345,20 +375,20 @@ If the config param `encrypt_on` is set to `true` along with `auto_encrypt` (def
 
 ### Example
 
-	$ varuh -f my -s
-	Password: 
-	Decryption complete.
-	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-	ID: 2
-	Title: MY LOCAL BANK
-	User: banklogin
-	URL: https://my.localbank.com
-	Password: bankpass123
-	Notes: 
-	Modified: 2021-21-18 12:44:10
-	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    $ varuh -f my -s
+    Password: 
+    Decryption complete.
+    +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    ID: 2
+    Title: MY LOCAL BANK
+    User: banklogin
+    URL: https://my.localbank.com
+    Password: bankpass123
+    Notes: 
+    Modified: 2021-21-18 12:44:10
+    +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-	Encryption complete.
+    Encryption complete.
 
 In this mode, your data is provided maximum safety as the database remains decrypted only for a short while on the disk while the data is being read and once done is encrypted back again.
 
@@ -369,79 +399,79 @@ Listing and Searching
 
 To list an entry using its id,
 
-	$ varuh -l 8
-	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-	ID: 8
-	Title: Google account
-	User: anandpillai@alumni.iitm.ac.in
-	URL: 
-	Password: ***********
-	Notes: 
-	Modified: 2021-21-25 15:02:50
-	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    $ varuh -l 8
+    +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    ID: 8
+    Title: Google account
+    User: anandpillai@alumni.iitm.ac.in
+    URL: 
+    Password: ***********
+    Notes: 
+    Modified: 2021-21-25 15:02:50
+    +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 ## To search an entry
 
 An entry can be searched on its title, username, URL or notes. Search is case-insensitive.
 
-	$ varuh -f google
-	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-	ID: 8
-	Title: Google account
-	User: anandpillai@alumni.iitm.ac.in
-	URL: 
-	Password: **********
-	Notes: 
-	Modified: 2021-21-25 15:02:50
-	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-	ID: 9
-	Title: Google account
-	User: xyz@gmail.com
-	URL: 
-	Password: ********
-	Notes: 
-	Modified: 2021-21-25 15:05:36
-	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-	ID: 10
-	Title: Google account
-	User: somethingaboutme@gmail.com
-	URL: 
-	Password: ***********
-	Notes: 
-	Modified: 2021-21-25 15:09:51
-	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    $ varuh -f google
+    +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    ID: 8
+    Title: Google account
+    User: anandpillai@alumni.iitm.ac.in
+    URL: 
+    Password: **********
+    Notes: 
+    Modified: 2021-21-25 15:02:50
+    +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    ID: 9
+    Title: Google account
+    User: xyz@gmail.com
+    URL: 
+    Password: ********
+    Notes: 
+    Modified: 2021-21-25 15:05:36
+    +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    ID: 10
+    Title: Google account
+    User: somethingaboutme@gmail.com
+    URL: 
+    Password: ***********
+    Notes: 
+    Modified: 2021-21-25 15:09:51
+    +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 ## To list all entries
 
 To list all entries, use the option `-a`.
 
-	$ varuh -a
-	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-	ID: 1
-	Title: My Bank #1
-	User: myusername1
-	URL: https://mysuperbank1.com
-	Password: ***********
-	Notes: 
-	Modified: 2021-21-15 15:40:29
-	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-	ID: 2
-	Title: My Digital Locker #1
-	User: mylockerusername
-	URL: https://mysuperlocker1.com
-	Password: **********
-	Notes: 
-	Modified: 2021-21-18 12:44:10
-	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-	ID: 3
-	Title: My Bank Login #2
-	User: mybankname2
-	URL: https://myaveragebank.com
-	Password: **********
-	Notes: 
-	Modified: 2021-21-19 14:16:33
-	+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-	...
+    $ varuh -a
+    +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    ID: 1
+    Title: My Bank #1
+    User: myusername1
+    URL: https://mysuperbank1.com
+    Password: ***********
+    Notes: 
+    Modified: 2021-21-15 15:40:29
+    +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    ID: 2
+    Title: My Digital Locker #1
+    User: mylockerusername
+    URL: https://mysuperlocker1.com
+    Password: **********
+    Notes: 
+    Modified: 2021-21-18 12:44:10
+    +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    ID: 3
+    Title: My Bank Login #2
+    User: mybankname2
+    URL: https://myaveragebank.com
+    Password: **********
+    Notes: 
+    Modified: 2021-21-19 14:16:33
+    +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    ...
 
 By default the listing is in ascending ID order. This can be changed in the configuration (see below).
 
@@ -457,8 +487,8 @@ This is useful to copy the password to a password input field in the browser for
 
 ## See current active database path
 
-	$ varuh -p
-	/home/anand/mypasswds
+    $ varuh -p
+    /home/anand/mypasswds
 
 Export
 ======
@@ -472,37 +502,37 @@ Export
 
 To export use the `-x` option. The type of file is automatically figured out from the filename extension.
 
-	$ varuh -x passwds.csv
-	!WARNING: Passwords are stored in plain-text!
-	Exported 14 records to passwds.csv .
-	Exported to passwds.csv.
+    $ varuh -x passwds.csv
+    !WARNING: Passwords are stored in plain-text!
+    Exported 14 records to passwds.csv .
+    Exported to passwds.csv.
 
-	$ varuh -x passwds.html
-	Exported to passwds.html.
+    $ varuh -x passwds.html
+    Exported to passwds.html.
 
 PDF export is supported if `pandoc` is installed along with the required `pdflatex` packages. The following command (on `Debian` and derived systems) should install the required dependencies.
 
-	$ sudo apt-get install pandoc texlive-latex-base texlive-fonts-recommended texlive-fonts-extra texlive-latex-extra texlive-xetex lmodern -y
+    $ sudo apt-get install pandoc texlive-latex-base texlive-fonts-recommended texlive-fonts-extra texlive-latex-extra texlive-xetex lmodern -y
 
 Then,
 
-	$ varuh -x passwds.pdf
-	pdftk not found, PDF won't be secure!
+    $ varuh -x passwds.pdf
+    pdftk not found, PDF won't be secure!
 
-	File passwds.pdf created without password.
-	Exported to passwds.pdf.
+    File passwds.pdf created without password.
+    Exported to passwds.pdf.
 
 PDF files are exported in landscape mode with 150 dpi and 600 columns. To avoid the data not fitting into one page the fields `Notes` and `URL` are not exported.
 
 If `pdftk` is installed, the PDF files will be encrypted with an (optional) password.
 
-	$ sudo apt-get install pdftk -y
+    $ sudo apt-get install pdftk -y
 
-	$ varuh -x passwds.pdf
-	PDF Encryption Password: ******
-	File passwds.pdf created without password.
-	Added password to passwds.pdf.
-	Exported to passwds.pdf.
+    $ varuh -x passwds.pdf
+    PDF Encryption Password: ******
+    File passwds.pdf created without password.
+    Added password to passwds.pdf.
+    Exported to passwds.pdf.
 
 Misc
 ====
@@ -513,14 +543,14 @@ Generate a strong password of length ranging from 12 - 16.
 
 A `strong` password is defined as a cryptographically secure string contaning at least one upper-case letter, one punctuation character and one number.
 
-	$ varuh -g
-	7%zv/uzIgpqexJ
+    $ varuh -g
+    7%zv/uzIgpqexJ
 
-	By passing the `-c` option, the password is also copied to the clipboard.
+    By passing the `-c` option, the password is also copied to the clipboard.
 
-	$ varuh -g -c 
-	y6UpD$~uBI#8
-	Password copied to clipboard
+    $ varuh -g -c 
+    y6UpD$~uBI#8
+    Password copied to clipboard
 
 
 Configuration
@@ -530,19 +560,19 @@ Configuration
 
 The config file is named *config.json*. It looks as follows.
 
-	`{
-		"active_db": "/home/anand/mypasswds",
-		"cipher": "aes",
-		"auto_encrypt": true,
-		"visible_passwords": false,
-		"encrypt_on": true,
-		"path": "/home/anand/.config/varuh/config.json",
-		"list_order": "id,asc",
-		"delimiter": "+",
-		"color": "default",
-		"bgcolor": "bgblack"
-	}
-	`
+    `{
+        "active_db": "/home/anand/mypasswds",
+        "cipher": "aes",
+        "auto_encrypt": true,
+        "visible_passwords": false,
+        "encrypt_on": true,
+        "path": "/home/anand/.config/varuh/config.json",
+        "list_order": "id,asc",
+        "delimiter": "+",
+        "color": "default",
+        "bgcolor": "bgblack"
+    }
+    `
 You can modify the following variables.
 
 1. `auto_encrypt` - Set this to true to enable automatic encryption/decryption when switching databases. Otherwise you have to do this manually. The default is `true`.
@@ -555,7 +585,7 @@ You can modify the following variables.
    * `title` - Uses the `Title` field.
    * `username` - Uses the `User` field.
 
-	Always specify this configuration as `<field>,<order>`. Supported `<order>` values are `asc` and `desc`.
+    Always specify this configuration as `<field>,<order>`. Supported `<order>` values are `asc` and `desc`.
 1. `delimiter` - This modifies the delimiter string when printing a listing. Only one character is allowed.
 1. `color` - The foreground color of the text when printing listings.
 1. `bgcolor` - The background color of the text when printing listings.

@@ -248,7 +248,7 @@ func addNewEntry() error {
 		err, passwd = generateStrongPassword()
 		fmt.Printf("done")
 	}
-	//	fmt.Printf("Password => %s\n", passwd)
+	//  fmt.Printf("Password => %s\n", passwd)
 
 	notes = readInput(reader, "\nNotes")
 
@@ -405,7 +405,7 @@ func editCurrentEntry(idString string) error {
 		fmt.Printf("\nGenerating new password ...")
 		err, passwd = generateStrongPassword()
 	}
-	//	fmt.Printf("Password => %s\n", passwd)
+	//  fmt.Printf("Password => %s\n", passwd)
 
 	fmt.Printf("\nCurrent Notes: %s\n", entry.Notes)
 	notes = readInput(reader, "New Notes")
@@ -434,7 +434,7 @@ func listCurrentEntry(idString string) error {
 
 	id, _ = strconv.Atoi(idString)
 
-	//	fmt.Printf("Listing current entry - %d\n", id)
+	//  fmt.Printf("Listing current entry - %d\n", id)
 	err, entry = getEntryById(id)
 	if err != nil || entry == nil {
 		fmt.Printf("No entry found for id %d\n", id)
@@ -444,7 +444,7 @@ func listCurrentEntry(idString string) error {
 	err = printEntry(entry, true)
 
 	if err == nil && settingsRider.CopyPassword {
-		//		fmt.Printf("Copying password " + entry.Password + " to clipboard\n")
+		//      fmt.Printf("Copying password " + entry.Password + " to clipboard\n")
 		copyPasswordToClipboard(entry.Password)
 	}
 
@@ -547,15 +547,49 @@ func findCurrentEntry(term string) error {
 	return err
 }
 
+// Remove a range of entries <id1>-<id2> say 10-14
+func removeMultipleEntries(idRangeEntry string) error {
+
+	var err error
+	var idRange []string
+	var id1, id2 int
+
+	idRange = strings.Split(idRangeEntry, "-")
+
+	if len(idRange) != 2 {
+		fmt.Println("Invalid id range - " + idRangeEntry)
+		return errors.New("Invalid id range - " + idRangeEntry)
+	}
+
+	id1, _ = strconv.Atoi(idRange[0])
+	id2, _ = strconv.Atoi(idRange[1])
+
+	if id1 >= id2 {
+		fmt.Println("Invalid id range - " + idRangeEntry)
+		return errors.New("Invalid id range - " + idRangeEntry)
+	}
+
+	for idNum := id1; idNum <= id2; idNum++ {
+		err = removeCurrentEntry(fmt.Sprintf("%d", idNum))
+	}
+
+	return err
+}
+
 // Remove current entry by id
 func removeCurrentEntry(idString string) error {
 
 	var err error
 	var entry *Entry
 	var id int
+	var response string
 
 	if err = checkActiveDatabase(); err != nil {
 		return err
+	}
+
+	if strings.Contains(idString, "-") {
+		return removeMultipleEntries(idString)
 	}
 
 	id, _ = strconv.Atoi(idString)
@@ -566,10 +600,22 @@ func removeCurrentEntry(idString string) error {
 		return err
 	}
 
-	// Drop from the database
-	err = removeDatabaseEntry(entry)
-	if err == nil {
-		fmt.Printf("Entry with id %d was removed from the database\n", id)
+	printEntryMinimal(entry, true)
+
+	if !settingsRider.AssumeYes {
+		response = readInput(bufio.NewReader(os.Stdin), "Please confirm removal [Y/n]: ")
+	} else {
+		response = "y"
+	}
+
+	if strings.ToLower(response) != "n" {
+		// Drop from the database
+		err = removeDatabaseEntry(entry)
+		if err == nil {
+			fmt.Printf("Entry with id %d was removed from the database\n", id)
+		}
+	} else {
+		fmt.Println("Removal of entry cancelled by user.")
 	}
 
 	return err
@@ -655,7 +701,7 @@ func encryptDatabase(dbPath string, givenPasswd *string) error {
 		}
 	}
 
-	//	err = encryptFileAES(dbPath, passwd)
+	//  err = encryptFileAES(dbPath, passwd)
 	_, settings := getOrCreateLocalConfig(APP)
 
 	switch settings.Cipher {
@@ -796,7 +842,7 @@ func exportToMarkdown(fileName string) error {
 		}
 	}
 
-	//	fmt.Printf("%+v\n", maxLengths)
+	//  fmt.Printf("%+v\n", maxLengths)
 	fh, err = os.Create(fileName)
 	if err != nil {
 		fmt.Printf("Cannt open \"%s\" for writing - \"%s\"\n", fileName, err.Error())
@@ -810,7 +856,7 @@ func exportToMarkdown(fileName string) error {
 	// Write markdown header
 	for idx, length := range maxLengths {
 		delta := length - len(headers[idx])
-		//		fmt.Printf("%d\n", delta)
+		//      fmt.Printf("%d\n", delta)
 		if delta > 0 {
 			for i := 0; i < delta+2; i++ {
 				headers[idx] += " "
@@ -872,7 +918,7 @@ func exportToPDF(fileName string) error {
 	}
 
 	tmpFile = randomFileName(os.TempDir(), ".tmp")
-	//	fmt.Printf("Temp file => %s\n", tmpFile)
+	//  fmt.Printf("Temp file => %s\n", tmpFile)
 	err = exportToMarkdownLimited(tmpFile)
 
 	if err == nil {
@@ -889,7 +935,7 @@ func exportToPDF(fileName string) error {
 
 			if pdfTkFound && len(passwd) > 0 {
 				tmpFile = randomFileName(".", ".pdf")
-				//				fmt.Printf("pdf file => %s\n", tmpFile)
+				//              fmt.Printf("pdf file => %s\n", tmpFile)
 				args = []string{fileName, "output", tmpFile, "user_pw", passwd}
 				cmd = exec.Command("pdftk", args...)
 				_, err = cmd.Output()
@@ -935,7 +981,7 @@ func exportToMarkdownLimited(fileName string) error {
 		}
 	}
 
-	//	fmt.Printf("%+v\n", maxLengths)
+	//  fmt.Printf("%+v\n", maxLengths)
 	fh, err = os.Create(fileName)
 	if err != nil {
 		fmt.Printf("Cannt open \"%s\" for writing - \"%s\"\n", fileName, err.Error())
@@ -949,7 +995,7 @@ func exportToMarkdownLimited(fileName string) error {
 	// Write markdown header
 	for idx, length := range maxLengths {
 		delta := length - len(headers[idx])
-		//		fmt.Printf("%d\n", delta)
+		//      fmt.Printf("%d\n", delta)
 		if delta > 0 {
 			for i := 0; i < delta+2; i++ {
 				headers[idx] += " "
@@ -1000,7 +1046,7 @@ func exportToHTML(fileName string) error {
 		return err
 	}
 
-	//	fmt.Printf("%+v\n", maxLengths)
+	//  fmt.Printf("%+v\n", maxLengths)
 	fh, err = os.Create(fileName)
 	if err != nil {
 		fmt.Printf("Cannt open \"%s\" for writing - \"%s\"\n", fileName, err.Error())

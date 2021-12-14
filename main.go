@@ -32,7 +32,7 @@ type CmdOption struct {
 
 // Print the program's usage string and exit
 func printUsage() error {
-	//	getopt.Usage()
+	//  getopt.Usage()
 	os.Exit(0)
 
 	return nil
@@ -102,8 +102,9 @@ func performAction(optMap map[string]interface{}) {
 	}
 
 	flagsActionsMap := map[string]voidFunc{
-		"show": setShowPasswords,
-		"copy": setCopyPasswordToClipboard,
+		"show":       setShowPasswords,
+		"copy":       setCopyPasswordToClipboard,
+		"assume-yes": setAssumeYes,
 	}
 
 	// Flag actions - always done
@@ -168,7 +169,7 @@ func initializeCmdLine(parser *argparse.Parser) map[string]interface{} {
 		{"I", "init", "Initialize a new database", "<path>", ""},
 		{"d", "decrypt", "Decrypt password database", "<path>", ""},
 		{"C", "clone", "Clone an entry with <id>", "<id>", ""},
-		{"R", "remove", "Remove an entry with <id>", "<id>", ""},
+		{"R", "remove", "Remove an entry with <id> or <id-range>", "<id>", ""},
 		{"U", "use-db", "Set <path> as active database", "<path>", ""},
 		{"f", "find", "Search entries with <term>", "<term>", ""},
 		{"E", "edit", "Edit entry by <id>", "<id>", ""},
@@ -188,6 +189,7 @@ func initializeCmdLine(parser *argparse.Parser) map[string]interface{} {
 		{"g", "genpass", "Generate a strong password (length: 12 - 16)", "", ""},
 		{"s", "show", "Show passwords when listing entries", "", ""},
 		{"c", "copy", "Copy password to clipboard", "", ""},
+		{"y", "assume-yes", "Assume yes to actions requiring confirmation", "", ""},
 		{"v", "version", "Show version information and exit", "", ""},
 		{"h", "help", "Print this help message and exit", "", ""},
 	}
