@@ -69,38 +69,39 @@ The binary will be installed in `/usr/local/bin` folder.
 Usage
 =====
 
-    $ ./varuh -h
+    $ varuh -h
     usage: varuh [-h|--help] [-I|--init "<value>"] [-d|--decrypt "<value>"]
                  [-C|--clone "<value>"] [-R|--remove "<value>"] [-U|--use-db
-                 "<value>"] [-f|--find "<value>"] [-E|--edit "<value>"]
-                 [-l|--list-entry "<value>"] [-x|--export "<value>"] [-e|--encrypt]
-                 [-A|--add] [-p|--path] [-a|--list-all] [-g|--genpass] [-s|--show]
-                 [-c|--copy] [-y|--assume-yes] [-v|--version]
+                 "<value>"] [-E|--edit "<value>"] [-l|--list-entry "<value>"]
+                 [-x|--export "<value>"] [-f|--find "<value>" [-f|--find "<value>"
+                 ...]] [-e|--encrypt] [-A|--add] [-p|--path] [-a|--list-all]
+                 [-g|--genpass] [-s|--show] [-c|--copy] [-y|--assume-yes]
+                 [-v|--version]
 
                  Password manager for the command line for Unix like operating
                  systems
 
     Options:
 
-      -h  --help                   Print help information
-      -I  --init        <path>     Initialize a new database
-      -d  --decrypt     <path>     Decrypt password database
-      -C  --clone       <id>       Clone an entry with <id>
-      -R  --remove      <id>       Remove an entry with <id> or <id-range>
-      -U  --use-db      <path>     Set <path> as active database
-      -f  --find        <term>     Search entries with <term>
-      -E  --edit        <id>       Edit entry by <id>
-      -l  --list-entry  <id>       List entry by <id>
-      -x  --export      <filename> Export all entries to <filename>
-      -e  --encrypt                Encrypt the current database
-      -A  --add                    Add a new entry
-      -p  --path                   Show current database path
-      -a  --list-all               List all entries in current database
-      -g  --genpass                Generate a strong password (length: 12 - 16)
-      -s  --show                   Show passwords when listing entries
-      -c  --copy                   Copy password to clipboard
-      -y  --assume-yes             Assume yes to actions requiring confirmation
-      -v  --version                Show version information and exit
+      -h  --help                      Print help information
+      -I  --init        <path>        Initialize a new database
+      -d  --decrypt     <path>        Decrypt password database
+      -C  --clone       <id>          Clone an entry with <id>
+      -R  --remove      <id>          Remove an entry with <id> or <id-range>
+      -U  --use-db      <path>        Set <path> as active database
+      -E  --edit        <id>          Edit entry by <id>
+      -l  --list-entry  <id>          List entry by <id>
+      -x  --export      <filename>    Export all entries to <filename>
+      -f  --find        <t1> <t2> ... Search entries with terms
+      -e  --encrypt                   Encrypt the current database
+      -A  --add                       Add a new entry
+      -p  --path                      Show current database path
+      -a  --list-all                  List all entries in current database
+      -g  --genpass                   Generate a strong password (length: 12 - 16)
+      -s  --show                      Show passwords when listing entries
+      -c  --copy                      Copy password to clipboard
+      -y  --assume-yes                Assume yes to actions requiring confirmation
+      -v  --version                   Show version information and exit
 
 
     AUTHORS
@@ -440,6 +441,25 @@ An entry can be searched on its title, username, URL or notes. Search is case-in
     Notes: 
     Modified: 2021-21-25 15:09:51
     +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+## To search using multiple terms
+
+The `-f` option supports multiple terms, so you can specify this more than one time to narrow a search down to a specific entry.
+
+    $ varuh -f google -f anand
+    +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    ID: 8
+    Title: Google account
+    User: anandpillai@alumni.iitm.ac.in
+    URL: 
+    Password: **********
+    Notes: 
+    Modified: 2021-21-25 15:02:50
+    +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    $ varuh -f google -f priya
+    Entry for "google priya" not found
 
 ## To list all entries
 

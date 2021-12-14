@@ -511,12 +511,15 @@ func findCurrentEntry(term string) error {
 
 	var err error
 	var entries []Entry
+	var terms []string
 
 	if err = checkActiveDatabase(); err != nil {
 		return err
 	}
 
-	err, entries = searchDatabaseEntry(term)
+	terms = strings.Split(term, " ")
+
+	err, entries = searchDatabaseEntries(terms, "AND")
 	if err != nil || len(entries) == 0 {
 		fmt.Printf("Entry for query \"%s\" not found\n", term)
 		return err
