@@ -244,7 +244,9 @@ When you edit an entry with custom fields, you get the option to change the name
     Current Username: mydev
     New Username: 
     Current Password: ghp_ipQrStuVwxYz1a2b3cdEF10ghI689kLaMnOp
-    New Password ([y/Y] to generate new, enter will keep old one): 
+    New Password ([y/Y] to generate new, enter will keep old one):
+	Current Tags: token github
+	New Tags: 	
     Current Notes: Never Expires
     New Notes:
     Editing/deleting custom fields
@@ -350,7 +352,7 @@ If you want to switch back to a previous database, you can use the `-U` option. 
 
 (New in version 0.4)
 
-When new features are added - sometimes new fields would be required to be added in the database schema. To make sure your old databases work with the new features in such cases, the `--migrate` option can be used to migrate your existing databases.
+When new features are added - sometimes new fields would be required to be added in the database schema. To make sure your old databases work with the new features in such cases, the `-m/--migrate` option can be used to migrate your existing databases.
 
 	$ ./varuh -m /home/anand/mypasswds
 	Password:
