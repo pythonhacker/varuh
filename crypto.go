@@ -278,7 +278,7 @@ func decryptFileAES(encDbPath string, password string) error {
 		return err
 	}
 
-	err, origFile = rewriteBaseFile(encDbPath, plainText, 0600)
+	err, origFile = rewriteFile(encDbPath, plainText, 0600)
 
 	if err != nil {
 		fmt.Printf("Error writing decrypted data to %s - \"%s\"\n", origFile, err.Error())
@@ -425,8 +425,8 @@ func decryptFileXChachaPoly(encDbPath string, password string) error {
 		return err
 	}
 
-	//	err = os.WriteFile("test.sqlite3", plainText, 0600)
-	err, origFile = rewriteBaseFile(encDbPath, plainText, 0600)
+	//	err = os.WriteFile("test.sqlite3", oplainText, 0600)
+	err, origFile = rewriteFile(encDbPath, plainText, 0600)
 
 	if err != nil {
 		fmt.Printf("Error writing decrypted data to %s - \"%s\"\n", origFile, err.Error())
