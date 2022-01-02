@@ -213,6 +213,22 @@ func rewriteBaseFile(path string, contents []byte, mode fs.FileMode) (error, str
 	return err, origFile
 }
 
+// Rewrite the contents of the file with the new contents
+func rewriteFile(path string, contents []byte, mode fs.FileMode) (error, string) {
+
+	var err error
+
+	// Overwrite it
+	err = os.WriteFile(path, contents, 0644)
+
+	if err == nil {
+		// Chmod it
+		os.Chmod(path, mode)
+	}
+
+	return err, path
+}
+
 // Get color codes for console colors
 func getColor(code string) string {
 
@@ -317,7 +333,13 @@ func printEntry(entry *Entry, delim bool) error {
 		}
 		fmt.Printf("Password: %s\n", strings.Join(asterisks, ""))
 	}
-	fmt.Printf("Notes: %s\n", entry.Notes)
+
+	if len(entry.Tags) > 0 {
+		fmt.Printf("Tags: %s\n", entry.Tags)
+	}
+	if len(entry.Notes) > 0 {
+		fmt.Printf("Notes: %s\n", entry.Notes)
+	}
 	// Query extended entries
 	customEntries = getExtendedEntries(entry)
 
