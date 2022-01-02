@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-const VERSION = 0.3
+const VERSION = 0.4
 const APP = "varuh"
 
 const AUTHOR_INFO = `
