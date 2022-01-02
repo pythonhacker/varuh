@@ -14,7 +14,7 @@ const APP = "varuh"
 
 const AUTHOR_INFO = `
 AUTHORS
-    Copyright (C) 2021 Anand B Pillai <abpillai@gmail.com>
+    Copyright (C) 2022 Anand B Pillai <abpillai@gmail.com>
 `
 
 type actionFunc func(string) error
