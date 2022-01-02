@@ -6,6 +6,7 @@ import (
 	"encoding/csv"
 	"errors"
 	"fmt"
+	"gorm.io/gorm"
 	"os"
 	"os/exec"
 	"os/signal"
@@ -175,14 +176,19 @@ func setActiveDatabasePath(dbPath string) error {
 			}
 
 			if newEncrypted {
-				// Decrypt new database if it is encrypted
-				fmt.Printf("Database %s is encrypted, decrypting it\n", fullPath)
-				err, _ = decryptDatabase(fullPath)
-				if err != nil {
-					fmt.Printf("Decryption Error - \"%s\", not switching databases\n", err.Error())
-					return err
+				if !settings.AutoEncrypt {
+					// Decrypt new database if it is encrypted
+					fmt.Printf("Database %s is encrypted, decrypting it\n", fullPath)
+					err, _ = decryptDatabase(fullPath)
+					if err != nil {
+						fmt.Printf("Decryption Error - \"%s\", not switching databases\n", err.Error())
+						return err
+					} else {
+						newEncrypted = false
+					}
 				} else {
-					newEncrypted = false
+					// New database is encrypted and autoencrypt is set - so keep it like that
+					// fmt.Printf("Database %s is already encrypted, nothing to do\n", fullPath)
 				}
 			}
 		}
@@ -193,7 +199,7 @@ func setActiveDatabasePath(dbPath string) error {
 			return nil
 		}
 
-		if newEncrypted {
+		if newEncrypted && !settings.AutoEncrypt {
 			// Use should manually decrypt before switching
 			fmt.Println("Auto-encrypt disabled, decrypt new database manually before switching.")
 			return nil
@@ -223,6 +229,7 @@ func addNewEntry() error {
 	var url string
 	var notes string
 	var passwd string
+	var tags string
 	var err error
 	var customEntries []CustomEntry
 
@@ -250,7 +257,8 @@ func addNewEntry() error {
 	}
 	//  fmt.Printf("Password => %s\n", passwd)
 
-	notes = readInput(reader, "\nNotes")
+	tags = readInput(reader, "\nTags (separated by space): ")
+	notes = readInput(reader, "Notes")
 
 	// Title and username/password are mandatory
 	if len(title) == 0 {
@@ -269,7 +277,7 @@ func addNewEntry() error {
 	customEntries = addCustomFields(reader)
 
 	// Trim spaces
-	err = addNewDatabaseEntry(title, userName, url, passwd, notes, customEntries)
+	err = addNewDatabaseEntry(title, userName, url, passwd, tags, notes, customEntries)
 
 	if err != nil {
 		fmt.Printf("Error adding entry - \"%s\"\n", err.Error())
@@ -299,7 +307,7 @@ func addOrUpdateCustomFields(reader *bufio.Reader, entry *Entry) ([]CustomEntry,
 			fmt.Println("Field Name: " + customEntry.FieldName)
 			fieldName = readInput(reader, "\tNew Field Name (Enter to keep, \"x\" to delete)")
 			if strings.ToLower(strings.TrimSpace(fieldName)) == "x" {
-				fmt.Println("Deleting field " + fieldName)
+				fmt.Println("Deleting field: " + customEntry.FieldName)
 			} else {
 				if strings.TrimSpace(fieldName) == "" {
 					fieldName = customEntry.FieldName
@@ -365,6 +373,7 @@ func editCurrentEntry(idString string) error {
 	var title string
 	var url string
 	var notes string
+	var tags string
 	var passwd string
 	var err error
 	var entry *Entry
@@ -407,13 +416,16 @@ func editCurrentEntry(idString string) error {
 	}
 	//  fmt.Printf("Password => %s\n", passwd)
 
+	fmt.Printf("\nCurrent Tags: %s\n", entry.Tags)
+	tags = readInput(reader, "New Tags")
+
 	fmt.Printf("\nCurrent Notes: %s\n", entry.Notes)
 	notes = readInput(reader, "New Notes")
 
 	customEntries, flag := addOrUpdateCustomFields(reader, entry)
 
 	// Update
-	err = updateDatabaseEntry(entry, title, userName, url, passwd, notes, customEntries, flag)
+	err = updateDatabaseEntry(entry, title, userName, url, passwd, tags, notes, customEntries, flag)
 	if err != nil {
 		fmt.Printf("Error updating entry - \"%s\"\n", err.Error())
 	}
@@ -629,6 +641,9 @@ func copyCurrentEntry(idString string) error {
 
 	var err error
 	var entry *Entry
+	var entryNew *Entry
+	var exEntries []ExtendedEntry
+
 	var id int
 
 	if err = checkActiveDatabase(); err != nil {
@@ -643,10 +658,22 @@ func copyCurrentEntry(idString string) error {
 		return err
 	}
 
-	err, _ = cloneEntry(entry)
+	err, entryNew = cloneEntry(entry)
 	if err != nil {
 		fmt.Printf("Error cloning entry: \"%s\"\n", err.Error())
 		return err
+	}
+
+	exEntries = getExtendedEntries(entry)
+
+	if len(exEntries) > 0 {
+		fmt.Printf("%d extended entries found\n", len(exEntries))
+
+		err = cloneExtendedEntries(entryNew, exEntries)
+		if err != nil {
+			fmt.Printf("Error cloning extended entries: \"%s\"\n", err.Error())
+			return err
+		}
 	}
 
 	return err
@@ -684,11 +711,11 @@ func encryptDatabase(dbPath string, givenPasswd *string) error {
 	}
 
 	if len(passwd) == 0 {
-		fmt.Printf("Password: ")
+		fmt.Printf("Encryption Password: ")
 		err, passwd = readPassword()
 
 		if err == nil {
-			fmt.Printf("\nPassword again: ")
+			fmt.Printf("\nEncryption Password again: ")
 			err, passwd2 = readPassword()
 			if err == nil {
 				if passwd != passwd2 {
@@ -736,7 +763,7 @@ func decryptDatabase(dbPath string) (error, string) {
 		return err, ""
 	}
 
-	fmt.Printf("Password: ")
+	fmt.Printf("Decryption Password: ")
 	err, passwd = readPassword()
 
 	if err != nil {
@@ -757,10 +784,63 @@ func decryptDatabase(dbPath string) (error, string) {
 	}
 
 	if err == nil {
-		fmt.Println("\nDecryption complete.")
+		fmt.Println("...decryption complete.")
 	}
 
 	return err, passwd
+}
+
+// Migrate an existing database to the new schema
+func migrateDatabase(dbPath string) error {
+
+	var err error
+	var flag bool
+	var passwd string
+	var db *gorm.DB
+
+	if _, err = os.Stat(dbPath); os.IsNotExist(err) {
+		fmt.Printf("Error - path %s does not exist\n", dbPath)
+		return err
+	}
+
+	if err, flag = isFileEncrypted(dbPath); flag {
+		err, passwd = decryptDatabase(dbPath)
+	}
+
+	if err != nil {
+		return err
+	}
+
+	err, db = openDatabase(dbPath)
+
+	if err != nil {
+		fmt.Printf("Error opening database path - %s: %s\n", dbPath, err.Error())
+		return err
+	}
+
+	fmt.Println("Migrating tables ...")
+	err = db.AutoMigrate(&Entry{})
+
+	if err != nil {
+		fmt.Printf("Error migrating table \"entries\" - %s: %s\n", dbPath, err.Error())
+		return err
+	}
+
+	err = db.AutoMigrate(&ExtendedEntry{})
+
+	if err != nil {
+		fmt.Printf("Error migrating table \"exentries\" - %s: %s\n", dbPath, err.Error())
+		return err
+	}
+
+	if flag {
+		// File was encrypted - encrypt it again
+		encryptDatabase(dbPath, &passwd)
+	}
+
+	fmt.Println("Migration successful.")
+
+	return nil
 }
 
 // Export data to a varity of file types
