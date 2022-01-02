@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-const VERSION = 0.3
+const VERSION = 0.4
 const APP = "varuh"
 
 const AUTHOR_INFO = `
@@ -91,6 +91,7 @@ func performAction(optMap map[string]interface{}) {
 		"clone":      WrapperMaxKryptStringFunc(copyCurrentEntry),
 		"use-db":     setActiveDatabasePath,
 		"export":     exportToFile,
+		"migrate":    migrateDatabase,
 	}
 
 	stringListActionsMap := map[string]actionFunc{
@@ -190,6 +191,7 @@ func initializeCmdLine(parser *argparse.Parser) map[string]interface{} {
 		{"E", "edit", "Edit entry by <id>", "<id>", ""},
 		{"l", "list-entry", "List entry by <id>", "<id>", ""},
 		{"x", "export", "Export all entries to <filename>", "<filename>", ""},
+		{"m", "migrate", "Migrate a database to latest schema", "<path>", ""},
 	}
 
 	for _, opt := range stringOptions {

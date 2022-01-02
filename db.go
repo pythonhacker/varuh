@@ -22,6 +22,7 @@ type Entry struct {
 	Url       string    `gorm:"column:url"`
 	Password  string    `gorm:"column:password"`
 	Notes     string    `gorm:"column:notes"`
+	Tags      string    `gorm:"column:tags"`
 	Timestamp time.Time `gorm:"type:timestamp;default:(datetime('now','localtime'))"` // sqlite3
 }
 
@@ -53,6 +54,16 @@ func (e1 *Entry) Copy(e2 *Entry) {
 		e1.Url = e2.Url
 		e1.Password = e2.Password
 		e1.Notes = e2.Notes
+	}
+}
+
+// Clone an entry
+func (e1 *ExtendedEntry) Copy(e2 *ExtendedEntry) {
+
+	if e2 != nil {
+		e1.FieldName = e2.FieldName
+		e1.FieldValue = e2.FieldValue
+		e1.EntryID = e2.EntryID
 	}
 }
 
@@ -219,13 +230,15 @@ func replaceCustomEntries(db *gorm.DB, entry *Entry, updatedEntries []CustomEntr
 }
 
 // Add a new entry to current database
-func addNewDatabaseEntry(title, userName, url, passwd, notes string, customEntries []CustomEntry) error {
+func addNewDatabaseEntry(title, userName, url, passwd, tags string,
+	notes string, customEntries []CustomEntry) error {
 
 	var entry Entry
 	var err error
 	var db *gorm.DB
 
-	entry = Entry{Title: title, User: userName, Url: url, Password: passwd, Notes: notes}
+	entry = Entry{Title: title, User: userName, Url: url, Password: passwd, Tags: strings.TrimSpace(tags),
+		Notes: notes}
 
 	err, db = openActiveDatabase()
 	if err == nil && db != nil {
@@ -247,13 +260,20 @@ func addNewDatabaseEntry(title, userName, url, passwd, notes string, customEntri
 }
 
 // Update current database entry with new values
-func updateDatabaseEntry(entry *Entry, title, userName, url, passwd, notes string, customEntries []CustomEntry, flag bool) error {
+func updateDatabaseEntry(entry *Entry, title, userName, url, passwd, tags string,
+	notes string, customEntries []CustomEntry, flag bool) error {
 
 	var updateMap map[string]interface{}
 
 	updateMap = make(map[string]interface{})
 
-	keyValMap := map[string]string{"title": title, "user": userName, "url": url, "password": passwd, "notes": notes}
+	keyValMap := map[string]string{
+		"title":    title,
+		"user":     userName,
+		"url":      url,
+		"password": passwd,
+		"notes":    notes,
+		"tags":     tags}
 
 	for key, val := range keyValMap {
 		if len(val) > 0 {
@@ -416,9 +436,20 @@ func removeDatabaseEntry(entry *Entry) error {
 
 	err, db = openActiveDatabase()
 	if err == nil && db != nil {
+		var exEntries []ExtendedEntry
+
 		res := db.Delete(entry)
 		if res.Error != nil {
 			return res.Error
+		}
+
+		// Delete extended entries if any
+		exEntries = getExtendedEntries(entry)
+		if len(exEntries) > 0 {
+			res = db.Delete(exEntries)
+			if res.Error != nil {
+				return res.Error
+			}
 		}
 
 		return nil
@@ -448,6 +479,31 @@ func cloneEntry(entry *Entry) (error, *Entry) {
 	}
 
 	return err, nil
+}
+
+// Clone extended entries for an entry and return error code
+func cloneExtendedEntries(entry *Entry, exEntries []ExtendedEntry) error {
+
+	var err error
+	var db *gorm.DB
+
+	err, db = openActiveDatabase()
+	if err == nil && db != nil {
+		for _, exEntry := range exEntries {
+			var exEntryNew ExtendedEntry
+
+			exEntryNew.Copy(&exEntry)
+			// Update the ID!
+			exEntryNew.EntryID = entry.ID
+
+			result := db.Create(&exEntryNew)
+			if result.Error != nil {
+				return result.Error
+			}
+		}
+	}
+
+	return err
 }
 
 // Return an iterator over all entries using the given order query keys
