@@ -6,6 +6,7 @@ import (
 	"encoding/csv"
 	"errors"
 	"fmt"
+	"gorm.io/gorm"
 	"os"
 	"os/exec"
 	"os/signal"
@@ -14,6 +15,11 @@ import (
 	"strings"
 	"syscall"
 )
+
+type CustomEntry struct {
+	fieldName  string
+	fieldValue string
+}
 
 // Wrappers (closures) for functions accepting strings as input for in/out encryption
 func WrapperMaxKryptStringFunc(fn actionFunc) actionFunc {
@@ -170,14 +176,19 @@ func setActiveDatabasePath(dbPath string) error {
 			}
 
 			if newEncrypted {
-				// Decrypt new database if it is encrypted
-				fmt.Printf("Database %s is encrypted, decrypting it\n", fullPath)
-				err, _ = decryptDatabase(fullPath)
-				if err != nil {
-					fmt.Printf("Decryption Error - \"%s\", not switching databases\n", err.Error())
-					return err
+				if !settings.AutoEncrypt {
+					// Decrypt new database if it is encrypted
+					fmt.Printf("Database %s is encrypted, decrypting it\n", fullPath)
+					err, _ = decryptDatabase(fullPath)
+					if err != nil {
+						fmt.Printf("Decryption Error - \"%s\", not switching databases\n", err.Error())
+						return err
+					} else {
+						newEncrypted = false
+					}
 				} else {
-					newEncrypted = false
+					// New database is encrypted and autoencrypt is set - so keep it like that
+					// fmt.Printf("Database %s is already encrypted, nothing to do\n", fullPath)
 				}
 			}
 		}
@@ -188,7 +199,7 @@ func setActiveDatabasePath(dbPath string) error {
 			return nil
 		}
 
-		if newEncrypted {
+		if newEncrypted && !settings.AutoEncrypt {
 			// Use should manually decrypt before switching
 			fmt.Println("Auto-encrypt disabled, decrypt new database manually before switching.")
 			return nil
@@ -218,7 +229,9 @@ func addNewEntry() error {
 	var url string
 	var notes string
 	var passwd string
+	var tags string
 	var err error
+	var customEntries []CustomEntry
 
 	if err = checkActiveDatabase(); err != nil {
 		return err
@@ -242,9 +255,10 @@ func addNewEntry() error {
 		err, passwd = generateStrongPassword()
 		fmt.Printf("done")
 	}
-	//	fmt.Printf("Password => %s\n", passwd)
+	//  fmt.Printf("Password => %s\n", passwd)
 
-	notes = readInput(reader, "\nNotes")
+	tags = readInput(reader, "\nTags (separated by space): ")
+	notes = readInput(reader, "Notes")
 
 	// Title and username/password are mandatory
 	if len(title) == 0 {
@@ -260,14 +274,96 @@ func addNewEntry() error {
 		return errors.New("invalid input")
 	}
 
+	customEntries = addCustomFields(reader)
+
 	// Trim spaces
-	err = addNewDatabaseEntry(title, userName, url, passwd, notes)
+	err = addNewDatabaseEntry(title, userName, url, passwd, tags, notes, customEntries)
 
 	if err != nil {
 		fmt.Printf("Error adding entry - \"%s\"\n", err.Error())
 	}
 
 	return err
+}
+
+// Function to update existing custom entries and add new ones
+// The bool part of the return value indicates whether to take action
+func addOrUpdateCustomFields(reader *bufio.Reader, entry *Entry) ([]CustomEntry, bool) {
+
+	var customEntries []ExtendedEntry
+	var editedCustomEntries []CustomEntry
+	var newCustomEntries []CustomEntry
+	var flag bool
+
+	customEntries = getExtendedEntries(entry)
+
+	if len(customEntries) > 0 {
+
+		fmt.Println("Editing/deleting custom fields")
+		for _, customEntry := range customEntries {
+			var fieldName string
+			var fieldValue string
+
+			fmt.Println("Field Name: " + customEntry.FieldName)
+			fieldName = readInput(reader, "\tNew Field Name (Enter to keep, \"x\" to delete)")
+			if strings.ToLower(strings.TrimSpace(fieldName)) == "x" {
+				fmt.Println("Deleting field: " + customEntry.FieldName)
+			} else {
+				if strings.TrimSpace(fieldName) == "" {
+					fieldName = customEntry.FieldName
+				}
+
+				fmt.Println("Field Value: " + customEntry.FieldValue)
+				fieldValue = readInput(reader, "\tNew Field Value (Enter to keep)")
+				if strings.TrimSpace(fieldValue) == "" {
+					fieldValue = customEntry.FieldValue
+				}
+
+				editedCustomEntries = append(editedCustomEntries, CustomEntry{fieldName, fieldValue})
+			}
+		}
+	}
+
+	newCustomEntries = addCustomFields(reader)
+
+	editedCustomEntries = append(editedCustomEntries, newCustomEntries...)
+
+	// Cases where length == 0
+	// 1. Existing entries - all deleted
+	flag = len(customEntries) > 0 || len(editedCustomEntries) > 0
+
+	return editedCustomEntries, flag
+}
+
+// Function to add custom fields to an entry
+func addCustomFields(reader *bufio.Reader) []CustomEntry {
+
+	// Custom fields
+	var custom string
+	var customEntries []CustomEntry
+
+	custom = readInput(reader, "Do you want to add custom fields [y/N]")
+	if strings.ToLower(custom) == "y" {
+
+		fmt.Println("Keep entering custom field name followed by the value. Press return with no input once done.")
+		for true {
+			var customFieldName string
+			var customFieldValue string
+
+			customFieldName = strings.TrimSpace(readInput(reader, "Field Name"))
+			if customFieldName != "" {
+				customFieldValue = strings.TrimSpace(readInput(reader, "Value for "+customFieldName))
+			}
+
+			if customFieldName == "" && customFieldValue == "" {
+				break
+			}
+
+			customEntries = append(customEntries, CustomEntry{customFieldName, customFieldValue})
+		}
+	}
+
+	return customEntries
 }
 
 // Edit a current entry by id
@@ -277,6 +373,7 @@ func editCurrentEntry(idString string) error {
 	var title string
 	var url string
 	var notes string
+	var tags string
 	var passwd string
 	var err error
 	var entry *Entry
@@ -317,13 +414,18 @@ func editCurrentEntry(idString string) error {
 		fmt.Printf("\nGenerating new password ...")
 		err, passwd = generateStrongPassword()
 	}
-	//	fmt.Printf("Password => %s\n", passwd)
+	//  fmt.Printf("Password => %s\n", passwd)
+
+	fmt.Printf("\nCurrent Tags: %s\n", entry.Tags)
+	tags = readInput(reader, "New Tags")
 
 	fmt.Printf("\nCurrent Notes: %s\n", entry.Notes)
 	notes = readInput(reader, "New Notes")
 
+	customEntries, flag := addOrUpdateCustomFields(reader, entry)
+
 	// Update
-	err = updateDatabaseEntry(entry, title, userName, url, passwd, notes)
+	err = updateDatabaseEntry(entry, title, userName, url, passwd, tags, notes, customEntries, flag)
 	if err != nil {
 		fmt.Printf("Error updating entry - \"%s\"\n", err.Error())
 	}
@@ -344,7 +446,7 @@ func listCurrentEntry(idString string) error {
 
 	id, _ = strconv.Atoi(idString)
 
-	//	fmt.Printf("Listing current entry - %d\n", id)
+	//  fmt.Printf("Listing current entry - %d\n", id)
 	err, entry = getEntryById(id)
 	if err != nil || entry == nil {
 		fmt.Printf("No entry found for id %d\n", id)
@@ -354,7 +456,7 @@ func listCurrentEntry(idString string) error {
 	err = printEntry(entry, true)
 
 	if err == nil && settingsRider.CopyPassword {
-		//		fmt.Printf("Copying password " + entry.Password + " to clipboard\n")
+		//      fmt.Printf("Copying password " + entry.Password + " to clipboard\n")
 		copyPasswordToClipboard(entry.Password)
 	}
 
@@ -421,12 +523,15 @@ func findCurrentEntry(term string) error {
 
 	var err error
 	var entries []Entry
+	var terms []string
 
 	if err = checkActiveDatabase(); err != nil {
 		return err
 	}
 
-	err, entries = searchDatabaseEntry(term)
+	terms = strings.Split(term, " ")
+
+	err, entries = searchDatabaseEntries(terms, "AND")
 	if err != nil || len(entries) == 0 {
 		fmt.Printf("Entry for query \"%s\" not found\n", term)
 		return err
@@ -457,15 +562,49 @@ func findCurrentEntry(term string) error {
 	return err
 }
 
+// Remove a range of entries <id1>-<id2> say 10-14
+func removeMultipleEntries(idRangeEntry string) error {
+
+	var err error
+	var idRange []string
+	var id1, id2 int
+
+	idRange = strings.Split(idRangeEntry, "-")
+
+	if len(idRange) != 2 {
+		fmt.Println("Invalid id range - " + idRangeEntry)
+		return errors.New("Invalid id range - " + idRangeEntry)
+	}
+
+	id1, _ = strconv.Atoi(idRange[0])
+	id2, _ = strconv.Atoi(idRange[1])
+
+	if id1 >= id2 {
+		fmt.Println("Invalid id range - " + idRangeEntry)
+		return errors.New("Invalid id range - " + idRangeEntry)
+	}
+
+	for idNum := id1; idNum <= id2; idNum++ {
+		err = removeCurrentEntry(fmt.Sprintf("%d", idNum))
+	}
+
+	return err
+}
+
 // Remove current entry by id
 func removeCurrentEntry(idString string) error {
 
 	var err error
 	var entry *Entry
 	var id int
+	var response string
 
 	if err = checkActiveDatabase(); err != nil {
 		return err
+	}
+
+	if strings.Contains(idString, "-") {
+		return removeMultipleEntries(idString)
 	}
 
 	id, _ = strconv.Atoi(idString)
@@ -476,10 +615,22 @@ func removeCurrentEntry(idString string) error {
 		return err
 	}
 
-	// Drop from the database
-	err = removeDatabaseEntry(entry)
-	if err == nil {
-		fmt.Printf("Entry with id %d was removed from the database\n", id)
+	printEntryMinimal(entry, true)
+
+	if !settingsRider.AssumeYes {
+		response = readInput(bufio.NewReader(os.Stdin), "Please confirm removal [Y/n]: ")
+	} else {
+		response = "y"
+	}
+
+	if strings.ToLower(response) != "n" {
+		// Drop from the database
+		err = removeDatabaseEntry(entry)
+		if err == nil {
+			fmt.Printf("Entry with id %d was removed from the database\n", id)
+		}
+	} else {
+		fmt.Println("Removal of entry cancelled by user.")
 	}
 
 	return err
@@ -490,6 +641,9 @@ func copyCurrentEntry(idString string) error {
 
 	var err error
 	var entry *Entry
+	var entryNew *Entry
+	var exEntries []ExtendedEntry
+
 	var id int
 
 	if err = checkActiveDatabase(); err != nil {
@@ -504,10 +658,22 @@ func copyCurrentEntry(idString string) error {
 		return err
 	}
 
-	err, _ = cloneEntry(entry)
+	err, entryNew = cloneEntry(entry)
 	if err != nil {
 		fmt.Printf("Error cloning entry: \"%s\"\n", err.Error())
 		return err
+	}
+
+	exEntries = getExtendedEntries(entry)
+
+	if len(exEntries) > 0 {
+		fmt.Printf("%d extended entries found\n", len(exEntries))
+
+		err = cloneExtendedEntries(entryNew, exEntries)
+		if err != nil {
+			fmt.Printf("Error cloning extended entries: \"%s\"\n", err.Error())
+			return err
+		}
 	}
 
 	return err
@@ -545,11 +711,11 @@ func encryptDatabase(dbPath string, givenPasswd *string) error {
 	}
 
 	if len(passwd) == 0 {
-		fmt.Printf("Password: ")
+		fmt.Printf("Encryption Password: ")
 		err, passwd = readPassword()
 
 		if err == nil {
-			fmt.Printf("\nPassword again: ")
+			fmt.Printf("\nEncryption Password again: ")
 			err, passwd2 = readPassword()
 			if err == nil {
 				if passwd != passwd2 {
@@ -565,7 +731,7 @@ func encryptDatabase(dbPath string, givenPasswd *string) error {
 		}
 	}
 
-	//	err = encryptFileAES(dbPath, passwd)
+	//  err = encryptFileAES(dbPath, passwd)
 	_, settings := getOrCreateLocalConfig(APP)
 
 	switch settings.Cipher {
@@ -597,7 +763,7 @@ func decryptDatabase(dbPath string) (error, string) {
 		return err, ""
 	}
 
-	fmt.Printf("Password: ")
+	fmt.Printf("Decryption Password: ")
 	err, passwd = readPassword()
 
 	if err != nil {
@@ -618,10 +784,63 @@ func decryptDatabase(dbPath string) (error, string) {
 	}
 
 	if err == nil {
-		fmt.Println("\nDecryption complete.")
+		fmt.Println("...decryption complete.")
 	}
 
 	return err, passwd
+}
+
+// Migrate an existing database to the new schema
+func migrateDatabase(dbPath string) error {
+
+	var err error
+	var flag bool
+	var passwd string
+	var db *gorm.DB
+
+	if _, err = os.Stat(dbPath); os.IsNotExist(err) {
+		fmt.Printf("Error - path %s does not exist\n", dbPath)
+		return err
+	}
+
+	if err, flag = isFileEncrypted(dbPath); flag {
+		err, passwd = decryptDatabase(dbPath)
+	}
+
+	if err != nil {
+		return err
+	}
+
+	err, db = openDatabase(dbPath)
+
+	if err != nil {
+		fmt.Printf("Error opening database path - %s: %s\n", dbPath, err.Error())
+		return err
+	}
+
+	fmt.Println("Migrating tables ...")
+	err = db.AutoMigrate(&Entry{})
+
+	if err != nil {
+		fmt.Printf("Error migrating table \"entries\" - %s: %s\n", dbPath, err.Error())
+		return err
+	}
+
+	err = db.AutoMigrate(&ExtendedEntry{})
+
+	if err != nil {
+		fmt.Printf("Error migrating table \"exentries\" - %s: %s\n", dbPath, err.Error())
+		return err
+	}
+
+	if flag {
+		// File was encrypted - encrypt it again
+		encryptDatabase(dbPath, &passwd)
+	}
+
+	fmt.Println("Migration successful.")
+
+	return nil
 }
 
 // Export data to a varity of file types
@@ -706,7 +925,7 @@ func exportToMarkdown(fileName string) error {
 		}
 	}
 
-	//	fmt.Printf("%+v\n", maxLengths)
+	//  fmt.Printf("%+v\n", maxLengths)
 	fh, err = os.Create(fileName)
 	if err != nil {
 		fmt.Printf("Cannt open \"%s\" for writing - \"%s\"\n", fileName, err.Error())
@@ -720,7 +939,7 @@ func exportToMarkdown(fileName string) error {
 	// Write markdown header
 	for idx, length := range maxLengths {
 		delta := length - len(headers[idx])
-		//		fmt.Printf("%d\n", delta)
+		//      fmt.Printf("%d\n", delta)
 		if delta > 0 {
 			for i := 0; i < delta+2; i++ {
 				headers[idx] += " "
@@ -782,7 +1001,7 @@ func exportToPDF(fileName string) error {
 	}
 
 	tmpFile = randomFileName(os.TempDir(), ".tmp")
-	//	fmt.Printf("Temp file => %s\n", tmpFile)
+	//  fmt.Printf("Temp file => %s\n", tmpFile)
 	err = exportToMarkdownLimited(tmpFile)
 
 	if err == nil {
@@ -799,7 +1018,7 @@ func exportToPDF(fileName string) error {
 
 			if pdfTkFound && len(passwd) > 0 {
 				tmpFile = randomFileName(".", ".pdf")
-				//				fmt.Printf("pdf file => %s\n", tmpFile)
+				//              fmt.Printf("pdf file => %s\n", tmpFile)
 				args = []string{fileName, "output", tmpFile, "user_pw", passwd}
 				cmd = exec.Command("pdftk", args...)
 				_, err = cmd.Output()
@@ -845,7 +1064,7 @@ func exportToMarkdownLimited(fileName string) error {
 		}
 	}
 
-	//	fmt.Printf("%+v\n", maxLengths)
+	//  fmt.Printf("%+v\n", maxLengths)
 	fh, err = os.Create(fileName)
 	if err != nil {
 		fmt.Printf("Cannt open \"%s\" for writing - \"%s\"\n", fileName, err.Error())
@@ -859,7 +1078,7 @@ func exportToMarkdownLimited(fileName string) error {
 	// Write markdown header
 	for idx, length := range maxLengths {
 		delta := length - len(headers[idx])
-		//		fmt.Printf("%d\n", delta)
+		//      fmt.Printf("%d\n", delta)
 		if delta > 0 {
 			for i := 0; i < delta+2; i++ {
 				headers[idx] += " "
@@ -910,7 +1129,7 @@ func exportToHTML(fileName string) error {
 		return err
 	}
 
-	//	fmt.Printf("%+v\n", maxLengths)
+	//  fmt.Printf("%+v\n", maxLengths)
 	fh, err = os.Create(fileName)
 	if err != nil {
 		fmt.Printf("Cannt open \"%s\" for writing - \"%s\"\n", fileName, err.Error())

@@ -6,14 +6,15 @@ import (
 	"fmt"
 	"github.com/pythonhacker/argparse"
 	"os"
+	"strings"
 )
 
-const VERSION = 0.3
+const VERSION = 0.4
 const APP = "varuh"
 
 const AUTHOR_INFO = `
 AUTHORS
-    Copyright (C) 2021 Anand B Pillai <abpillai@gmail.com>
+    Copyright (C) 2022 Anand B Pillai <abpillai@gmail.com>
 `
 
 type actionFunc func(string) error
@@ -32,7 +33,7 @@ type CmdOption struct {
 
 // Print the program's usage string and exit
 func printUsage() error {
-	//	getopt.Usage()
+	//  getopt.Usage()
 	os.Exit(0)
 
 	return nil
@@ -86,11 +87,15 @@ func performAction(optMap map[string]interface{}) {
 		"edit":       WrapperMaxKryptStringFunc(editCurrentEntry),
 		"init":       initNewDatabase,
 		"list-entry": WrapperMaxKryptStringFunc(listCurrentEntry),
-		"find":       WrapperMaxKryptStringFunc(findCurrentEntry),
 		"remove":     WrapperMaxKryptStringFunc(removeCurrentEntry),
 		"clone":      WrapperMaxKryptStringFunc(copyCurrentEntry),
 		"use-db":     setActiveDatabasePath,
 		"export":     exportToFile,
+		"migrate":    migrateDatabase,
+	}
+
+	stringListActionsMap := map[string]actionFunc{
+		"find": WrapperMaxKryptStringFunc(findCurrentEntry),
 	}
 
 	stringActions2Map := map[string]actionFunc2{
@@ -102,8 +107,9 @@ func performAction(optMap map[string]interface{}) {
 	}
 
 	flagsActionsMap := map[string]voidFunc{
-		"show": setShowPasswords,
-		"copy": setCopyPasswordToClipboard,
+		"show":       setShowPasswords,
+		"copy":       setCopyPasswordToClipboard,
+		"assume-yes": setAssumeYes,
 	}
 
 	// Flag actions - always done
@@ -145,6 +151,18 @@ func performAction(optMap map[string]interface{}) {
 		}
 	}
 
+	for key, mappedFunc := range stringListActionsMap {
+		if len(*optMap[key].(*[]string)) > 0 {
+
+			var vals = *(optMap[key].(*[]string))
+			// Convert to single string
+			var singleVal = strings.Join(vals, " ")
+			mappedFunc(singleVal)
+			flag = true
+			break
+		}
+	}
+
 	if flag {
 		return
 	}
@@ -168,16 +186,24 @@ func initializeCmdLine(parser *argparse.Parser) map[string]interface{} {
 		{"I", "init", "Initialize a new database", "<path>", ""},
 		{"d", "decrypt", "Decrypt password database", "<path>", ""},
 		{"C", "clone", "Clone an entry with <id>", "<id>", ""},
-		{"R", "remove", "Remove an entry with <id>", "<id>", ""},
+		{"R", "remove", "Remove an entry with <id> or <id-range>", "<id>", ""},
 		{"U", "use-db", "Set <path> as active database", "<path>", ""},
-		{"f", "find", "Search entries with <term>", "<term>", ""},
 		{"E", "edit", "Edit entry by <id>", "<id>", ""},
 		{"l", "list-entry", "List entry by <id>", "<id>", ""},
 		{"x", "export", "Export all entries to <filename>", "<filename>", ""},
+		{"m", "migrate", "Migrate a database to latest schema", "<path>", ""},
 	}
 
 	for _, opt := range stringOptions {
 		optMap[opt.Long] = parser.String(opt.Short, opt.Long, &argparse.Options{Help: opt.Help, Path: opt.Path})
+	}
+
+	stringListOptions := []CmdOption{
+		{"f", "find", "Search entries with terms", "<t1> <t2> ...", ""},
+	}
+
+	for _, opt := range stringListOptions {
+		optMap[opt.Long] = parser.StringList(opt.Short, opt.Long, &argparse.Options{Help: opt.Help, Path: opt.Path})
 	}
 
 	boolOptions := []CmdOption{
@@ -185,9 +211,10 @@ func initializeCmdLine(parser *argparse.Parser) map[string]interface{} {
 		{"A", "add", "Add a new entry", "", ""},
 		{"p", "path", "Show current database path", "", ""},
 		{"a", "list-all", "List all entries in current database", "", ""},
-		{"g", "genpass", "Generate a strong password of length from 12 - 16", "", ""},
+		{"g", "genpass", "Generate a strong password (length: 12 - 16)", "", ""},
 		{"s", "show", "Show passwords when listing entries", "", ""},
 		{"c", "copy", "Copy password to clipboard", "", ""},
+		{"y", "assume-yes", "Assume yes to actions requiring confirmation", "", ""},
 		{"v", "version", "Show version information and exit", "", ""},
 		{"h", "help", "Print this help message and exit", "", ""},
 	}

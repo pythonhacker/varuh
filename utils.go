@@ -22,6 +22,7 @@ const DELIMSIZE int = 69
 type SettingsOverride struct {
 	ShowPasswords bool
 	CopyPassword  bool
+	AssumeYes     bool
 }
 
 // Settings structure for local config
@@ -104,7 +105,7 @@ func getOrCreateLocalConfig(app string) (error, *Settings) {
 	}
 
 	configFile = filepath.Join(configPath, "config.json")
-	//	fmt.Printf("Config file, path => %s %s\n", configFile, configPath)
+	//  fmt.Printf("Config file, path => %s %s\n", configFile, configPath)
 
 	if _, err = os.Stat(configFile); err == nil {
 		fh, err = os.Open(configFile)
@@ -121,8 +122,8 @@ func getOrCreateLocalConfig(app string) (error, *Settings) {
 		}
 
 	} else {
-		//		fmt.Printf("Creating default configuration ...")
-		settings = Settings{"", "aes", true, true, false, configFile, "id,asc", "+", "default", "bgblack"}
+		//      fmt.Printf("Creating default configuration ...")
+		settings = Settings{"", "aes", true, true, false, configFile, "id,asc", ">", "default", "bgblack"}
 
 		if err = writeSettings(&settings, configFile); err == nil {
 			// fmt.Println(" ...done")
@@ -212,6 +213,22 @@ func rewriteBaseFile(path string, contents []byte, mode fs.FileMode) (error, str
 	return err, origFile
 }
 
+// Rewrite the contents of the file with the new contents
+func rewriteFile(path string, contents []byte, mode fs.FileMode) (error, string) {
+
+	var err error
+
+	// Overwrite it
+	err = os.WriteFile(path, contents, 0644)
+
+	if err == nil {
+		// Chmod it
+		os.Chmod(path, mode)
+	}
+
+	return err, path
+}
+
 // Get color codes for console colors
 func getColor(code string) string {
 
@@ -283,6 +300,7 @@ func printEntry(entry *Entry, delim bool) error {
 
 	var err error
 	var settings *Settings
+	var customEntries []ExtendedEntry
 
 	err, settings = getOrCreateLocalConfig(APP)
 
@@ -315,8 +333,60 @@ func printEntry(entry *Entry, delim bool) error {
 		}
 		fmt.Printf("Password: %s\n", strings.Join(asterisks, ""))
 	}
-	fmt.Printf("Notes: %s\n", entry.Notes)
+
+	if len(entry.Tags) > 0 {
+		fmt.Printf("Tags: %s\n", entry.Tags)
+	}
+	if len(entry.Notes) > 0 {
+		fmt.Printf("Notes: %s\n", entry.Notes)
+	}
+	// Query extended entries
+	customEntries = getExtendedEntries(entry)
+
+	if len(customEntries) > 0 {
+		for _, customEntry := range customEntries {
+			fmt.Printf("%s: %s\n", customEntry.FieldName, customEntry.FieldValue)
+		}
+	}
+
 	fmt.Printf("Modified: %s\n", entry.Timestamp.Format("2006-06-02 15:04:05"))
+
+	printDelim(settings.Delim, settings.Color)
+
+	// Reset
+	fmt.Printf("%s", getColor("default"))
+
+	return nil
+
+}
+
+// Print an entry to the console with minimal data
+func printEntryMinimal(entry *Entry, delim bool) error {
+
+	var err error
+	var settings *Settings
+
+	err, settings = getOrCreateLocalConfig(APP)
+
+	if err != nil {
+		fmt.Printf("Error parsing config - \"%s\"\n", err.Error())
+		return err
+	}
+
+	fmt.Printf("%s", getColor(strings.ToLower(settings.Color)))
+	if strings.HasPrefix(settings.BgColor, "bg") {
+		fmt.Printf("%s", getColor(strings.ToLower(settings.BgColor)))
+	}
+
+	if delim {
+		printDelim(settings.Delim, settings.Color)
+	}
+
+	fmt.Printf("Title: %s\n", entry.Title)
+	fmt.Printf("User: %s\n", entry.User)
+	fmt.Printf("URL: %s\n", entry.Url)
+	fmt.Printf("Modified: %s\n", entry.Timestamp.Format("2006-06-02 15:04:05"))
+
 	printDelim(settings.Delim, settings.Color)
 
 	// Reset
@@ -386,7 +456,7 @@ func isActiveDatabaseEncryptedAndMaxKryptOn() (bool, string) {
 
 // (Temporarily) enable showing of passwords
 func setShowPasswords() error {
-	//	fmt.Printf("Setting show passwords to true\n")
+	//  fmt.Printf("Setting show passwords to true\n")
 	settingsRider.ShowPasswords = true
 	return nil
 }
@@ -394,6 +464,11 @@ func setShowPasswords() error {
 // Copy the password to clipboard - only for single listings or single search results
 func setCopyPasswordToClipboard() error {
 	settingsRider.CopyPassword = true
+	return nil
+}
+
+func setAssumeYes() error {
+	settingsRider.AssumeYes = true
 	return nil
 }
 
