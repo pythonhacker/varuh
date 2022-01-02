@@ -69,43 +69,44 @@ The binary will be installed in `/usr/local/bin` folder.
 Usage
 =====
 
-    $ varuh -h
-    usage: varuh [-h|--help] [-I|--init "<value>"] [-d|--decrypt "<value>"]
-                 [-C|--clone "<value>"] [-R|--remove "<value>"] [-U|--use-db
-                 "<value>"] [-E|--edit "<value>"] [-l|--list-entry "<value>"]
-                 [-x|--export "<value>"] [-f|--find "<value>" [-f|--find "<value>"
-                 ...]] [-e|--encrypt] [-A|--add] [-p|--path] [-a|--list-all]
-                 [-g|--genpass] [-s|--show] [-c|--copy] [-y|--assume-yes]
-                 [-v|--version]
+	$ varuh -h
+	usage: varuh [-h|--help] [-I|--init "<value>"] [-d|--decrypt "<value>"]
+				 [-C|--clone "<value>"] [-R|--remove "<value>"] [-U|--use-db
+				 "<value>"] [-E|--edit "<value>"] [-l|--list-entry "<value>"]
+				 [-x|--export "<value>"] [-m|--migrate "<value>"] [-f|--find
+				 "<value>" [-f|--find "<value>" ...]] [-e|--encrypt] [-A|--add]
+				 [-p|--path] [-a|--list-all] [-g|--genpass] [-s|--show] [-c|--copy]
+				 [-y|--assume-yes] [-v|--version]
 
-                 Password manager for the command line for Unix like operating
-                 systems
+				 Password manager for the command line for Unix like operating
+				 systems
 
-    Options:
+	Options:
 
-      -h  --help                      Print help information
-      -I  --init        <path>        Initialize a new database
-      -d  --decrypt     <path>        Decrypt password database
-      -C  --clone       <id>          Clone an entry with <id>
-      -R  --remove      <id>          Remove an entry with <id> or <id-range>
-      -U  --use-db      <path>        Set <path> as active database
-      -E  --edit        <id>          Edit entry by <id>
-      -l  --list-entry  <id>          List entry by <id>
-      -x  --export      <filename>    Export all entries to <filename>
-      -f  --find        <t1> <t2> ... Search entries with terms
-      -e  --encrypt                   Encrypt the current database
-      -A  --add                       Add a new entry
-      -p  --path                      Show current database path
-      -a  --list-all                  List all entries in current database
-      -g  --genpass                   Generate a strong password (length: 12 - 16)
-      -s  --show                      Show passwords when listing entries
-      -c  --copy                      Copy password to clipboard
-      -y  --assume-yes                Assume yes to actions requiring confirmation
-      -v  --version                   Show version information and exit
+	  -h  --help                      Print help information
+	  -I  --init        <path>        Initialize a new database
+	  -d  --decrypt     <path>        Decrypt password database
+	  -C  --clone       <id>          Clone an entry with <id>
+	  -R  --remove      <id>          Remove an entry with <id> or <id-range>
+	  -U  --use-db      <path>        Set <path> as active database
+	  -E  --edit        <id>          Edit entry by <id>
+	  -l  --list-entry  <id>          List entry by <id>
+	  -x  --export      <filename>    Export all entries to <filename>
+	  -m  --migrate     <path>        Migrate a database to latest schema
+	  -f  --find        <t1> <t2> ... Search entries with terms
+	  -e  --encrypt                   Encrypt the current database
+	  -A  --add                       Add a new entry
+	  -p  --path                      Show current database path
+	  -a  --list-all                  List all entries in current database
+	  -g  --genpass                   Generate a strong password (length: 12 - 16)
+	  -s  --show                      Show passwords when listing entries
+	  -c  --copy                      Copy password to clipboard
+	  -y  --assume-yes                Assume yes to actions requiring confirmation
+	  -v  --version                   Show version information and exit
 
 
-    AUTHORS
-        Copyright (C) 2021 Anand B Pillai <abpillai@gmail.com>
+	AUTHORS
+		Copyright (C) 2022 Anand B Pillai <abpillai@gmail.com>
 
 
 Encryption and Security
@@ -149,6 +150,7 @@ The password database is created and is active now. You can start adding entries
     Username: mememe
     Password (enter to generate new): 
     Generating password ...done
+	Tags (separated by space): testing test website
     Notes: Website uses Nginx auth
     Do you want to add custom fields [y/N]: 
     Created new entry with id: 1
@@ -162,6 +164,7 @@ You can now list the entry with one of the list options.
     User: mememe
     URL: http://mywebsite.name
     Password: ****************
+	Tags: testing test website
     Notes: Website uses Nginx auth
     Modified: 2021-21-09 23:12:35
     +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -175,6 +178,7 @@ From version 0.3 onwards, custom fields are supported.
     URL: https://github.com/mydev/myproject
     Username: mydev
     Password (enter to generate new): ghp_ipQrStuVwxYz1a2b3cdEF10ghI689kLaMnOp
+	Tags (separated by space): token github
     Notes: Never Expires
     Do you want to add custom fields [y/N]: y
     Field Name: Domain
@@ -190,11 +194,11 @@ From version 0.3 onwards, custom fields are supported.
     User: mydev
     URL: https://github.com/mydev/myproject
     Password: ghp_ipQrStuVwxYz1a2b3cdEF10ghI689kLaMnOp
+	Tags: token github
     Notes: Never Expires
     Domain: github.com
     Type: Auth Token
     Modified: 2021-21-13 00:07:18
-
 
 For more on listing see the [Listing and Searching](#listing-and-searching) section below.
 
@@ -208,7 +212,9 @@ For more on listing see the [Listing and Searching](#listing-and-searching) sect
     Current Username: mememe
     New Username: meblog
     Current Password: lTzC2z9kRppnYsYl
-    New Password ([y/Y] to generate new, enter will keep old one): 
+    New Password ([y/Y] to generate new, enter will keep old one):
+	Current Tags: testing test website
+	New Tags: 
     Current Notes: Website uses Nginx auth
     New Notes: Website uses Apache
     Do you want to add custom fields [y/N]:
@@ -221,6 +227,7 @@ For more on listing see the [Listing and Searching](#listing-and-searching) sect
     User: meblog
     URL: http://myblog.name
     Password: myblog123
+	Tags: testing test website
     Notes: Website uses Apache
     Modified: 2021-21-09 23:15:29
     +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -242,7 +249,8 @@ When you edit an entry with custom fields, you get the option to change the name
     New Notes:
     Editing/deleting custom fields
     Field Name: Domain
-        New Field Name (Enter to keep, "x" to delete): x
+		New Field Name (Enter to keep, "x" to delete): x
+	Deleting field: Domain
     Field Name: Type
         New Field Name (Enter to keep, "x" to delete): Token Type
     Field Value: Auth Token
@@ -257,6 +265,7 @@ When you edit an entry with custom fields, you get the option to change the name
     User: mydev
     URL: https://github.com/mydev/myproject
     Password: ghp_ipQrStuVwxYz1a2b3cdEF10ghI689kLaMnOp
+	Tags: token github
     Notes: Never Expires
     Token Type: Auth Token
     Modified: 2021-21-13 00:16:41
@@ -336,7 +345,25 @@ If you want to switch back to a previous database, you can use the `-U` option. 
     Password: 
     Decryption complete.
     Switched active database successfully.
-    
+
+## Database Migration
+
+(New in version 0.4)
+
+When new features are added - sometimes new fields would be required to be added in the database schema. To make sure your old databases work with the new features in such cases, the `--migrate` option can be used to migrate your existing databases.
+
+	$ ./varuh -m /home/anand/mypasswds
+	Password:
+	Decryption complete.
+	Migrating tables ...
+
+	Encryption complete.
+	Migration successful.
+
+For migration you need to provide the database path - even for the active database. Once migrated, you can continue to use your database as before.
+
+NOTE: It is suggested to make a backup copy of your current active database before migration.
+
 ## Manual encryption and decryption
 
 You can manually encrypt the current database using the `-e` option.
@@ -366,6 +393,7 @@ Now the database is active again and you can see the listings.
     User: myblog.name
     URL: http://meblog
     Password: *********
+	Tags: test testing website
     Notes: Website uses Apache
     Modified: 2021-21-09 23:21:32
     +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -385,6 +413,7 @@ If the config param `encrypt_on` is set to `true` along with `auto_encrypt` (def
     User: banklogin
     URL: https://my.localbank.com
     Password: bankpass123
+	Tags: bank banking finance
     Notes: 
     Modified: 2021-21-18 12:44:10
     +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -588,7 +617,7 @@ The config file is named *config.json*. It looks as follows.
         "encrypt_on": true,
         "path": "/home/anand/.config/varuh/config.json",
         "list_order": "id,asc",
-        "delimiter": "+",
+        "delimiter": ">",
         "color": "default",
         "bgcolor": "bgblack"
     }
