@@ -17,7 +17,23 @@ import (
 // Structure representing an entry in the db
 type Entry struct {
 	ID        int       `gorm:"column:id;autoIncrement;primaryKey"`
+	Type      string    `gorm:"column:type"`  // Type of entry - password (default), card, identity etc
 	Title     string    `gorm:"column:title"`
+    Name      string    `gorm:"column:name"` // Card holder name/ID card name - for types cards/identity
+	Company   string    `gorm:"column:company"` // Company name of person  - for type identity and
+                                             	// Credit card company for type CC
+	Number    string    `gorm:"column:number"`  // Number type - CC number for credit cards
+	                                            // ID card number for identity types
+	SecurityCode string  `gorm:"security_code"` // CVV number/security code for CC type
+	ExpiryMonth string   `gorm:"expiry_month"` // CC or Identity document expiry month
+	ExpiryDay string     `gorm:"expiry_day"`   // Identity document expiry day
+	ExpiryYear string    `gorm:"expiry_year"`  // CC or Identity document expiry year
+	FirstName  string    `gorm:"column:first_name"` // first name - for ID card types
+	MiddleName string    `gorm:"column:middle_name"` // middle name - for ID card types
+	LastName   string    `gorm:"column:last_name"` // last name - for ID card types	
+	Email      string    `gorm:"email"` // Email - for ID card types
+	PhoneNumber string   `gorm:"phone_number"` // Phone number - for ID card types
+
 	User      string    `gorm:"column:user"`
 	Url       string    `gorm:"column:url"`
 	Password  string    `gorm:"column:password"`
@@ -45,15 +61,68 @@ func (ex *ExtendedEntry) TableName() string {
 	return "exentries"
 }
 
+type Address struct {
+	ID     int   `gorm:"column:id;autoIncrement;primaryKey"`
+	Number string `gorm:"column:number"` // Flat or building number
+	Building string `gorm:"column:building"` // Apartment or building or society name
+	Street  string `gorm:"column:street"` // Street address
+	Locality string `gorm:"column:locality"` // Name of the locality e.g: Whitefield
+	Area     string `gorm:"column:area"` // Name of the larger area e.g: East Bangalore
+	City     string `gorm:"column:city"` // Name of the city e.g: Bangalore
+	State   string  `gorm:"column:state"` // Name of the state e.g: Karnataka
+	Country string  `gorm:"column:country"` // Name of the country e.g: India
+
+	Landmark string `gorm:"column:landmark"` // Name of landmark if any
+	ZipCode string  `gorm:"column:zipcode"` // PIN/ZIP code
+	Type    string  `gorm:"column:type"` // Type of address: Home/Work/Business
+
+	Entry   Entry `gorm:"foreignKey:EntryID"`
+	EntryID int	
+}
+
+func (ad *Address) TableName() string {
+	return "address"
+}
+
 // Clone an entry
 func (e1 *Entry) Copy(e2 *Entry) {
 
 	if e2 != nil {
-		e1.Title = e2.Title
-		e1.User = e2.User
-		e1.Url = e2.Url
-		e1.Password = e2.Password
-		e1.Notes = e2.Notes
+		switch (e2.Type) {
+		case "password":
+			e1.Title = e2.Title
+			e1.User = e2.User
+			e1.Url = e2.Url
+			e1.Password = e2.Password
+			e1.Notes = e2.Notes
+			e1.Tags = e2.Tags
+			e1.Type = e2.Type
+		case "card":
+			e1.Title = e2.Title
+			e1.Name = e2.Name // card holder name
+			e1.Company = e2.Company
+			e1.Number = e2.Number
+			e1.SecurityCode = e2.SecurityCode
+			e1.ExpiryMonth = e2.ExpiryMonth
+			e1.ExpiryYear = e2.ExpiryYear
+			e1.Tags = e2.Tags
+			e1.Notes = e2.Notes
+			e1.Type = e2.Type			
+		case "identity":
+			e1.Title = e2.Title
+			e1.Name = e2.Name 
+			e1.Company = e2.Company
+			e1.FirstName = e2.FirstName
+			e1.LastName = e2.LastName			
+			e1.MiddleName = e2.MiddleName
+			e1.User = e2.User
+			e1.Email = e2.Email
+			e1.PhoneNumber = e2.PhoneNumber
+			e1.Number = e2.Number
+			e1.Notes = e2.Notes
+			e1.Tags = e2.Tags
+			e1.Type = e2.Type
+		}
 	}
 }
 
