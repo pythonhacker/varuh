@@ -34,6 +34,7 @@ type Entry struct {
 	Email      string    `gorm:"email"` // Email - for ID card types
 	PhoneNumber string   `gorm:"phone_number"` // Phone number - for ID card types
 
+	Active    bool       `gorm:"active;default:true"` // Is the id card/CC active ?
 	User      string    `gorm:"column:user"`
 	Url       string    `gorm:"column:url"`
 	Password  string    `gorm:"column:password"`
