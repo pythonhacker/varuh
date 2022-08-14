@@ -17,15 +17,22 @@ import (
 // Structure representing an entry in the db
 type Entry struct {
     ID        int       `gorm:"column:id;autoIncrement;primaryKey"`
-    Title     string    `gorm:"column:title"`
-    User      string    `gorm:"column:user"`
-    Url       string    `gorm:"column:url"`
-    Password  string    `gorm:"column:password"`
+    Title     string    `gorm:"column:title"`  // For card type this -> Card Name
+    User      string    `gorm:"column:user"`   // For card type this -> Card Holder Name
+    Url       string    `gorm:"column:url"`    // For card type this -> Card Number
+    Password  string    `gorm:"column:password"` // For card type this -> CVV number
+    Pin       string    `gorm:"column:pin"` // For card type this -> card pin
+    ExpiryDate string   `gorm:"colum:expiry_date"` // For card type this -> Card expiry date
+    Issuer     string   `gorm:"column:issuer"`    // For card type this -> Issuing bank
+    Class      string   `gorm:"column:class"`    // For card type this -> visa/mastercard/amex etc
+    
     Notes     string    `gorm:"column:notes"`
     Tags      string    `gorm:"column:tags"`
+    Type      string    `gorm:"column:type"`  // Entry type, default/card/ID
     Timestamp time.Time `gorm:"type:timestamp;default:(datetime('now','localtime'))"` // sqlite3
 }
 
+    
 func (e *Entry) TableName() string {
     return "entries"
 }
@@ -258,6 +265,47 @@ func addNewDatabaseEntry(title, userName, url, passwd, tags string,
 
     return err
 }
+
+// Add a new card entry to current database
+func addNewDatabaseCardEntry(cardName, cardNumber, cardHolder, cardIssuer, cardClass,
+    cardCvv, cardPin, cardExpiry, notes, tags string, customEntries []CustomEntry) error {
+
+    var entry Entry
+    var err error
+    var db *gorm.DB
+
+    entry = Entry{
+        Title: cardName,
+        User: cardHolder,
+        Url: cardNumber,
+        Password: cardCvv,
+        Pin: cardPin,
+        Issuer: cardIssuer,
+        Class: cardClass,
+        ExpiryDate: cardExpiry,
+        Type: "card",
+        Tags: strings.TrimSpace(tags),
+        Notes: notes}
+
+    err, db = openActiveDatabase()
+    if err == nil && db != nil {
+        //      result := db.Debug().Create(&entry)
+        result := db.Create(&entry)
+        if result.Error == nil && result.RowsAffected == 1 {
+            // Add custom fields if given
+            fmt.Printf("Created new entry with id: %d.\n", entry.ID)
+            if len(customEntries) > 0 {
+                return addCustomEntries(db, &entry, customEntries)
+            }
+            return nil
+        } else if result.Error != nil {
+            return result.Error
+        }
+    }
+
+    return err
+}
+
 
 // Update current database entry with new values
 func updateDatabaseEntry(entry *Entry, title, userName, url, passwd, tags string,
