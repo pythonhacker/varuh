@@ -17,4 +17,4 @@ jobs:
       - run: echo "\U0001f34f This job's status is ${{ job.status }}."
       - name: Build code
         run: |
-          make          
+          cd ${{ github.workspace }} && make
