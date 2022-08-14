@@ -339,7 +339,7 @@ func searchDatabaseEntry(term string) (error, []Entry) {
     if err == nil && db != nil {
         searchTerm = fmt.Sprintf("%%%s%%", term)
         // Search on fields title, user, url and notes and tags.
-        query := db.Debug().Where(fmt.Sprintf("title like \"%s\"", searchTerm))
+        query := db.Where(fmt.Sprintf("title like \"%s\"", searchTerm))
 
         for _, field := range[]string{"user", "url", "notes", "tags"} {
             query = query.Or(fmt.Sprintf("%s like \"%s\"", field, searchTerm))
