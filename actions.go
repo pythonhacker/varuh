@@ -274,8 +274,7 @@ func addNewCardEntry() error {
     err, cardPin = readPassword()
 
     if !validateCardPin(cardPin) {
-        fmt.Printf("\nError - Invalid PIN")
-        return errors.New("Error - Invalid PIN")
+        fmt.Printf("\n<Warning - Empty PIN!>")
     }
 
     cardIssuer = readInput(reader, "\nIssuing Bank")

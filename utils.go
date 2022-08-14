@@ -300,6 +300,27 @@ func printDelim(delimChar string, color string) {
     fmt.Println(strings.Join(delims, ""))
 }
 
+// Prettify credit/debit card numbers
+func prettifyCardNumber(cardNumber string) string {
+
+    // Amex cards are 15 digits - group as 4, 6, 5
+    // Any 16 digits - group as 4/4/4/4
+    var numbers []string
+
+    if len(cardNumber) == 15 {
+        numbers = append(numbers, cardNumber[0:4])
+        numbers = append(numbers, cardNumber[4:10])
+        numbers = append(numbers, cardNumber[10:15])     
+    } else if len(cardNumber) == 16 {
+        numbers = append(numbers, cardNumber[0:4])
+        numbers = append(numbers, cardNumber[4:8])
+        numbers = append(numbers, cardNumber[8:12])
+        numbers = append(numbers, cardNumber[12:16])             
+    }
+
+    return strings.Join(numbers, " ")
+}
+
 // Print a card entry to the console
 func printCardEntry(entry *Entry, settings* Settings, delim bool) error {
 
@@ -317,7 +338,7 @@ func printCardEntry(entry *Entry, settings* Settings, delim bool) error {
     fmt.Printf("ID: %d\n", entry.ID)
     fmt.Printf("Card Name: %s\n", entry.Title)
     fmt.Printf("Card Holder: %s\n", entry.User)
-    fmt.Printf("Card Number: %s\n", entry.Url)
+    fmt.Printf("Card Number: %s\n", prettifyCardNumber(entry.Url))
     fmt.Printf("Card Type: %s\n", entry.Class)  
 
     if entry.Issuer != "" {
