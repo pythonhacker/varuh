@@ -1,0 +1,21 @@
+name: build
+on: [push]
+jobs:
+  varuh build
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "\U0001f389 The job was automatically triggered by a ${{ github.event_name }} event."
+      - run: echo "\U0001f427 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
+      - run: echo "\U0001f50e The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
+      - name: Check out repository code
+        uses: actions/checkout@v3
+      - run: echo "\U0001f4a1 The ${{ github.repository }} repository has been cloned to the runner."
+      - run: echo "\U0001f5a5\ufe0f The workflow is now ready to test your code on the runner."
+      - name: List files in the repository
+        run: |
+          ls ${{ github.workspace }}
+      - run: echo "\U0001f34f This job's status is ${{ job.status }}."
+      - name: Build code
+        run: |
+          make 
+          
