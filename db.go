@@ -16,33 +16,50 @@ import (
 
 // Structure representing an entry in the db
 type Entry struct {
-	ID        int       `gorm:"column:id;autoIncrement;primaryKey"`
-	Type      string    `gorm:"column:type"`  // Type of entry - password (default), card, identity etc
-	Title     string    `gorm:"column:title"`
-  Name      string    `gorm:"column:name"` // Card holder name/ID card name - for types cards/identity
-	Company   string    `gorm:"column:company"` // Company name of person  - for type identity and
-                                             	// Credit card company for type CC
-	Number    string    `gorm:"column:number"`  // Number type - CC number for credit cards
-	                                            // ID card number for identity types
-	SecurityCode string  `gorm:"security_code"` // CVV number/security code for CC type
-	ExpiryMonth string   `gorm:"expiry_month"` // CC or Identity document expiry month
-	ExpiryDay string     `gorm:"expiry_day"`   // Identity document expiry day
-	ExpiryYear string    `gorm:"expiry_year"`  // CC or Identity document expiry year
-	FirstName  string    `gorm:"column:first_name"` // first name - for ID card types
-	MiddleName string    `gorm:"column:middle_name"` // middle name - for ID card types
-	LastName   string    `gorm:"column:last_name"` // last name - for ID card types	
-	Email      string    `gorm:"email"` // Email - for ID card types
-	PhoneNumber string   `gorm:"phone_number"` // Phone number - for ID card types
+    ID        int       `gorm:"column:id;autoIncrement;primaryKey"`
+    Title     string    `gorm:"column:title"`  // For card type this -> Card Name
+    User      string    `gorm:"column:user"`   // For card type this -> Card Holder Name
+    Url       string    `gorm:"column:url"`    // For card type this -> Card Number
+    Password  string    `gorm:"column:password"` // For card type this -> CVV number
+    Pin       string    `gorm:"column:pin"` // For card type this -> card pin
+    ExpiryDate string   `gorm:"colum:expiry_date"` // For card type this -> Card expiry date
+    Issuer     string   `gorm:"column:issuer"`    // For card type this -> Issuing bank
+    Class      string   `gorm:"column:class"`    // For card type this -> visa/mastercard/amex etc
+    
+    Notes     string    `gorm:"column:notes"`
+    Tags      string    `gorm:"column:tags"`
+    Type      string    `gorm:"column:type"`  // Entry type, default/card/ID
+    Timestamp time.Time `gorm:"type:timestamp;default:(datetime('now','localtime'))"` // sqlite3
 
-	Active    bool       `gorm:"active;default:true"` // Is the id card/CC active ?
-	User      string    `gorm:"column:user"`
-	Url       string    `gorm:"column:url"`
-	Password  string    `gorm:"column:password"`
-	Notes     string    `gorm:"column:notes"`
-	Tags      string    `gorm:"column:tags"`
-	Timestamp time.Time `gorm:"type:timestamp;default:(datetime('now','localtime'))"` // sqlite3
+// 	ID        int       `gorm:"column:id;autoIncrement;primaryKey"`
+// 	Type      string    `gorm:"column:type"`  // Type of entry - password (default), card, identity etc
+// 	Title     string    `gorm:"column:title"`
+//     Name      string    `gorm:"column:name"` // Card holder name/ID card name - for types cards/identity
+//   	Company   string    `gorm:"column:company"` // Company name of person  - for type identity and
+//                                              	// Credit card company for type CC
+// 	Number    string    `gorm:"column:number"`  // Number type - CC number for credit cards
+// 	                                            // ID card number for identity types
+// 	SecurityCode string  `gorm:"security_code"` // CVV number/security code for CC type
+// 	ExpiryMonth string   `gorm:"expiry_month"` // CC or Identity document expiry month
+// 	ExpiryDay string     `gorm:"expiry_day"`   // Identity document expiry day
+// 	ExpiryYear string    `gorm:"expiry_year"`  // CC or Identity document expiry year
+// 	FirstName  string    `gorm:"column:first_name"` // first name - for ID card types
+// 	MiddleName string    `gorm:"column:middle_name"` // middle name - for ID card types
+// 	LastName   string    `gorm:"column:last_name"` // last name - for ID card types	
+// 	Email      string    `gorm:"email"` // Email - for ID card types
+// 	PhoneNumber string   `gorm:"phone_number"` // Phone number - for ID card types
+
+// 	Active    bool       `gorm:"active;default:true"` // Is the id card/CC active ?
+// 	User      string    `gorm:"column:user"`
+// 	Url       string    `gorm:"column:url"`
+// 	Password  string    `gorm:"column:password"`
+// 	Notes     string    `gorm:"column:notes"`
+// 	Tags      string    `gorm:"column:tags"`
+// 	Timestamp time.Time `gorm:"type:timestamp;default:(datetime('now','localtime'))"` // sqlite3
+
 }
 
+    
 func (e *Entry) TableName() string {
     return "entries"
 }
@@ -100,29 +117,28 @@ func (e1 *Entry) Copy(e2 *Entry) {
 			e1.Type = e2.Type
 		case "card":
 			e1.Title = e2.Title
-			e1.Name = e2.Name // card holder name
-			e1.Company = e2.Company
-			e1.Number = e2.Number
-			e1.SecurityCode = e2.SecurityCode
-			e1.ExpiryMonth = e2.ExpiryMonth
-			e1.ExpiryYear = e2.ExpiryYear
+			e1.User = e2.User // card holder name
+			e1.Issuer = e2.Issuer
+			e1.Url = e2.Url
+			e1.Password = e2.Password
+			e1.ExpiryDate = e2.ExpiryDate
 			e1.Tags = e2.Tags
 			e1.Notes = e2.Notes
 			e1.Type = e2.Type			
-		case "identity":
-			e1.Title = e2.Title
-			e1.Name = e2.Name 
-			e1.Company = e2.Company
-			e1.FirstName = e2.FirstName
-			e1.LastName = e2.LastName			
-			e1.MiddleName = e2.MiddleName
-			e1.User = e2.User
-			e1.Email = e2.Email
-			e1.PhoneNumber = e2.PhoneNumber
-			e1.Number = e2.Number
-			e1.Notes = e2.Notes
-			e1.Tags = e2.Tags
-			e1.Type = e2.Type
+		// case "identity":
+		// 	e1.Title = e2.Title
+		// 	e1.Name = e2.Name 
+		// 	e1.Company = e2.Company
+		// 	e1.FirstName = e2.FirstName
+		// 	e1.LastName = e2.LastName			
+		// 	e1.MiddleName = e2.MiddleName
+		// 	e1.User = e2.User
+		// 	e1.Email = e2.Email
+		// 	e1.PhoneNumber = e2.PhoneNumber
+		// 	e1.Number = e2.Number
+		// 	e1.Notes = e2.Notes
+		// 	e1.Tags = e2.Tags
+		// 	e1.Type = e2.Type
 		}
 	}
 }
@@ -328,6 +344,47 @@ func addNewDatabaseEntry(title, userName, url, passwd, tags string,
 
     return err
 }
+
+// Add a new card entry to current database
+func addNewDatabaseCardEntry(cardName, cardNumber, cardHolder, cardIssuer, cardClass,
+    cardCvv, cardPin, cardExpiry, notes, tags string, customEntries []CustomEntry) error {
+
+    var entry Entry
+    var err error
+    var db *gorm.DB
+
+    entry = Entry{
+        Title: cardName,
+        User: cardHolder,
+        Url: cardNumber,
+        Password: cardCvv,
+        Pin: cardPin,
+        Issuer: cardIssuer,
+        Class: cardClass,
+        ExpiryDate: cardExpiry,
+        Type: "card",
+        Tags: strings.TrimSpace(tags),
+        Notes: notes}
+
+    err, db = openActiveDatabase()
+    if err == nil && db != nil {
+        //      result := db.Debug().Create(&entry)
+        result := db.Create(&entry)
+        if result.Error == nil && result.RowsAffected == 1 {
+            // Add custom fields if given
+            fmt.Printf("Created new entry with id: %d.\n", entry.ID)
+            if len(customEntries) > 0 {
+                return addCustomEntries(db, &entry, customEntries)
+            }
+            return nil
+        } else if result.Error != nil {
+            return result.Error
+        }
+    }
+
+    return err
+}
+
 
 // Update current database entry with new values
 func updateDatabaseEntry(entry *Entry, title, userName, url, passwd, tags string,
