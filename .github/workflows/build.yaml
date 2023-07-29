@@ -1,7 +1,7 @@
 name: build
 on: [push]
 jobs:
-  varuh build
+  varuh-build:
     runs-on: ubuntu-latest
     steps:
       - run: echo "\U0001f389 The job was automatically triggered by a ${{ github.event_name }} event."
@@ -17,5 +17,4 @@ jobs:
       - run: echo "\U0001f34f This job's status is ${{ job.status }}."
       - name: Build code
         run: |
-          make 
-          
+          cd ${{ github.workspace }} && make
