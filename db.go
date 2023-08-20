@@ -360,16 +360,17 @@ func updateDatabaseCardEntry(entry *Entry, cardName, cardNumber, cardHolder, car
 		// Issuer has to be the same
 		"class":       cardClass,
 		"expiry_date": cardExpiry,
-		"tags":        strings.TrimSpace(tags),
+		"tags":        tags,
 		"notes":       notes,
 	}
 
 	for key, val := range keyValMap {
+		val := strings.TrimSpace(val)
 		if len(val) > 0 {
 			updateMap[key] = val
 		}
 	}
-	fmt.Printf("%+v\n", updateMap)
+	//	fmt.Printf("%+v\n", updateMap)
 
 	if len(updateMap) == 0 && !flag {
 		fmt.Printf("Nothing to update\n")
@@ -405,18 +406,23 @@ func addNewDatabaseCardEntry(cardName, cardNumber, cardHolder, cardIssuer, cardC
 	var err error
 	var db *gorm.DB
 
+	fields := MapString([]string{cardName, cardHolder, cardNumber, cardCvv,
+		cardPin, cardIssuer, cardClass, cardExpiry, tags, notes},
+		strings.TrimSpace)
+
 	entry = Entry{
-		Title:      cardName,
-		User:       cardHolder,
-		Url:        cardNumber,
-		Password:   cardCvv,
-		Pin:        cardPin,
-		Issuer:     cardIssuer,
-		Class:      cardClass,
-		ExpiryDate: cardExpiry,
+		Title:      fields[0],
+		User:       fields[1],
+		Url:        fields[2],
+		Password:   fields[3],
+		Pin:        fields[4],
+		Issuer:     fields[5],
+		Class:      fields[6],
+		ExpiryDate: fields[7],
 		Type:       "card",
-		Tags:       strings.TrimSpace(tags),
-		Notes:      notes}
+		Tags:       fields[8],
+		Notes:      fields[9],
+	}
 
 	err, db = openActiveDatabase()
 	if err == nil && db != nil {

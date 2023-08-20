@@ -53,6 +53,26 @@ type Settings struct {
 // Global settings override
 var settingsRider SettingsOverride
 
+// Map a function to an array of strings
+func MapString(vs []string, f func(string) string) []string {
+	vsm := make([]string, len(vs))
+	for i, v := range vs {
+		vsm[i] = f(v)
+	}
+	return vsm
+}
+
+// Print a secret
+func hideSecret(secret string) string {
+	var stars []string
+
+	for i := 0; i < len(secret); i++ {
+		stars = append(stars, "*")
+	}
+
+	return strings.Join(stars, "")
+}
+
 // Write settings to disk
 func writeSettings(settings *Settings, configFile string) error {
 
@@ -307,6 +327,8 @@ func prettifyCardNumber(cardNumber string) string {
 	// Any 16 digits - group as 4/4/4/4
 	var numbers []string
 
+	// Remove spaces in between
+	cardNumber = strings.Join(strings.Split(cardNumber, " "), "")
 	if len(cardNumber) == 15 {
 		numbers = append(numbers, cardNumber[0:4])
 		numbers = append(numbers, cardNumber[4:10])
@@ -347,26 +369,26 @@ func printCardEntry(entry *Entry, settings *Settings, delim bool) error {
 	}
 
 	fmt.Println()
-
 	fmt.Printf("Expiry Date: %s\n", entry.ExpiryDate)
 
+	passwd := strings.TrimSpace(entry.Password)
+	pin := strings.TrimSpace(entry.Pin)
 	if settings.ShowPasswords || settingsRider.ShowPasswords {
-		fmt.Printf("Card CVV: %s\n", entry.Password)
-		fmt.Printf("Card PIN: %s\n", entry.Pin)
+
+		if len(passwd) > 0 {
+			fmt.Printf("Card CVV: %s\n", passwd)
+		}
+		if len(pin) > 0 {
+			fmt.Printf("Card PIN: %s\n", pin)
+		}
 	} else {
-		var asterisks1 []string
-		var asterisks2 []string
-		var i int
 
-		for i = 0; i < len(entry.Password); i++ {
-			asterisks1 = append(asterisks1, "*")
+		if len(passwd) > 0 {
+			fmt.Printf("Card CVV: %s\n", hideSecret(passwd))
 		}
-		fmt.Printf("Card CVV: %s\n", strings.Join(asterisks1, ""))
-
-		for i = 0; i < len(entry.Pin); i++ {
-			asterisks2 = append(asterisks2, "*")
+		if len(pin) > 0 {
+			fmt.Printf("Card PIN: %s\n", hideSecret(passwd))
 		}
-		fmt.Printf("Card PIN: %s\n", strings.Join(asterisks2, ""))
 	}
 
 	if len(entry.Tags) > 0 {
@@ -377,7 +399,6 @@ func printCardEntry(entry *Entry, settings *Settings, delim bool) error {
 	}
 	// Query extended entries
 	customEntries = getExtendedEntries(entry)
-
 	if len(customEntries) > 0 {
 		for _, customEntry := range customEntries {
 			fmt.Printf("%s: %s\n", customEntry.FieldName, customEntry.FieldValue)
@@ -385,9 +406,7 @@ func printCardEntry(entry *Entry, settings *Settings, delim bool) error {
 	}
 
 	fmt.Printf("Modified: %s\n", entry.Timestamp.Format("2006-01-02 15:04:05"))
-
 	printDelim(settings.Delim, settings.Color)
-
 	// Reset
 	fmt.Printf("%s", getColor("default"))
 
@@ -431,12 +450,7 @@ func printEntry(entry *Entry, delim bool) error {
 	if settings.ShowPasswords || settingsRider.ShowPasswords {
 		fmt.Printf("Password: %s\n", entry.Password)
 	} else {
-		var asterisks []string
-
-		for i := 0; i < len(entry.Password); i++ {
-			asterisks = append(asterisks, "*")
-		}
-		fmt.Printf("Password: %s\n", strings.Join(asterisks, ""))
+		fmt.Printf("Password: %s\n", hideSecret(entry.Password))
 	}
 
 	if len(entry.Tags) > 0 {
