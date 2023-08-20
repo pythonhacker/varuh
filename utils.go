@@ -53,13 +53,12 @@ type Settings struct {
 // Global settings override
 var settingsRider SettingsOverride
 
-// Map a function to an array of strings
-func MapString(vs []string, f func(string) string) []string {
-	vsm := make([]string, len(vs))
-	for i, v := range vs {
-		vsm[i] = f(v)
+func Map[T any](input []T, f func(T) T) []T {
+	output := make([]T, len(input))
+	for i, v := range input {
+		output[i] = f(v)
 	}
-	return vsm
+	return output
 }
 
 // Print a secret

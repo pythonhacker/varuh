@@ -406,7 +406,7 @@ func addNewDatabaseCardEntry(cardName, cardNumber, cardHolder, cardIssuer, cardC
 	var err error
 	var db *gorm.DB
 
-	fields := MapString([]string{cardName, cardHolder, cardNumber, cardCvv,
+	fields := Map([]string{cardName, cardHolder, cardNumber, cardCvv,
 		cardPin, cardIssuer, cardClass, cardExpiry, tags, notes},
 		strings.TrimSpace)
 
