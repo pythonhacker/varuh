@@ -1,5 +1,5 @@
 // Cryptographic functions
-package main
+package varuh
 
 import (
 	"crypto/aes"
@@ -28,7 +28,7 @@ const HMAC_SHA512_SIZE = 64
 const MAGIC_HEADER = 0xcafebabe
 
 // Generate random bytes of the given length
-func generateRandomBytes(size int) (error, []byte) {
+func GenerateRandomBytes(size int) (error, []byte) {
 	var data []byte
 
 	data = make([]byte, size)
@@ -45,15 +45,18 @@ func generateRandomBytes(size int) (error, []byte) {
 
 // Generate a key from the given passphrase and (optional) salt
 // If 2nd argument is nil, salt will be generated. Uses argon2
-func generateKeyArgon2(passPhrase string, oldSalt *[]byte) (error, []byte, []byte) {
+func GenerateKeyArgon2(passPhrase string, oldSalt *[]byte) (error, []byte, []byte) {
 
 	var salt []byte
 	var key []byte
 	var err error
 
 	if oldSalt == nil {
-		err, salt = generateRandomBytes(SALT_SIZE)
+		err, salt = GenerateRandomBytes(SALT_SIZE)
 	} else {
+		if len(*oldSalt) != SALT_SIZE {
+			return errors.New("invalid salt length"), key, salt
+		}
 		salt = *oldSalt
 	}
 
@@ -71,15 +74,18 @@ func generateKeyArgon2(passPhrase string, oldSalt *[]byte) (error, []byte, []byt
 
 // Generate a key from the given passphrase and (optional) salt
 // If 2nd argument is nil, salt will be generated. Uses pbkdf2
-func generateKey(passPhrase string, oldSalt *[]byte) (error, []byte, []byte) {
+func GenerateKey(passPhrase string, oldSalt *[]byte) (error, []byte, []byte) {
 
 	var salt []byte
 	var key []byte
 	var err error
 
 	if oldSalt == nil {
-		err, salt = generateRandomBytes(SALT_SIZE)
+		err, salt = GenerateRandomBytes(SALT_SIZE)
 	} else {
+		if len(*oldSalt) != SALT_SIZE {
+			return errors.New("invalid salt length"), key, salt
+		}
 		salt = *oldSalt
 	}
 
@@ -95,7 +101,7 @@ func generateKey(passPhrase string, oldSalt *[]byte) (error, []byte, []byte) {
 }
 
 // Return if file is encrypted by looking at the magic header
-func isFileEncrypted(encDbPath string) (error, bool) {
+func IsFileEncrypted(encDbPath string) (error, bool) {
 
 	var magicBytes string
 	var header []byte
@@ -115,6 +121,9 @@ func isFileEncrypted(encDbPath string) (error, bool) {
 
 	_, err = io.ReadFull(fh, header[:])
 	if err != nil {
+		if err == io.EOF {
+			return fmt.Errorf("Not an encrypted database - file is empty"), false
+		}
 		return fmt.Errorf("Error - Can't read file header -\"%s\"\n", err.Error()), false
 	}
 
@@ -126,7 +135,7 @@ func isFileEncrypted(encDbPath string) (error, bool) {
 }
 
 // Encrypt the database path using AES
-func encryptFileAES(dbPath string, password string) error {
+func EncryptFileAES(dbPath string, password string) error {
 
 	var err error
 	var key []byte
@@ -145,7 +154,7 @@ func encryptFileAES(dbPath string, password string) error {
 		return err
 	}
 
-	err, key, salt = generateKeyArgon2(password, nil)
+	err, key, salt = GenerateKeyArgon2(password, nil)
 
 	if err != nil {
 		fmt.Printf("Error - Key derivation failed -\"%s\"\n", err)
@@ -168,7 +177,7 @@ func encryptFileAES(dbPath string, password string) error {
 
 	nonceSize := aesGCM.NonceSize()
 	//	fmt.Printf("%d\n", nonceSize)
-	err, nonce = generateRandomBytes(nonceSize)
+	err, nonce = GenerateRandomBytes(nonceSize)
 
 	if err != nil {
 		fmt.Printf("Error - Nonce generation failed -\"%s\"\n", err)
@@ -207,7 +216,7 @@ func encryptFileAES(dbPath string, password string) error {
 }
 
 // Decrypt an already encrypted database file using given password using AES
-func decryptFileAES(encDbPath string, password string) error {
+func DecryptFileAES(encDbPath string, password string) error {
 
 	var encText []byte
 	var cipherText []byte
@@ -233,7 +242,7 @@ func decryptFileAES(encDbPath string, password string) error {
 	// Read the hmac hash checksum
 	hmacHash, encText = encText[:HMAC_SHA512_SIZE], encText[HMAC_SHA512_SIZE:]
 
-	err, key, _ = generateKeyArgon2(password, &salt)
+	err, key, _ = GenerateKeyArgon2(password, &salt)
 
 	if err != nil {
 		fmt.Printf("Error - Key derivation failed -\"%s\"\n", err)
@@ -278,7 +287,7 @@ func decryptFileAES(encDbPath string, password string) error {
 		return err
 	}
 
-	err, origFile = rewriteFile(encDbPath, plainText, 0600)
+	err, origFile = RewriteFile(encDbPath, plainText, 0600)
 
 	if err != nil {
 		fmt.Printf("Error writing decrypted data to %s - \"%s\"\n", origFile, err.Error())
@@ -289,7 +298,7 @@ func decryptFileAES(encDbPath string, password string) error {
 }
 
 // Encrypt a file using XChaCha20-Poly1305 cipher
-func encryptFileXChachaPoly(dbPath string, password string) error {
+func EncryptFileXChachaPoly(dbPath string, password string) error {
 
 	var err error
 	var key []byte
@@ -308,7 +317,7 @@ func encryptFileXChachaPoly(dbPath string, password string) error {
 		return err
 	}
 
-	err, key, salt = generateKeyArgon2(password, nil)
+	err, key, salt = GenerateKeyArgon2(password, nil)
 
 	if err != nil {
 		fmt.Printf("Error - Key derivation failed -\"%s\"\n", err)
@@ -360,7 +369,7 @@ func encryptFileXChachaPoly(dbPath string, password string) error {
 }
 
 // Decrypt an already encrypted database file using given password using XChaCha20-Poly1305
-func decryptFileXChachaPoly(encDbPath string, password string) error {
+func DecryptFileXChachaPoly(encDbPath string, password string) error {
 
 	var encText []byte
 	var cipherText []byte
@@ -386,7 +395,7 @@ func decryptFileXChachaPoly(encDbPath string, password string) error {
 	// Read the hmac hash checksum
 	hmacHash, encText = encText[:HMAC_SHA512_SIZE], encText[HMAC_SHA512_SIZE:]
 
-	err, key, _ = generateKeyArgon2(password, &salt)
+	err, key, _ = GenerateKeyArgon2(password, &salt)
 
 	if err != nil {
 		fmt.Printf("Error - Key derivation failed -\"%s\"\n", err)
@@ -426,7 +435,7 @@ func decryptFileXChachaPoly(encDbPath string, password string) error {
 	}
 
 	//	err = os.WriteFile("test.sqlite3", oplainText, 0600)
-	err, origFile = rewriteFile(encDbPath, plainText, 0600)
+	err, origFile = RewriteFile(encDbPath, plainText, 0600)
 
 	if err != nil {
 		fmt.Printf("Error writing decrypted data to %s - \"%s\"\n", origFile, err.Error())
@@ -437,7 +446,7 @@ func decryptFileXChachaPoly(encDbPath string, password string) error {
 }
 
 // Generate a random password - for adding listings
-func generatePassword(length int) (error, string) {
+func GeneratePassword(length int) (error, string) {
 
 	var data []byte
 	const source = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789=+_()$#@!~:/%"
@@ -463,7 +472,7 @@ func generatePassword(length int) (error, string) {
 // at least one upper case alphabet [A-Z]
 // at least one punctuation character
 // at least length 12
-func generateStrongPassword() (error, string) {
+func GenerateStrongPassword() (error, string) {
 
 	var data []byte
 	var length int

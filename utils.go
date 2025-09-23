@@ -1,5 +1,5 @@
 // Utility functions
-package main
+package varuh
 
 import (
 	"bufio"
@@ -51,7 +51,7 @@ type Settings struct {
 }
 
 // Global settings override
-var settingsRider SettingsOverride
+var SettingsRider SettingsOverride
 
 // Map a function to an array of strings
 func MapString(vs []string, f func(string) string) []string {
@@ -63,7 +63,7 @@ func MapString(vs []string, f func(string) string) []string {
 }
 
 // Print a secret
-func hideSecret(secret string) string {
+func HideSecret(secret string) string {
 	var stars []string
 
 	for i := 0; i < len(secret); i++ {
@@ -74,7 +74,7 @@ func hideSecret(secret string) string {
 }
 
 // Write settings to disk
-func writeSettings(settings *Settings, configFile string) error {
+func WriteSettings(settings *Settings, configFile string) error {
 
 	fh, err := os.Create(configFile)
 	if err != nil {
@@ -92,7 +92,7 @@ func writeSettings(settings *Settings, configFile string) error {
 }
 
 // Write updated settings to disk
-func updateSettings(settings *Settings, configFile string) error {
+func UpdateSettings(settings *Settings, configFile string) error {
 
 	fh, err := os.OpenFile(configFile, os.O_RDWR, 0644)
 	if err != nil {
@@ -115,7 +115,7 @@ func updateSettings(settings *Settings, configFile string) error {
 }
 
 // Make the per-user configuration folder and return local settings
-func getOrCreateLocalConfig(app string) (error, *Settings) {
+func GetOrCreateLocalConfig(app string) (error, *Settings) {
 
 	var settings Settings
 	var configPath string
@@ -150,7 +150,7 @@ func getOrCreateLocalConfig(app string) (error, *Settings) {
 		//      fmt.Printf("Creating default configuration ...")
 		settings = Settings{"", "aes", true, true, false, configFile, "id,asc", ">", "default", "bgblack"}
 
-		if err = writeSettings(&settings, configFile); err == nil {
+		if err = WriteSettings(&settings, configFile); err == nil {
 			// fmt.Println(" ...done")
 		} else {
 			return err, nil
@@ -161,12 +161,12 @@ func getOrCreateLocalConfig(app string) (error, *Settings) {
 }
 
 // Return if there is an active, decrypted database
-func hasActiveDatabase() bool {
+func HasActiveDatabase() bool {
 
-	err, settings := getOrCreateLocalConfig(APP)
+	err, settings := GetOrCreateLocalConfig(APP)
 	if err == nil && settings.ActiveDB != "" {
 		if _, err := os.Stat(settings.ActiveDB); err == nil {
-			if _, flag := isFileEncrypted(settings.ActiveDB); !flag {
+			if _, flag := IsFileEncrypted(settings.ActiveDB); !flag {
 				return true
 			}
 			return false
@@ -181,9 +181,9 @@ func hasActiveDatabase() bool {
 }
 
 // Get the current active database
-func getActiveDatabase() (error, string) {
+func GetActiveDatabase() (error, string) {
 
-	err, settings := getOrCreateLocalConfig(APP)
+	err, settings := GetOrCreateLocalConfig(APP)
 	if err == nil && settings.ActiveDB != "" {
 		if _, err := os.Stat(settings.ActiveDB); err == nil {
 			return nil, settings.ActiveDB
@@ -198,20 +198,20 @@ func getActiveDatabase() (error, string) {
 }
 
 // Update the active db path
-func updateActiveDbPath(dbPath string) error {
+func UpdateActiveDbPath(dbPath string) error {
 
-	_, settings := getOrCreateLocalConfig(APP)
+	_, settings := GetOrCreateLocalConfig(APP)
 
 	if settings != nil {
 		settings.ActiveDB = dbPath
 	}
 
-	return updateSettings(settings, settings.ConfigPath)
+	return UpdateSettings(settings, settings.ConfigPath)
 
 }
 
 // Read the password from console without echoing
-func readPassword() (error, string) {
+func ReadPassword() (error, string) {
 
 	var passwd []byte
 	var err error
@@ -221,7 +221,7 @@ func readPassword() (error, string) {
 }
 
 // Rewrite the contents of the base file (path minus extension) with the new contents
-func rewriteBaseFile(path string, contents []byte, mode fs.FileMode) (error, string) {
+func RewriteBaseFile(path string, contents []byte, mode fs.FileMode) (error, string) {
 
 	var err error
 	var origFile string
@@ -239,7 +239,7 @@ func rewriteBaseFile(path string, contents []byte, mode fs.FileMode) (error, str
 }
 
 // Rewrite the contents of the file with the new contents
-func rewriteFile(path string, contents []byte, mode fs.FileMode) (error, string) {
+func RewriteFile(path string, contents []byte, mode fs.FileMode) (error, string) {
 
 	var err error
 
@@ -255,7 +255,7 @@ func rewriteFile(path string, contents []byte, mode fs.FileMode) (error, string)
 }
 
 // Get color codes for console colors
-func getColor(code string) string {
+func GetColor(code string) string {
 
 	colors := map[string]string{
 		"black":   "\x1b[30m",
@@ -300,7 +300,7 @@ func getColor(code string) string {
 }
 
 // Print the delimiter line for listings
-func printDelim(delimChar string, color string) {
+func PrintDelim(delimChar string, color string) {
 
 	var delims []string
 
@@ -321,7 +321,7 @@ func printDelim(delimChar string, color string) {
 }
 
 // Prettify credit/debit card numbers
-func prettifyCardNumber(cardNumber string) string {
+func PrettifyCardNumber(cardNumber string) string {
 
 	// Amex cards are 15 digits - group as 4, 6, 5
 	// Any 16 digits - group as 4/4/4/4
@@ -344,24 +344,24 @@ func prettifyCardNumber(cardNumber string) string {
 }
 
 // Print a card entry to the console
-func printCardEntry(entry *Entry, settings *Settings, delim bool) error {
+func PrintCardEntry(entry *Entry, settings *Settings, delim bool) error {
 
 	var customEntries []ExtendedEntry
 
-	fmt.Printf("%s", getColor(strings.ToLower(settings.Color)))
+	fmt.Printf("%s", GetColor(strings.ToLower(settings.Color)))
 	if strings.HasPrefix(settings.BgColor, "bg") {
-		fmt.Printf("%s", getColor(strings.ToLower(settings.BgColor)))
+		fmt.Printf("%s", GetColor(strings.ToLower(settings.BgColor)))
 	}
 
 	if delim {
-		printDelim(settings.Delim, settings.Color)
+		PrintDelim(settings.Delim, settings.Color)
 	}
 
 	fmt.Printf("[Type: card]\n")
 	fmt.Printf("ID: %d\n", entry.ID)
 	fmt.Printf("Card Name: %s\n", entry.Title)
 	fmt.Printf("Card Holder: %s\n", entry.User)
-	fmt.Printf("Card Number: %s\n", prettifyCardNumber(entry.Url))
+	fmt.Printf("Card Number: %s\n", PrettifyCardNumber(entry.Url))
 	fmt.Printf("Card Type: %s\n", entry.Class)
 
 	if entry.Issuer != "" {
@@ -373,7 +373,7 @@ func printCardEntry(entry *Entry, settings *Settings, delim bool) error {
 
 	passwd := strings.TrimSpace(entry.Password)
 	pin := strings.TrimSpace(entry.Pin)
-	if settings.ShowPasswords || settingsRider.ShowPasswords {
+	if settings.ShowPasswords || SettingsRider.ShowPasswords {
 
 		if len(passwd) > 0 {
 			fmt.Printf("Card CVV: %s\n", passwd)
@@ -384,10 +384,10 @@ func printCardEntry(entry *Entry, settings *Settings, delim bool) error {
 	} else {
 
 		if len(passwd) > 0 {
-			fmt.Printf("Card CVV: %s\n", hideSecret(passwd))
+			fmt.Printf("Card CVV: %s\n", HideSecret(passwd))
 		}
 		if len(pin) > 0 {
-			fmt.Printf("Card PIN: %s\n", hideSecret(passwd))
+			fmt.Printf("Card PIN: %s\n", HideSecret(passwd))
 		}
 	}
 
@@ -398,7 +398,7 @@ func printCardEntry(entry *Entry, settings *Settings, delim bool) error {
 		fmt.Printf("Notes: %s\n", entry.Notes)
 	}
 	// Query extended entries
-	customEntries = getExtendedEntries(entry)
+	customEntries = GetExtendedEntries(entry)
 	if len(customEntries) > 0 {
 		for _, customEntry := range customEntries {
 			fmt.Printf("%s: %s\n", customEntry.FieldName, customEntry.FieldValue)
@@ -406,22 +406,22 @@ func printCardEntry(entry *Entry, settings *Settings, delim bool) error {
 	}
 
 	fmt.Printf("Modified: %s\n", entry.Timestamp.Format("2006-01-02 15:04:05"))
-	printDelim(settings.Delim, settings.Color)
+	PrintDelim(settings.Delim, settings.Color)
 	// Reset
-	fmt.Printf("%s", getColor("default"))
+	fmt.Printf("%s", GetColor("default"))
 
 	return nil
 
 }
 
 // Print an entry to the console
-func printEntry(entry *Entry, delim bool) error {
+func PrintEntry(entry *Entry, delim bool) error {
 
 	var err error
 	var settings *Settings
 	var customEntries []ExtendedEntry
 
-	err, settings = getOrCreateLocalConfig(APP)
+	err, settings = GetOrCreateLocalConfig(APP)
 
 	if err != nil {
 		fmt.Printf("Error parsing config - \"%s\"\n", err.Error())
@@ -429,16 +429,16 @@ func printEntry(entry *Entry, delim bool) error {
 	}
 
 	if entry.Type == "card" {
-		return printCardEntry(entry, settings, delim)
+		return PrintCardEntry(entry, settings, delim)
 	}
 
-	fmt.Printf("%s", getColor(strings.ToLower(settings.Color)))
+	fmt.Printf("%s", GetColor(strings.ToLower(settings.Color)))
 	if strings.HasPrefix(settings.BgColor, "bg") {
-		fmt.Printf("%s", getColor(strings.ToLower(settings.BgColor)))
+		fmt.Printf("%s", GetColor(strings.ToLower(settings.BgColor)))
 	}
 
 	if delim {
-		printDelim(settings.Delim, settings.Color)
+		PrintDelim(settings.Delim, settings.Color)
 	}
 
 	fmt.Printf("[Type: password]\n")
@@ -447,10 +447,10 @@ func printEntry(entry *Entry, delim bool) error {
 	fmt.Printf("User: %s\n", entry.User)
 	fmt.Printf("URL: %s\n", entry.Url)
 
-	if settings.ShowPasswords || settingsRider.ShowPasswords {
+	if settings.ShowPasswords || SettingsRider.ShowPasswords {
 		fmt.Printf("Password: %s\n", entry.Password)
 	} else {
-		fmt.Printf("Password: %s\n", hideSecret(entry.Password))
+		fmt.Printf("Password: %s\n", HideSecret(entry.Password))
 	}
 
 	if len(entry.Tags) > 0 {
@@ -460,7 +460,7 @@ func printEntry(entry *Entry, delim bool) error {
 		fmt.Printf("Notes: %s\n", entry.Notes)
 	}
 	// Query extended entries
-	customEntries = getExtendedEntries(entry)
+	customEntries = GetExtendedEntries(entry)
 
 	if len(customEntries) > 0 {
 		for _, customEntry := range customEntries {
@@ -470,35 +470,35 @@ func printEntry(entry *Entry, delim bool) error {
 
 	fmt.Printf("Modified: %s\n", entry.Timestamp.Format("2006-01-02 15:04:05"))
 
-	printDelim(settings.Delim, settings.Color)
+	PrintDelim(settings.Delim, settings.Color)
 
 	// Reset
-	fmt.Printf("%s", getColor("default"))
+	fmt.Printf("%s", GetColor("default"))
 
 	return nil
 
 }
 
 // Print an entry to the console with minimal data
-func printEntryMinimal(entry *Entry, delim bool) error {
+func PrintEntryMinimal(entry *Entry, delim bool) error {
 
 	var err error
 	var settings *Settings
 
-	err, settings = getOrCreateLocalConfig(APP)
+	err, settings = GetOrCreateLocalConfig(APP)
 
 	if err != nil {
 		fmt.Printf("Error parsing config - \"%s\"\n", err.Error())
 		return err
 	}
 
-	fmt.Printf("%s", getColor(strings.ToLower(settings.Color)))
+	fmt.Printf("%s", GetColor(strings.ToLower(settings.Color)))
 	if strings.HasPrefix(settings.BgColor, "bg") {
-		fmt.Printf("%s", getColor(strings.ToLower(settings.BgColor)))
+		fmt.Printf("%s", GetColor(strings.ToLower(settings.BgColor)))
 	}
 
 	if delim {
-		printDelim(settings.Delim, settings.Color)
+		PrintDelim(settings.Delim, settings.Color)
 	}
 
 	fmt.Printf("Title: %s\n", entry.Title)
@@ -506,10 +506,10 @@ func printEntryMinimal(entry *Entry, delim bool) error {
 	fmt.Printf("URL: %s\n", entry.Url)
 	fmt.Printf("Modified: %s\n", entry.Timestamp.Format("2006-01-02 15:04:05"))
 
-	printDelim(settings.Delim, settings.Color)
+	PrintDelim(settings.Delim, settings.Color)
 
 	// Reset
-	fmt.Printf("%s", getColor("default"))
+	fmt.Printf("%s", GetColor("default"))
 
 	return nil
 
@@ -528,7 +528,7 @@ func readInput(reader *bufio.Reader, prompt string) string {
 // Check for an active, decrypted database
 func checkActiveDatabase() error {
 
-	if !hasActiveDatabase() {
+	if !HasActiveDatabase() {
 		fmt.Printf("No decrypted active database found.\n")
 		return errors.New("no active database")
 	}
@@ -539,10 +539,10 @@ func checkActiveDatabase() error {
 // Return true if active database is encrypted
 func isActiveDatabaseEncrypted() bool {
 
-	err, settings := getOrCreateLocalConfig(APP)
+	err, settings := GetOrCreateLocalConfig(APP)
 	if err == nil && settings.ActiveDB != "" {
 		if _, err := os.Stat(settings.ActiveDB); err == nil {
-			if _, flag := isFileEncrypted(settings.ActiveDB); flag {
+			if _, flag := IsFileEncrypted(settings.ActiveDB); flag {
 				return true
 			}
 		}
@@ -554,17 +554,17 @@ func isActiveDatabaseEncrypted() bool {
 // Return true if always encrypt is on
 func isEncryptOn() bool {
 
-	_, settings := getOrCreateLocalConfig(APP)
+	_, settings := GetOrCreateLocalConfig(APP)
 	return settings.KeepEncrypted
 }
 
 // Combination of above 2 logic plus auto encryption on (a play on CryptOn)
 func isActiveDatabaseEncryptedAndMaxKryptOn() (bool, string) {
 
-	err, settings := getOrCreateLocalConfig(APP)
+	err, settings := GetOrCreateLocalConfig(APP)
 	if err == nil && settings.ActiveDB != "" {
 		if _, err := os.Stat(settings.ActiveDB); err == nil {
-			if _, flag := isFileEncrypted(settings.ActiveDB); flag && settings.KeepEncrypted && settings.AutoEncrypt {
+			if _, flag := IsFileEncrypted(settings.ActiveDB); flag && settings.KeepEncrypted && settings.AutoEncrypt {
 				return true, settings.ActiveDB
 			}
 		}
@@ -574,40 +574,44 @@ func isActiveDatabaseEncryptedAndMaxKryptOn() (bool, string) {
 }
 
 // (Temporarily) enable showing of passwords
-func setShowPasswords() error {
+func SetShowPasswords() error {
 	//  fmt.Printf("Setting show passwords to true\n")
-	settingsRider.ShowPasswords = true
+	SettingsRider.ShowPasswords = true
 	return nil
 }
 
 // Copy the password to clipboard - only for single listings or single search results
-func setCopyPasswordToClipboard() error {
-	settingsRider.CopyPassword = true
+func SetCopyPasswordToClipboard() error {
+	SettingsRider.CopyPassword = true
 	return nil
 }
 
-func setAssumeYes() error {
-	settingsRider.AssumeYes = true
+func SetAssumeYes() error {
+	SettingsRider.AssumeYes = true
 	return nil
 }
 
-func setType(_type string) {
-	settingsRider.Type = _type
+func SetType(_type string) {
+	SettingsRider.Type = _type
 }
 
-func copyPasswordToClipboard(passwd string) {
+func CopyPasswordToClipboard(passwd string) {
 	clipboard.WriteAll(passwd)
 }
 
 // Generate a random file name
-func randomFileName(folder string, suffix string) string {
+func RandomFileName(folder string, suffix string) string {
 
-	_, name := generateRandomBytes(16)
+	_, name := GenerateRandomBytes(16)
 	return filepath.Join(folder, hex.EncodeToString(name)+suffix)
 }
 
 // Detect card type from card number
-func detectCardType(cardNum string) (string, error) {
+func DetectCardType(cardNum string) (string, error) {
+	// Handle empty or invalid input
+	if cardNum == "" {
+		return "", errors.New("card number cannot be empty")
+	}
 
 	var cardTypeIndex creditcard.CardType
 	var err error
@@ -629,7 +633,7 @@ func detectCardType(cardNum string) (string, error) {
 }
 
 // Validate CVV
-func validateCvv(cardCvv string, cardClass string) bool {
+func ValidateCvv(cardCvv string, cardClass string) bool {
 
 	var matched bool
 
@@ -647,7 +651,7 @@ func validateCvv(cardCvv string, cardClass string) bool {
 	return false
 }
 
-func validateCardPin(cardPin string) bool {
+func ValidateCardPin(cardPin string) bool {
 
 	// A PIN is 4 digits or more
 	if matched, _ := regexp.Match(`^\d{4,}$`, []byte(cardPin)); matched {
@@ -658,7 +662,7 @@ func validateCardPin(cardPin string) bool {
 }
 
 // Verify if the expiry date is in the form mm/dd
-func checkValidExpiry(expiryDate string) bool {
+func CheckValidExpiry(expiryDate string) bool {
 
 	pieces := strings.Split(expiryDate, "/")
 
@@ -670,12 +674,12 @@ func checkValidExpiry(expiryDate string) bool {
 
 		month, err = strconv.Atoi(pieces[0])
 		if err != nil {
-			fmt.Printf("Error parsing month: %s: \"%s\"\n", month, err.Error())
+			fmt.Printf("Error parsing month: %d: \"%s\"\n", month, err.Error())
 			return false
 		}
 		year, err = strconv.Atoi(pieces[1])
 		if err != nil {
-			fmt.Printf("Error parsing year: %s: \"%s\"\n", year, err.Error())
+			fmt.Printf("Error parsing year: %d: \"%s\"\n", year, err.Error())
 			return false
 		}
 

@@ -1,0 +1,416 @@
+!_TAG_FILE_FORMAT	2
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted/
+!_TAG_PROGRAM_AUTHOR	Joel Stemmer	/stemmertech@gmail.com/
+!_TAG_PROGRAM_NAME	gotags
+!_TAG_PROGRAM_URL	https://github.com/jstemmer/gotags
+!_TAG_PROGRAM_VERSION	1.4.1	/go1.24.5/
+APP	./defns.go	10;"	c	access:public	line:10
+AUTHOR_INFO	./defns.go	12;"	c	access:public	line:12
+ActiveDB	./utils.go	35;"	w	access:public	ctype:Settings	line:35	type:string
+Address	./db.go	81;"	t	access:public	line:81	type:struct
+Area	./db.go	87;"	w	access:public	ctype:Address	line:87	type:string
+AssertContains	./tests/test_config.go	232;"	f	access:public	line:232	signature:(t *testing.T, str, substr string, message string)
+AssertEmpty	./tests/test_config.go	225;"	f	access:public	line:225	signature:(t *testing.T, str string, message string)
+AssertEqual	./tests/test_config.go	190;"	f	access:public	line:190	signature:(t *testing.T, actual, expected interface{}, message string)
+AssertError	./tests/test_config.go	183;"	f	access:public	line:183	signature:(t *testing.T, err error, message string)
+AssertFalse	./tests/test_config.go	211;"	f	access:public	line:211	signature:(t *testing.T, condition bool, message string)
+AssertFileContent	./tests/test_config.go	137;"	f	access:public	line:137	signature:(t *testing.T, filePath string, expectedContent string)
+AssertFileExists	./tests/test_config.go	109;"	f	access:public	line:109	signature:(t *testing.T, filePath string)
+AssertFileNotExists	./tests/test_config.go	116;"	f	access:public	line:116	signature:(t *testing.T, filePath string)
+AssertFilePermissions	./tests/test_config.go	123;"	f	access:public	line:123	signature:(t *testing.T, filePath string, expectedMode os.FileMode)
+AssertFileSize	./tests/test_config.go	150;"	f	access:public	line:150	signature:(t *testing.T, filePath string, expectedSize int64)
+AssertFileSizeGreaterThan	./tests/test_config.go	163;"	f	access:public	line:163	signature:(t *testing.T, filePath string, minSize int64)
+AssertLength	./tests/test_config.go	246;"	f	access:public	line:246	signature:(t *testing.T, slice interface{}, expectedLength int, message string)
+AssertNoError	./tests/test_config.go	176;"	f	access:public	line:176	signature:(t *testing.T, err error, message string)
+AssertNotContains	./tests/test_config.go	239;"	f	access:public	line:239	signature:(t *testing.T, str, substr string, message string)
+AssertNotEmpty	./tests/test_config.go	218;"	f	access:public	line:218	signature:(t *testing.T, str string, message string)
+AssertNotEqual	./tests/test_config.go	197;"	f	access:public	line:197	signature:(t *testing.T, actual, expected interface{}, message string)
+AssertTrue	./tests/test_config.go	204;"	f	access:public	line:204	signature:(t *testing.T, condition bool, message string)
+AssumeYes	./utils.go	29;"	w	access:public	ctype:SettingsOverride	line:29	type:bool
+AutoEncrypt	./utils.go	37;"	w	access:public	ctype:Settings	line:37	type:bool
+BgColor	./utils.go	50;"	w	access:public	ctype:Settings	line:50	type:string
+Building	./db.go	84;"	w	access:public	ctype:Address	line:84	type:string
+Cipher	./utils.go	36;"	w	access:public	ctype:Settings	line:36	type:string
+City	./db.go	88;"	w	access:public	ctype:Address	line:88	type:string
+Class	./db.go	27;"	w	access:public	ctype:Entry	line:27	type:string
+CleanupTestConfig	./tests/test_config.go	31;"	m	access:public	ctype:TestConfig	line:31	signature:()
+CmdOption	./scripts/main.go	15;"	t	access:public	line:15	type:struct
+Color	./utils.go	49;"	w	access:public	ctype:Settings	line:49	type:string
+ConfigPath	./tests/test_config.go	14;"	w	access:public	ctype:TestConfig	line:14	type:string
+ConfigPath	./utils.go	40;"	w	access:public	ctype:Settings	line:40	type:string
+Copy	./db.go	105;"	m	access:public	ctype:Entry	line:105	signature:(e2 *Entry)
+Copy	./db.go	146;"	m	access:public	ctype:ExtendedEntry	line:146	signature:(e2 *ExtendedEntry)
+CopyPassword	./utils.go	28;"	w	access:public	ctype:SettingsOverride	line:28	type:bool
+Country	./db.go	90;"	w	access:public	ctype:Address	line:90	type:string
+CreateTestCardDatabase	./tests/test_config.go	62;"	m	access:public	ctype:TestConfig	line:62	signature:(t *testing.T)
+CreateTestDatabase	./tests/test_config.go	36;"	m	access:public	ctype:TestConfig	line:36	signature:(t *testing.T)
+CreateTestDatabaseWithCustomFields	./tests/test_config.go	86;"	m	access:public	ctype:TestConfig	line:86	signature:(t *testing.T)
+CustomEntry	./actions.go	17;"	t	access:public	line:17	type:struct
+DELIMSIZE	./utils.go	23;"	c	access:public	line:23	type:int
+Default	./scripts/main.go	20;"	w	access:public	ctype:CmdOption	line:20	type:string
+Delim	./utils.go	48;"	w	access:public	ctype:Settings	line:48	type:string
+Entry	./db.go	18;"	t	access:public	line:18	type:struct
+Entry	./db.go	73;"	w	access:public	ctype:ExtendedEntry	line:73	type:Entry
+Entry	./db.go	96;"	w	access:public	ctype:Address	line:96	type:Entry
+EntryID	./db.go	74;"	w	access:public	ctype:ExtendedEntry	line:74	type:int
+EntryID	./db.go	97;"	w	access:public	ctype:Address	line:97	type:int
+ExpiryDate	./db.go	25;"	w	access:public	ctype:Entry	line:25	type:string
+ExtendedEntry	./db.go	67;"	t	access:public	line:67	type:struct
+FieldName	./db.go	69;"	w	access:public	ctype:ExtendedEntry	line:69	type:string
+FieldValue	./db.go	70;"	w	access:public	ctype:ExtendedEntry	line:70	type:string
+HMAC_SHA512_SIZE	./crypto.go	27;"	c	access:public	line:27
+Help	./scripts/main.go	18;"	w	access:public	ctype:CmdOption	line:18	type:string
+ID	./db.go	19;"	w	access:public	ctype:Entry	line:19	type:int
+ID	./db.go	68;"	w	access:public	ctype:ExtendedEntry	line:68	type:int
+ID	./db.go	82;"	w	access:public	ctype:Address	line:82	type:int
+Issuer	./db.go	26;"	w	access:public	ctype:Entry	line:26	type:string
+KEY_N_ITER	./crypto.go	26;"	c	access:public	line:26
+KEY_SIZE	./crypto.go	24;"	c	access:public	line:24
+KeepEncrypted	./utils.go	38;"	w	access:public	ctype:Settings	line:38	type:bool
+Landmark	./db.go	92;"	w	access:public	ctype:Address	line:92	type:string
+ListOrder	./utils.go	47;"	w	access:public	ctype:Settings	line:47	type:string
+Locality	./db.go	86;"	w	access:public	ctype:Address	line:86	type:string
+Long	./scripts/main.go	17;"	w	access:public	ctype:CmdOption	line:17	type:string
+MAGIC_HEADER	./crypto.go	28;"	c	access:public	line:28
+MapString	./utils.go	57;"	f	access:public	line:57	signature:(vs []string, f func(string) string)	type:[]string
+Notes	./db.go	29;"	w	access:public	ctype:Entry	line:29	type:string
+Number	./db.go	83;"	w	access:public	ctype:Address	line:83	type:string
+Password	./db.go	23;"	w	access:public	ctype:Entry	line:23	type:string
+Path	./scripts/main.go	19;"	w	access:public	ctype:CmdOption	line:19	type:string
+Pin	./db.go	24;"	w	access:public	ctype:Entry	line:24	type:string
+SALT_SIZE	./crypto.go	25;"	c	access:public	line:25
+Settings	./utils.go	34;"	t	access:public	line:34	type:struct
+SettingsOverride	./utils.go	26;"	t	access:public	line:26	type:struct
+SetupTestConfig	./tests/test_config.go	18;"	f	access:public	ctype:TestConfig	line:18	signature:(t *testing.T)	type:*TestConfig
+Short	./scripts/main.go	16;"	w	access:public	ctype:CmdOption	line:16	type:string
+ShowPasswords	./utils.go	27;"	w	access:public	ctype:SettingsOverride	line:27	type:bool
+ShowPasswords	./utils.go	39;"	w	access:public	ctype:Settings	line:39	type:bool
+State	./db.go	89;"	w	access:public	ctype:Address	line:89	type:string
+Street	./db.go	85;"	w	access:public	ctype:Address	line:85	type:string
+TableName	./db.go	100;"	m	access:public	ctype:Address	line:100	signature:()	type:string
+TableName	./db.go	62;"	m	access:public	ctype:Entry	line:62	signature:()	type:string
+TableName	./db.go	77;"	m	access:public	ctype:ExtendedEntry	line:77	signature:()	type:string
+Tags	./db.go	30;"	w	access:public	ctype:Entry	line:30	type:string
+TempDir	./tests/test_config.go	12;"	w	access:public	ctype:TestConfig	line:12	type:string
+TestAddCustomFields	./tests/test_actions.go	125;"	f	access:public	line:125	signature:(t *testing.T)
+TestAddNewCardEntry	./tests/test_actions.go	41;"	f	access:public	line:41	signature:(t *testing.T)
+TestAddNewDatabaseCardEntry	./tests/test_db.go	173;"	f	access:public	line:173	signature:(t *testing.T)
+TestAddNewDatabaseEntry	./tests/test_db.go	111;"	f	access:public	line:111	signature:(t *testing.T)
+TestAddNewEntry	./tests/test_actions.go	63;"	f	access:public	line:63	signature:(t *testing.T)
+TestAddOrUpdateCustomFields	./tests/test_actions.go	85;"	f	access:public	line:85	signature:(t *testing.T)
+TestAuthorInfo	./tests/test_main.go	30;"	f	access:public	line:30	signature:(t *testing.T)
+TestCheckActiveDatabase	./tests/test_utils.go	403;"	f	access:public	line:403	signature:(t *testing.T)
+TestCheckValidExpiry	./tests/test_utils.go	603;"	f	access:public	line:603	signature:(t *testing.T)
+TestCloneEntry	./tests/test_db.go	449;"	f	access:public	line:449	signature:(t *testing.T)
+TestCmdOption	./tests/test_main.go	98;"	f	access:public	line:98	signature:(t *testing.T)
+TestConfig	./tests/test_config.go	11;"	t	access:public	line:11	type:struct
+TestConstants	./tests/test_main.go	11;"	f	access:public	line:11	signature:(t *testing.T)
+TestCopyCurrentEntry	./tests/test_actions.go	449;"	f	access:public	line:449	signature:(t *testing.T)
+TestCopyPasswordToClipboard	./tests/test_utils.go	472;"	f	access:public	line:472	signature:(t *testing.T)
+TestCreateNewEntry	./tests/test_db.go	42;"	f	access:public	line:42	signature:(t *testing.T)
+TestCreateNewExEntry	./tests/test_db.go	62;"	f	access:public	line:62	signature:(t *testing.T)
+TestDBPath	./tests/test_config.go	13;"	w	access:public	ctype:TestConfig	line:13	type:string
+TestDecryptDatabase	./tests/test_actions.go	557;"	f	access:public	line:557	signature:(t *testing.T)
+TestDetectCardType	./tests/test_utils.go	523;"	f	access:public	line:523	signature:(t *testing.T)
+TestEditCurrentCardEntry	./tests/test_actions.go	134;"	f	access:public	line:134	signature:(t *testing.T)
+TestEditCurrentEntry	./tests/test_actions.go	170;"	f	access:public	line:170	signature:(t *testing.T)
+TestEncryptActiveDatabase	./tests/test_actions.go	495;"	f	access:public	line:495	signature:(t *testing.T)
+TestEncryptDatabase	./tests/test_actions.go	517;"	f	access:public	line:517	signature:(t *testing.T)
+TestEncryptDecryptFileAES	./tests/test_crypto.go	122;"	f	access:public	line:122	signature:(t *testing.T)
+TestEncryptDecryptFileXChachaPoly	./tests/test_crypto.go	182;"	f	access:public	line:182	signature:(t *testing.T)
+TestEncryptionConsistency	./tests/test_crypto.go	323;"	f	access:public	line:323	signature:(t *testing.T)
+TestEntriesToStringArray	./tests/test_db.go	540;"	f	access:public	line:540	signature:(t *testing.T)
+TestEntryCopy	./tests/test_db.go	631;"	f	access:public	line:631	signature:(t *testing.T)
+TestExportFilePermissions	./tests/test_export.go	524;"	f	access:public	line:524	signature:(t *testing.T)
+TestExportToCSV	./tests/test_export.go	275;"	f	access:public	line:275	signature:(t *testing.T)
+TestExportToFile	./tests/test_export.go	10;"	f	access:public	line:10	signature:(t *testing.T)
+TestExportToHTML	./tests/test_export.go	205;"	f	access:public	line:205	signature:(t *testing.T)
+TestExportToMarkdown	./tests/test_export.go	71;"	f	access:public	line:71	signature:(t *testing.T)
+TestExportToMarkdownLimited	./tests/test_export.go	138;"	f	access:public	line:138	signature:(t *testing.T)
+TestExportToPDF	./tests/test_export.go	345;"	f	access:public	line:345	signature:(t *testing.T)
+TestExportWithCardEntries	./tests/test_export.go	478;"	f	access:public	line:478	signature:(t *testing.T)
+TestExportWithCustomFields	./tests/test_export.go	428;"	f	access:public	line:428	signature:(t *testing.T)
+TestExportWithEmptyDatabase	./tests/test_export.go	385;"	f	access:public	line:385	signature:(t *testing.T)
+TestExtendedEntryCopy	./tests/test_db.go	714;"	f	access:public	line:714	signature:(t *testing.T)
+TestFindCurrentEntry	./tests/test_actions.go	294;"	f	access:public	line:294	signature:(t *testing.T)
+TestFunctionTypes	./tests/test_main.go	40;"	f	access:public	line:40	signature:(t *testing.T)
+TestGenerateKey	./tests/test_crypto.go	66;"	f	access:public	line:66	signature:(t *testing.T)
+TestGenerateKeyArgon2	./tests/test_crypto.go	34;"	f	access:public	line:34	signature:(t *testing.T)
+TestGeneratePassword	./tests/test_crypto.go	242;"	f	access:public	line:242	signature:(t *testing.T)
+TestGenerateRandomBytes	./tests/test_crypto.go	9;"	f	access:public	line:9	signature:(t *testing.T)
+TestGenerateStrongPassword	./tests/test_crypto.go	267;"	f	access:public	line:267	signature:(t *testing.T)
+TestGetActiveDatabase	./tests/test_utils.go	166;"	f	access:public	line:166	signature:(t *testing.T)
+TestGetColor	./tests/test_utils.go	245;"	f	access:public	line:245	signature:(t *testing.T)
+TestGetEntryById	./tests/test_db.go	229;"	f	access:public	line:229	signature:(t *testing.T)
+TestGetExtendedEntries	./tests/test_db.go	593;"	f	access:public	line:593	signature:(t *testing.T)
+TestGetOrCreateLocalConfig	./tests/test_utils.go	136;"	f	access:public	line:136	signature:(t *testing.T)
+TestHasActiveDatabase	./tests/test_utils.go	159;"	f	access:public	line:159	signature:(t *testing.T)
+TestHideSecret	./tests/test_utils.go	52;"	f	access:public	line:52	signature:(t *testing.T)
+TestInitNewDatabase	./tests/test_db.go	82;"	f	access:public	line:82	signature:(t *testing.T)
+TestIsActiveDatabaseEncrypted	./tests/test_utils.go	410;"	f	access:public	line:410	signature:(t *testing.T)
+TestIsActiveDatabaseEncryptedAndMaxKryptOn	./tests/test_utils.go	424;"	f	access:public	line:424	signature:(t *testing.T)
+TestIsEncryptOn	./tests/test_utils.go	417;"	f	access:public	line:417	signature:(t *testing.T)
+TestIsFileEncrypted	./tests/test_crypto.go	97;"	f	access:public	line:97	signature:(t *testing.T)
+TestIterateEntries	./tests/test_db.go	391;"	f	access:public	line:391	signature:(t *testing.T)
+TestListAllEntries	./tests/test_actions.go	257;"	f	access:public	line:257	signature:(t *testing.T)
+TestListCurrentEntry	./tests/test_actions.go	215;"	f	access:public	line:215	signature:(t *testing.T)
+TestMapString	./tests/test_utils.go	10;"	f	access:public	line:10	signature:(t *testing.T)
+TestMigrateDatabase	./tests/test_actions.go	602;"	f	access:public	line:602	signature:(t *testing.T)
+TestOpenDatabase	./tests/test_db.go	10;"	f	access:public	line:10	signature:(t *testing.T)
+TestPrettifyCardNumber	./tests/test_utils.go	297;"	f	access:public	line:297	signature:(t *testing.T)
+TestPrintCardEntry	./tests/test_utils.go	321;"	f	access:public	line:321	signature:(t *testing.T)
+TestPrintDelim	./tests/test_utils.go	275;"	f	access:public	line:275	signature:(t *testing.T)
+TestPrintEntry	./tests/test_utils.go	353;"	f	access:public	line:353	signature:(t *testing.T)
+TestPrintEntryMinimal	./tests/test_utils.go	374;"	f	access:public	line:374	signature:(t *testing.T)
+TestRandomFileName	./tests/test_utils.go	493;"	f	access:public	line:493	signature:(t *testing.T)
+TestReadInput	./tests/test_utils.go	395;"	f	access:public	line:395	signature:(t *testing.T)
+TestReadPassword	./tests/test_utils.go	182;"	f	access:public	line:182	signature:(t *testing.T)
+TestRemoveCurrentEntry	./tests/test_actions.go	404;"	f	access:public	line:404	signature:(t *testing.T)
+TestRemoveDatabaseEntry	./tests/test_db.go	500;"	f	access:public	line:500	signature:(t *testing.T)
+TestRemoveMultipleEntries	./tests/test_actions.go	349;"	f	access:public	line:349	signature:(t *testing.T)
+TestRewriteBaseFile	./tests/test_utils.go	189;"	f	access:public	line:189	signature:(t *testing.T)
+TestRewriteFile	./tests/test_utils.go	217;"	f	access:public	line:217	signature:(t *testing.T)
+TestSearchDatabaseEntries	./tests/test_db.go	333;"	f	access:public	line:333	signature:(t *testing.T)
+TestSearchDatabaseEntry	./tests/test_db.go	274;"	f	access:public	line:274	signature:(t *testing.T)
+TestSetActiveDatabasePath	./tests/test_actions.go	17;"	f	access:public	line:17	signature:(t *testing.T)
+TestSetAssumeYes	./tests/test_utils.go	446;"	f	access:public	line:446	signature:(t *testing.T)
+TestSetCopyPasswordToClipboard	./tests/test_utils.go	439;"	f	access:public	line:439	signature:(t *testing.T)
+TestSetShowPasswords	./tests/test_utils.go	432;"	f	access:public	line:432	signature:(t *testing.T)
+TestSetType	./tests/test_utils.go	453;"	f	access:public	line:453	signature:(t *testing.T)
+TestShowActiveDatabasePath	./tests/test_actions.go	10;"	f	access:public	line:10	signature:(t *testing.T)
+TestUpdateActiveDbPath	./tests/test_utils.go	173;"	f	access:public	line:173	signature:(t *testing.T)
+TestUpdateSettings	./tests/test_utils.go	103;"	f	access:public	line:103	signature:(t *testing.T)
+TestValidateCardPin	./tests/test_utils.go	578;"	f	access:public	line:578	signature:(t *testing.T)
+TestValidateCvv	./tests/test_utils.go	551;"	f	access:public	line:551	signature:(t *testing.T)
+TestVoidWrapperFunctions	./tests/test_main.go	80;"	f	access:public	line:80	signature:(t *testing.T)
+TestWrapperFunctions	./tests/test_main.go	62;"	f	access:public	line:62	signature:(t *testing.T)
+TestWriteSettings	./tests/test_utils.go	75;"	f	access:public	line:75	signature:(t *testing.T)
+TestWrongPasswordDecryption	./tests/test_crypto.go	290;"	f	access:public	line:290	signature:(t *testing.T)
+Timestamp	./db.go	32;"	w	access:public	ctype:Entry	line:32	type:time.Time
+Timestamp	./db.go	71;"	w	access:public	ctype:ExtendedEntry	line:71	type:time.Time
+Title	./db.go	20;"	w	access:public	ctype:Entry	line:20	type:string
+Type	./db.go	31;"	w	access:public	ctype:Entry	line:31	type:string
+Type	./db.go	94;"	w	access:public	ctype:Address	line:94	type:string
+Type	./utils.go	30;"	w	access:public	ctype:SettingsOverride	line:30	type:string
+Url	./db.go	22;"	w	access:public	ctype:Entry	line:22	type:string
+User	./db.go	21;"	w	access:public	ctype:Entry	line:21	type:string
+VERSION	./defns.go	9;"	c	access:public	line:9
+WrapperMaxKryptStringFunc	./actions.go	23;"	f	access:public	line:23	signature:(fn actionFunc)	type:actionFunc
+WrapperMaxKryptVoidFunc	./actions.go	65;"	f	access:public	line:65	signature:(fn voidFunc)	type:voidFunc
+ZipCode	./db.go	93;"	w	access:public	ctype:Address	line:93	type:string
+actionFunc	./defns.go	3;"	t	access:private	line:3	type:func(string) error
+actionFunc2	./defns.go	4;"	t	access:private	line:4	type:func(string) error, string
+addCustomEntries	./db.go	259;"	f	access:private	line:259	signature:(db *gorm.DB, entry *Entry, customEntries []CustomEntry)	type:error
+addCustomFields	./actions.go	418;"	f	access:private	line:418	signature:(reader *bufio.Reader)	type:[]CustomEntry
+addNewCardEntry	./actions.go	223;"	f	access:private	line:223	signature:()	type:error
+addNewDatabaseCardEntry	./db.go	402;"	f	access:private	line:402	signature:(cardName, cardNumber, cardHolder, cardIssuer, cardClass, cardCvv, cardPin, cardExpiry, notes, tags string, customEntries []CustomEntry)	type:error
+addNewDatabaseEntry	./db.go	318;"	f	access:private	line:318	signature:(title, userName, url, passwd, tags string, notes string, customEntries []CustomEntry)	type:error
+addNewEntry	./actions.go	301;"	f	access:private	line:301	signature:()	type:error
+addOrUpdateCustomFields	./actions.go	370;"	f	access:private	line:370	signature:(reader *bufio.Reader, entry *Entry)	type:[]CustomEntry, bool
+bufio	./actions.go	5;"	i	line:5
+bufio	./export.go	4;"	i	line:4
+bufio	./utils.go	5;"	i	line:5
+bytes	./test/testpgp.go	6;"	i	line:6
+checkActiveDatabase	./utils.go	529;"	f	access:private	line:529	signature:()	type:error
+checkValidExpiry	./utils.go	661;"	f	access:private	line:661	signature:(expiryDate string)	type:bool
+cloneEntry	./db.go	643;"	f	access:private	line:643	signature:(entry *Entry)	type:error, *Entry
+cloneExtendedEntries	./db.go	666;"	f	access:private	line:666	signature:(entry *Entry, exEntries []ExtendedEntry)	type:error
+contains	./tests/test_utils.go	631;"	f	access:private	line:631	signature:(s, substr string)	type:bool
+copyCurrentEntry	./actions.go	786;"	f	access:private	line:786	signature:(idString string)	type:error
+copyPasswordToClipboard	./utils.go	598;"	f	access:private	line:598	signature:(passwd string)
+createNewEntry	./db.go	165;"	f	access:private	line:165	signature:(db *gorm.DB)	type:error
+createNewExEntry	./db.go	170;"	f	access:private	line:170	signature:(db *gorm.DB)	type:error
+crypto/aes	./crypto.go	5;"	i	line:5
+crypto/cipher	./crypto.go	6;"	i	line:6
+crypto/hmac	./crypto.go	7;"	i	line:7
+crypto/rand	./crypto.go	21;"	i	line:21
+crypto/sha512	./crypto.go	8;"	i	line:8
+database/sql	./db.go	5;"	i	line:5
+decryptDatabase	./actions.go	901;"	f	access:private	line:901	signature:(dbPath string)	type:error, string
+decryptFileAES	./crypto.go	210;"	f	access:private	line:210	signature:(encDbPath string, password string)	type:error
+decryptFileXChachaPoly	./crypto.go	363;"	f	access:private	line:363	signature:(encDbPath string, password string)	type:error
+detectCardType	./utils.go	610;"	f	access:private	line:610	signature:(cardNum string)	type:string, error
+editCurrentCardEntry	./actions.go	449;"	f	access:private	line:449	signature:(entry *Entry)	type:error
+editCurrentEntry	./actions.go	512;"	f	access:private	line:512	signature:(idString string)	type:error
+encoding/csv	./export.go	5;"	i	line:5
+encoding/hex	./utils.go	6;"	i	line:6
+encoding/json	./utils.go	7;"	i	line:7
+encryptActiveDatabase	./actions.go	829;"	f	access:private	line:829	signature:()	type:error
+encryptDatabase	./actions.go	848;"	f	access:private	line:848	signature:(dbPath string, givenPasswd *string)	type:error
+encryptFileAES	./crypto.go	129;"	f	access:private	line:129	signature:(dbPath string, password string)	type:error
+encryptFileXChachaPoly	./crypto.go	292;"	f	access:private	line:292	signature:(dbPath string, password string)	type:error
+entriesToStringArray	./db.go	717;"	f	access:private	line:717	signature:(skipLongFields bool)	type:error, [][]string
+errors	./actions.go	6;"	i	line:6
+errors	./crypto.go	9;"	i	line:9
+errors	./export.go	6;"	i	line:6
+errors	./utils.go	8;"	i	line:8
+exportToCsv	./export.go	341;"	f	access:private	line:341	signature:(fileName string)	type:error
+exportToFile	./export.go	15;"	f	access:private	line:15	signature:(fileName string)	type:error
+exportToHTML	./export.go	286;"	f	access:private	line:286	signature:(fileName string)	type:error
+exportToMarkdown	./export.go	72;"	f	access:private	line:72	signature:(fileName string)	type:error
+exportToMarkdownLimited	./export.go	211;"	f	access:private	line:211	signature:(fileName string)	type:error
+exportToPDF	./export.go	147;"	f	access:private	line:147	signature:(fileName string)	type:error
+fieldName	./actions.go	18;"	w	access:private	ctype:CustomEntry	line:18	type:string
+fieldValue	./actions.go	19;"	w	access:private	ctype:CustomEntry	line:19	type:string
+findCurrentEntry	./actions.go	668;"	f	access:private	line:668	signature:(term string)	type:error
+fmt	./actions.go	7;"	i	line:7
+fmt	./crypto.go	10;"	i	line:10
+fmt	./db.go	6;"	i	line:6
+fmt	./export.go	7;"	i	line:7
+fmt	./scripts/main.go	6;"	i	line:6
+fmt	./test/testpgp.go	7;"	i	line:7
+fmt	./utils.go	9;"	i	line:9
+genPass	./scripts/main.go	40;"	f	access:private	line:40	signature:()	type:error, string
+generateKey	./crypto.go	74;"	f	access:private	line:74	signature:(passPhrase string, oldSalt *[]byte)	type:error, []byte, []byte
+generateKeyArgon2	./crypto.go	48;"	f	access:private	line:48	signature:(passPhrase string, oldSalt *[]byte)	type:error, []byte, []byte
+generatePassword	./crypto.go	440;"	f	access:private	line:440	signature:(length int)	type:error, string
+generateRandomBytes	./crypto.go	31;"	f	access:private	line:31	signature:(size int)	type:error, []byte
+generateStrongPassword	./crypto.go	466;"	f	access:private	line:466	signature:()	type:error, string
+getActiveDatabase	./utils.go	184;"	f	access:private	line:184	signature:()	type:error, string
+getColor	./utils.go	258;"	f	access:private	line:258	signature:(code string)	type:string
+getEntryById	./db.go	495;"	f	access:private	line:495	signature:(id int)	type:error, *Entry
+getExtendedEntries	./db.go	755;"	f	access:private	line:755	signature:(entry *Entry)	type:[]ExtendedEntry
+getOrCreateLocalConfig	./utils.go	118;"	f	access:private	line:118	signature:(app string)	type:error, *Settings
+github.com/atotto/clipboard	./utils.go	10;"	i	line:10
+github.com/kirsle/configdir	./utils.go	11;"	i	line:11
+github.com/polyglothacker/creditcard	./utils.go	12;"	i	line:12
+github.com/pythonhacker/argparse	./scripts/main.go	7;"	i	line:7
+golang.org/x/crypto/argon2	./crypto.go	11;"	i	line:11
+golang.org/x/crypto/chacha20poly1305	./crypto.go	12;"	i	line:12
+golang.org/x/crypto/openpgp	./test/testpgp.go	8;"	i	line:8
+golang.org/x/crypto/pbkdf2	./crypto.go	13;"	i	line:13
+golang.org/x/crypto/ssh/terminal	./utils.go	13;"	i	line:13
+gorm.io/driver/sqlite	./db.go	7;"	i	line:7
+gorm.io/gorm	./actions.go	8;"	i	line:8
+gorm.io/gorm	./db.go	8;"	i	line:8
+gorm.io/gorm/logger	./db.go	9;"	i	line:9
+hasActiveDatabase	./utils.go	164;"	f	access:private	line:164	signature:()	type:bool
+hideSecret	./utils.go	66;"	f	access:private	line:66	signature:(secret string)	type:string
+initNewDatabase	./db.go	175;"	f	access:private	line:175	signature:(dbPath string)	type:error
+initializeCmdLine	./scripts/main.go	181;"	f	access:private	line:181	signature:(parser *argparse.Parser)	type:map[string]interface{}
+intersection	./db.go	564;"	f	access:private	line:564	signature:(entry1 []Entry, entry2 []Entry)	type:[]Entry
+io	./crypto.go	14;"	i	line:14
+io/fs	./utils.go	14;"	i	line:14
+io/ioutil	./test/testpgp.go	9;"	i	line:9
+isActiveDatabaseEncrypted	./utils.go	540;"	f	access:private	line:540	signature:()	type:bool
+isActiveDatabaseEncryptedAndMaxKryptOn	./utils.go	562;"	f	access:private	line:562	signature:()	type:bool, string
+isEncryptOn	./utils.go	555;"	f	access:private	line:555	signature:()	type:bool
+isFileEncrypted	./crypto.go	98;"	f	access:private	line:98	signature:(encDbPath string)	type:error, bool
+iterateEntries	./db.go	691;"	f	access:private	line:691	signature:(orderKey string, order string)	type:error, []Entry
+listAllEntries	./actions.go	613;"	f	access:private	line:613	signature:()	type:error
+listCurrentEntry	./actions.go	583;"	f	access:private	line:583	signature:(idString string)	type:error
+main	./scripts/main.go	232;"	f	access:private	line:232	signature:()
+main	./scripts/main.go	3;"	p	line:3
+main	./test/testpgp.go	15;"	f	access:private	line:15	signature:()
+main	./test/testpgp.go	3;"	p	line:3
+math/big	./crypto.go	15;"	i	line:15
+math/rand	./crypto.go	16;"	i	line:16
+migrateDatabase	./actions.go	940;"	f	access:private	line:940	signature:(dbPath string)	type:error
+openActiveDatabase	./db.go	238;"	f	access:private	line:238	signature:()	type:error, *gorm.DB
+openDatabase	./db.go	156;"	f	access:private	line:156	signature:(filePath string)	type:error, *gorm.DB
+os	./actions.go	9;"	i	line:9
+os	./crypto.go	17;"	i	line:17
+os	./db.go	10;"	i	line:10
+os	./export.go	8;"	i	line:8
+os	./scripts/main.go	8;"	i	line:8
+os	./test/testpgp.go	10;"	i	line:10
+os	./tests/test_actions.go	4;"	i	line:4
+os	./tests/test_config.go	4;"	i	line:4
+os	./tests/test_crypto.go	4;"	i	line:4
+os	./tests/test_db.go	4;"	i	line:4
+os	./tests/test_export.go	4;"	i	line:4
+os	./tests/test_utils.go	4;"	i	line:4
+os	./utils.go	15;"	i	line:15
+os/exec	./export.go	9;"	i	line:9
+os/signal	./actions.go	10;"	i	line:10
+os/user	./test/testpgp.go	11;"	i	line:11
+path/filepath	./actions.go	11;"	i	line:11
+path/filepath	./db.go	11;"	i	line:11
+path/filepath	./export.go	10;"	i	line:10
+path/filepath	./test/testpgp.go	12;"	i	line:12
+path/filepath	./tests/test_actions.go	5;"	i	line:5
+path/filepath	./tests/test_config.go	5;"	i	line:5
+path/filepath	./tests/test_db.go	5;"	i	line:5
+path/filepath	./tests/test_export.go	5;"	i	line:5
+path/filepath	./tests/test_utils.go	5;"	i	line:5
+path/filepath	./utils.go	16;"	i	line:16
+performAction	./scripts/main.go	62;"	f	access:private	line:62	signature:(optMap map[string]interface{})
+prettifyCardNumber	./utils.go	324;"	f	access:private	line:324	signature:(cardNumber string)	type:string
+printCardEntry	./utils.go	347;"	f	access:private	line:347	signature:(entry *Entry, settings *Settings, delim bool)	type:error
+printDelim	./utils.go	303;"	f	access:private	line:303	signature:(delimChar string, color string)
+printEntry	./utils.go	418;"	f	access:private	line:418	signature:(entry *Entry, delim bool)	type:error
+printEntryMinimal	./utils.go	483;"	f	access:private	line:483	signature:(entry *Entry, delim bool)	type:error
+printUsage	./scripts/main.go	24;"	f	access:private	line:24	signature:()	type:error
+printVersionInfo	./scripts/main.go	32;"	f	access:private	line:32	signature:()	type:error
+randomFileName	./utils.go	603;"	f	access:private	line:603	signature:(folder string, suffix string)	type:string
+readInput	./utils.go	519;"	f	access:private	line:519	signature:(reader *bufio.Reader, prompt string)	type:string
+readPassword	./utils.go	214;"	f	access:private	line:214	signature:()	type:error, string
+regexp	./utils.go	17;"	i	line:17
+removeCurrentEntry	./actions.go	741;"	f	access:private	line:741	signature:(idString string)	type:error
+removeDatabaseEntry	./db.go	613;"	f	access:private	line:613	signature:(entry *Entry)	type:error
+removeMultipleEntries	./actions.go	712;"	f	access:private	line:712	signature:(idRangeEntry string)	type:error
+replaceCustomEntries	./db.go	287;"	f	access:private	line:287	signature:(db *gorm.DB, entry *Entry, updatedEntries []CustomEntry)	type:error
+rewriteBaseFile	./utils.go	224;"	f	access:private	line:224	signature:(path string, contents []byte, mode fs.FileMode)	type:error, string
+rewriteFile	./utils.go	242;"	f	access:private	line:242	signature:(path string, contents []byte, mode fs.FileMode)	type:error, string
+searchDatabaseEntries	./db.go	584;"	f	access:private	line:584	signature:(terms []string, operator string)	type:error, []Entry
+searchDatabaseEntry	./db.go	515;"	f	access:private	line:515	signature:(term string)	type:error, []Entry
+setActiveDatabasePath	./actions.go	130;"	f	access:private	line:130	signature:(dbPath string)	type:error
+setAssumeYes	./utils.go	589;"	f	access:private	line:589	signature:()	type:error
+setCopyPasswordToClipboard	./utils.go	584;"	f	access:private	line:584	signature:()	type:error
+setShowPasswords	./utils.go	577;"	f	access:private	line:577	signature:()	type:error
+setType	./utils.go	594;"	f	access:private	line:594	signature:(_type string)
+settingFunc	./defns.go	7;"	t	access:private	line:7	type:func(string)
+settingsRider	./utils.go	54;"	v	access:private	line:54	type:SettingsOverride
+showActiveDatabasePath	./actions.go	107;"	f	access:private	line:107	signature:()	type:error
+strconv	./actions.go	12;"	i	line:12
+strconv	./db.go	12;"	i	line:12
+strconv	./utils.go	18;"	i	line:18
+stringPtr	./tests/test_actions.go	638;"	f	access:private	line:638	signature:(s string)	type:*string
+strings	./actions.go	13;"	i	line:13
+strings	./db.go	13;"	i	line:13
+strings	./export.go	11;"	i	line:11
+strings	./scripts/main.go	9;"	i	line:9
+strings	./utils.go	19;"	i	line:19
+syscall	./actions.go	14;"	i	line:14
+testing	./tests/test_actions.go	6;"	i	line:6
+testing	./tests/test_config.go	6;"	i	line:6
+testing	./tests/test_crypto.go	5;"	i	line:5
+testing	./tests/test_db.go	6;"	i	line:6
+testing	./tests/test_export.go	6;"	i	line:6
+testing	./tests/test_main.go	4;"	i	line:4
+testing	./tests/test_utils.go	6;"	i	line:6
+tests	./tests/test_actions.go	1;"	p	line:1
+tests	./tests/test_config.go	1;"	p	line:1
+tests	./tests/test_crypto.go	1;"	p	line:1
+tests	./tests/test_db.go	1;"	p	line:1
+tests	./tests/test_export.go	1;"	p	line:1
+tests	./tests/test_main.go	1;"	p	line:1
+tests	./tests/test_utils.go	1;"	p	line:1
+time	./crypto.go	18;"	i	line:18
+time	./db.go	14;"	i	line:14
+time	./utils.go	20;"	i	line:20
+union	./db.go	546;"	f	access:private	line:546	signature:(entry1 []Entry, entry2 []Entry)	type:[]Entry
+unsafe	./crypto.go	19;"	i	line:19
+updateActiveDbPath	./utils.go	201;"	f	access:private	line:201	signature:(dbPath string)	type:error
+updateDatabaseCardEntry	./db.go	347;"	f	access:private	line:347	signature:(entry *Entry, cardName, cardNumber, cardHolder, cardClass, cardCvv, cardPin, cardExpiry, notes, tags string, customEntries []CustomEntry, flag bool)	type:error
+updateDatabaseEntry	./db.go	447;"	f	access:private	line:447	signature:(entry *Entry, title, userName, url, passwd, tags string, notes string, customEntries []CustomEntry, flag bool)	type:error
+updateSettings	./utils.go	95;"	f	access:private	line:95	signature:(settings *Settings, configFile string)	type:error
+validateCardPin	./utils.go	650;"	f	access:private	line:650	signature:(cardPin string)	type:bool
+validateCvv	./utils.go	632;"	f	access:private	line:632	signature:(cardCvv string, cardClass string)	type:bool
+varuh	./actions.go	2;"	p	line:2
+varuh	./crypto.go	2;"	p	line:2
+varuh	./db.go	2;"	p	line:2
+varuh	./defns.go	1;"	p	line:1
+varuh	./export.go	1;"	p	line:1
+varuh	./scripts/main.go	10;"	i	line:10
+varuh	./tests/test_actions.go	7;"	i	line:7
+varuh	./tests/test_config.go	7;"	i	line:7
+varuh	./tests/test_crypto.go	6;"	i	line:6
+varuh	./tests/test_db.go	7;"	i	line:7
+varuh	./tests/test_export.go	7;"	i	line:7
+varuh	./tests/test_main.go	5;"	i	line:5
+varuh	./tests/test_utils.go	7;"	i	line:7
+varuh	./utils.go	2;"	p	line:2
+voidFunc	./defns.go	5;"	t	access:private	line:5	type:func() error
+voidFunc2	./defns.go	6;"	t	access:private	line:6	type:func() error, string
+writeSettings	./utils.go	77;"	f	access:private	line:77	signature:(settings *Settings, configFile string)	type:error

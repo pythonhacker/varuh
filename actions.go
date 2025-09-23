@@ -1,5 +1,5 @@
 // Actions on the database
-package main
+package varuh
 
 import (
 	"bufio"
@@ -15,12 +15,12 @@ import (
 )
 
 type CustomEntry struct {
-	fieldName  string
-	fieldValue string
+	FieldName  string
+	FieldValue string
 }
 
 // Wrappers (closures) for functions accepting strings as input for in/out encryption
-func WrapperMaxKryptStringFunc(fn actionFunc) actionFunc {
+func WrapperMaxKryptStringFunc(fn ActionFunc) ActionFunc {
 
 	return func(inputStr string) error {
 		var maxKrypt bool
@@ -32,7 +32,7 @@ func WrapperMaxKryptStringFunc(fn actionFunc) actionFunc {
 
 		// If max krypt on - then autodecrypt on call and auto encrypt after call
 		if maxKrypt {
-			err, encPasswd = decryptDatabase(defaultDB)
+			err, encPasswd = DecryptDatabase(defaultDB)
 			if err != nil {
 				return err
 			}
@@ -44,7 +44,7 @@ func WrapperMaxKryptStringFunc(fn actionFunc) actionFunc {
 				sig := <-sigChan
 				fmt.Println("Received signal", sig)
 				// Reencrypt
-				encryptDatabase(defaultDB, &encPasswd)
+				EncryptDatabase(defaultDB, &encPasswd)
 				os.Exit(1)
 			}()
 		}
@@ -53,7 +53,7 @@ func WrapperMaxKryptStringFunc(fn actionFunc) actionFunc {
 
 		// If max krypt on - then autodecrypt on call and auto encrypt after call
 		if maxKrypt {
-			encryptDatabase(defaultDB, &encPasswd)
+			EncryptDatabase(defaultDB, &encPasswd)
 		}
 
 		return err
@@ -62,7 +62,7 @@ func WrapperMaxKryptStringFunc(fn actionFunc) actionFunc {
 }
 
 // Wrappers (closures) for functions accepting no input for in/out encryption
-func WrapperMaxKryptVoidFunc(fn voidFunc) voidFunc {
+func WrapperMaxKryptVoidFunc(fn VoidFunc) VoidFunc {
 
 	return func() error {
 		var maxKrypt bool
@@ -74,7 +74,7 @@ func WrapperMaxKryptVoidFunc(fn voidFunc) voidFunc {
 
 		// If max krypt on - then autodecrypt on call and auto encrypt after call
 		if maxKrypt {
-			err, encPasswd = decryptDatabase(defaultDB)
+			err, encPasswd = DecryptDatabase(defaultDB)
 			if err != nil {
 				return err
 			}
@@ -86,7 +86,7 @@ func WrapperMaxKryptVoidFunc(fn voidFunc) voidFunc {
 				sig := <-sigChan
 				fmt.Println("Received signal", sig)
 				// Reencrypt
-				encryptDatabase(defaultDB, &encPasswd)
+				EncryptDatabase(defaultDB, &encPasswd)
 				os.Exit(1)
 			}()
 		}
@@ -95,7 +95,7 @@ func WrapperMaxKryptVoidFunc(fn voidFunc) voidFunc {
 
 		// If max krypt on - then autodecrypt on call and auto encrypt after call
 		if maxKrypt {
-			encryptDatabase(defaultDB, &encPasswd)
+			EncryptDatabase(defaultDB, &encPasswd)
 		}
 
 		return err
@@ -104,9 +104,9 @@ func WrapperMaxKryptVoidFunc(fn voidFunc) voidFunc {
 }
 
 // Print the current active database path
-func showActiveDatabasePath() error {
+func ShowActiveDatabasePath() error {
 
-	err, settings := getOrCreateLocalConfig(APP)
+	err, settings := GetOrCreateLocalConfig(APP)
 
 	if err != nil {
 		fmt.Printf("Error parsing config - \"%s\"\n", err.Error())
@@ -127,13 +127,13 @@ func showActiveDatabasePath() error {
 }
 
 // Set the current active database path
-func setActiveDatabasePath(dbPath string) error {
+func SetActiveDatabasePath(dbPath string) error {
 
 	var fullPath string
 	var activeEncrypted bool
 	var newEncrypted bool
 
-	err, settings := getOrCreateLocalConfig(APP)
+	err, settings := GetOrCreateLocalConfig(APP)
 
 	if err != nil {
 		fmt.Printf("Error parsing config - \"%s\"\n", err.Error())
@@ -155,11 +155,11 @@ func setActiveDatabasePath(dbPath string) error {
 			return nil
 		}
 
-		if _, flag = isFileEncrypted(settings.ActiveDB); flag {
+		if _, flag = IsFileEncrypted(settings.ActiveDB); flag {
 			activeEncrypted = true
 		}
 
-		if _, flag = isFileEncrypted(fullPath); flag {
+		if _, flag = IsFileEncrypted(fullPath); flag {
 			newEncrypted = true
 		}
 
@@ -167,7 +167,7 @@ func setActiveDatabasePath(dbPath string) error {
 		if settings.AutoEncrypt {
 			if !activeEncrypted {
 				fmt.Printf("Encrypting current active database - %s\n", settings.ActiveDB)
-				err = encryptActiveDatabase()
+				err = EncryptActiveDatabase()
 				if err == nil {
 					activeEncrypted = true
 				}
@@ -177,7 +177,7 @@ func setActiveDatabasePath(dbPath string) error {
 				if !settings.AutoEncrypt {
 					// Decrypt new database if it is encrypted
 					fmt.Printf("Database %s is encrypted, decrypting it\n", fullPath)
-					err, _ = decryptDatabase(fullPath)
+					err, _ = DecryptDatabase(fullPath)
 					if err != nil {
 						fmt.Printf("Decryption Error - \"%s\", not switching databases\n", err.Error())
 						return err
@@ -204,7 +204,7 @@ func setActiveDatabasePath(dbPath string) error {
 		}
 
 		settings.ActiveDB = fullPath
-		err = updateSettings(settings, settings.ConfigPath)
+		err = UpdateSettings(settings, settings.ConfigPath)
 		if err == nil {
 			fmt.Println("Switched active database successfully.")
 		} else {
@@ -220,7 +220,7 @@ func setActiveDatabasePath(dbPath string) error {
 }
 
 // Text menu driven function to add a new entry for a card type
-func addNewCardEntry() error {
+func AddNewCardEntry() error {
 
 	var cardHolder string
 	var cardName string
@@ -242,7 +242,7 @@ func addNewCardEntry() error {
 
 	reader := bufio.NewReader(os.Stdin)
 	cardNumber = readInput(reader, "Card Number")
-	cardClass, err = detectCardType(cardNumber)
+	cardClass, err = DetectCardType(cardNumber)
 
 	if err != nil {
 		fmt.Printf("Error - %s\n", err.Error())
@@ -255,22 +255,22 @@ func addNewCardEntry() error {
 	cardExpiry = readInput(reader, "Expiry Date as mm/dd")
 
 	// expiry has to be in the form of <month>/<year>
-	if !checkValidExpiry(cardExpiry) {
+	if !CheckValidExpiry(cardExpiry) {
 		return errors.New("Invalid Expiry Date")
 	}
 
 	fmt.Printf("CVV: ")
-	err, cardCvv = readPassword()
+	err, cardCvv = ReadPassword()
 
-	if !validateCvv(cardCvv, cardClass) {
+	if !ValidateCvv(cardCvv, cardClass) {
 		fmt.Printf("\nError - Invalid CVV for %s\n", cardClass)
 		return errors.New(fmt.Sprintf("Error - Invalid CVV for %s\n", cardClass))
 	}
 
 	fmt.Printf("\nCard PIN: ")
-	err, cardPin = readPassword()
+	err, cardPin = ReadPassword()
 
-	if !validateCardPin(cardPin) {
+	if !ValidateCardPin(cardPin) {
 		fmt.Printf("\n<Warning - Empty PIN!>")
 	}
 
@@ -285,9 +285,9 @@ func addNewCardEntry() error {
 	tags = readInput(reader, "\nTags (separated by space): ")
 	notes = readInput(reader, "Notes")
 
-	customEntries = addCustomFields(reader)
+	customEntries = AddCustomFields(reader)
 
-	err = addNewDatabaseCardEntry(cardName, cardNumber, cardHolder, cardIssuer,
+	err = AddNewDatabaseCardEntry(cardName, cardNumber, cardHolder, cardIssuer,
 		cardClass, cardCvv, cardPin, cardExpiry, notes, tags, customEntries)
 
 	if err != nil {
@@ -298,7 +298,7 @@ func addNewCardEntry() error {
 }
 
 // Text menu driven function to add a new entry
-func addNewEntry() error {
+func AddNewEntry() error {
 
 	var userName string
 	var title string
@@ -313,8 +313,8 @@ func addNewEntry() error {
 		return err
 	}
 
-	if settingsRider.Type == "card" {
-		return addNewCardEntry()
+	if SettingsRider.Type == "card" {
+		return AddNewCardEntry()
 	}
 
 	reader := bufio.NewReader(os.Stdin)
@@ -327,11 +327,11 @@ func addNewEntry() error {
 	userName = readInput(reader, "Username")
 
 	fmt.Printf("Password (enter to generate new): ")
-	err, passwd = readPassword()
+	err, passwd = ReadPassword()
 
 	if len(passwd) == 0 {
 		fmt.Printf("\nGenerating password ...")
-		err, passwd = generateStrongPassword()
+		err, passwd = GenerateStrongPassword()
 		fmt.Printf("done")
 	}
 	//  fmt.Printf("Password => %s\n", passwd)
@@ -353,10 +353,10 @@ func addNewEntry() error {
 		return errors.New("invalid input")
 	}
 
-	customEntries = addCustomFields(reader)
+	customEntries = AddCustomFields(reader)
 
 	// Trim spaces
-	err = addNewDatabaseEntry(title, userName, url, passwd, tags, notes, customEntries)
+	err = AddNewDatabaseEntry(title, userName, url, passwd, tags, notes, customEntries)
 
 	if err != nil {
 		fmt.Printf("Error adding entry - \"%s\"\n", err.Error())
@@ -367,14 +367,14 @@ func addNewEntry() error {
 
 // Function to update existing custom entries and add new ones
 // The bool part of the return value indicates whether to take action
-func addOrUpdateCustomFields(reader *bufio.Reader, entry *Entry) ([]CustomEntry, bool) {
+func AddOrUpdateCustomFields(reader *bufio.Reader, entry *Entry) ([]CustomEntry, bool) {
 
 	var customEntries []ExtendedEntry
 	var editedCustomEntries []CustomEntry
 	var newCustomEntries []CustomEntry
 	var flag bool
 
-	customEntries = getExtendedEntries(entry)
+	customEntries = GetExtendedEntries(entry)
 
 	if len(customEntries) > 0 {
 
@@ -403,7 +403,7 @@ func addOrUpdateCustomFields(reader *bufio.Reader, entry *Entry) ([]CustomEntry,
 		}
 	}
 
-	newCustomEntries = addCustomFields(reader)
+	newCustomEntries = AddCustomFields(reader)
 
 	editedCustomEntries = append(editedCustomEntries, newCustomEntries...)
 
@@ -415,7 +415,7 @@ func addOrUpdateCustomFields(reader *bufio.Reader, entry *Entry) ([]CustomEntry,
 }
 
 // Function to add custom fields to an entry
-func addCustomFields(reader *bufio.Reader) []CustomEntry {
+func AddCustomFields(reader *bufio.Reader) []CustomEntry {
 
 	// Custom fields
 	var custom string
@@ -446,7 +446,7 @@ func addCustomFields(reader *bufio.Reader) []CustomEntry {
 }
 
 // Edit a card entry by id
-func editCurrentCardEntry(entry *Entry) error {
+func EditCurrentCardEntry(entry *Entry) error {
 	var klass string
 	var err error
 	var flag bool
@@ -461,7 +461,7 @@ func editCurrentCardEntry(entry *Entry) error {
 	fmt.Printf("Card Number: %s\n", entry.Url)
 	number := readInput(reader, "New Card Number")
 	if number != "" {
-		klass, err = detectCardType(number)
+		klass, err = DetectCardType(number)
 
 		if err != nil {
 			fmt.Printf("Error - %s\n", err.Error())
@@ -473,32 +473,32 @@ func editCurrentCardEntry(entry *Entry) error {
 
 	fmt.Printf("Card CVV: %s\n", entry.Password)
 	fmt.Printf("New Card CVV: ")
-	err, cvv := readPassword()
+	err, cvv := ReadPassword()
 
-	if cvv != "" && !validateCvv(cvv, klass) {
+	if cvv != "" && !ValidateCvv(cvv, klass) {
 		fmt.Printf("\nError - Invalid CVV for %s\n", klass)
 		return errors.New(fmt.Sprintf("Error - Invalid CVV for %s\n", klass))
 	}
 	fmt.Printf("\nCard PIN: %s\n", entry.Pin)
 	fmt.Printf("New Card PIN: ")
-	err, pin := readPassword()
+	err, pin := ReadPassword()
 
-	if pin != "" && !validateCardPin(pin) {
+	if pin != "" && !ValidateCardPin(pin) {
 		fmt.Printf("\n<Warning - Empty PIN!>")
 	}
 	fmt.Printf("\nCard Expiry Date: %s\n", entry.ExpiryDate)
 	expiryDate := readInput(reader, "New Card Expiry Date (as mm/dd): ")
 	// expiry has to be in the form of <month>/<year>
-	if expiryDate != "" && !checkValidExpiry(expiryDate) {
+	if expiryDate != "" && !CheckValidExpiry(expiryDate) {
 		return errors.New("Invalid Expiry Date")
 	}
 	tags := readInput(reader, "\nTags (separated by space): ")
 	notes := readInput(reader, "Notes")
 
-	customEntries, flag = addOrUpdateCustomFields(reader, entry)
+	customEntries, flag = AddOrUpdateCustomFields(reader, entry)
 
 	// Update
-	err = updateDatabaseCardEntry(entry, title, number, name,
+	err = UpdateDatabaseCardEntry(entry, title, number, name,
 		klass, cvv, pin, expiryDate, notes, tags, customEntries, flag)
 
 	if err != nil {
@@ -509,7 +509,7 @@ func editCurrentCardEntry(entry *Entry) error {
 }
 
 // Edit a current entry by id
-func editCurrentEntry(idString string) error {
+func EditCurrentEntry(idString string) error {
 
 	var userName string
 	var title string
@@ -527,14 +527,14 @@ func editCurrentEntry(idString string) error {
 
 	id, _ = strconv.Atoi(idString)
 
-	err, entry = getEntryById(id)
+	err, entry = GetEntryById(id)
 	if err != nil || entry == nil {
 		fmt.Printf("No entry found for id %d\n", id)
 		return err
 	}
 
 	if entry.Type == "card" {
-		return editCurrentCardEntry(entry)
+		return EditCurrentCardEntry(entry)
 	}
 
 	reader := bufio.NewReader(os.Stdin)
@@ -554,11 +554,11 @@ func editCurrentEntry(idString string) error {
 
 	fmt.Printf("Current Password: %s\n", entry.Password)
 	fmt.Printf("New Password ([y/Y] to generate new, enter will keep old one): ")
-	err, passwd = readPassword()
+	err, passwd = ReadPassword()
 
 	if strings.ToLower(passwd) == "y" {
 		fmt.Printf("\nGenerating new password ...")
-		err, passwd = generateStrongPassword()
+		err, passwd = GenerateStrongPassword()
 	}
 	//  fmt.Printf("Password => %s\n", passwd)
 
@@ -568,10 +568,10 @@ func editCurrentEntry(idString string) error {
 	fmt.Printf("\nCurrent Notes: %s\n", entry.Notes)
 	notes = readInput(reader, "New Notes")
 
-	customEntries, flag := addOrUpdateCustomFields(reader, entry)
+	customEntries, flag := AddOrUpdateCustomFields(reader, entry)
 
 	// Update
-	err = updateDatabaseEntry(entry, title, userName, url, passwd, tags, notes, customEntries, flag)
+	err = UpdateDatabaseEntry(entry, title, userName, url, passwd, tags, notes, customEntries, flag)
 	if err != nil {
 		fmt.Printf("Error updating entry - \"%s\"\n", err.Error())
 	}
@@ -580,7 +580,7 @@ func editCurrentEntry(idString string) error {
 }
 
 // List current entry by id
-func listCurrentEntry(idString string) error {
+func ListCurrentEntry(idString string) error {
 
 	var id int
 	var err error
@@ -593,24 +593,24 @@ func listCurrentEntry(idString string) error {
 	id, _ = strconv.Atoi(idString)
 
 	//  fmt.Printf("Listing current entry - %d\n", id)
-	err, entry = getEntryById(id)
+	err, entry = GetEntryById(id)
 	if err != nil || entry == nil {
 		fmt.Printf("No entry found for id %d\n", id)
 		return err
 	}
 
-	err = printEntry(entry, true)
+	err = PrintEntry(entry, true)
 
-	if err == nil && settingsRider.CopyPassword {
+	if err == nil && SettingsRider.CopyPassword {
 		//      fmt.Printf("Copying password " + entry.Password + " to clipboard\n")
-		copyPasswordToClipboard(entry.Password)
+		CopyPasswordToClipboard(entry.Password)
 	}
 
 	return err
 }
 
 // List all entries
-func listAllEntries() error {
+func ListAllEntries() error {
 
 	var err error
 	var maxKrypt bool
@@ -621,7 +621,7 @@ func listAllEntries() error {
 
 	// If max krypt on - then autodecrypt on call and auto encrypt after call
 	if maxKrypt {
-		err, passwd = decryptDatabase(defaultDB)
+		err, passwd = DecryptDatabase(defaultDB)
 		if err != nil {
 			return err
 		}
@@ -631,7 +631,7 @@ func listAllEntries() error {
 		return err
 	}
 
-	err, settings := getOrCreateLocalConfig(APP)
+	err, settings := GetOrCreateLocalConfig(APP)
 
 	if err != nil {
 		fmt.Printf("Error parsing config - \"%s\"\n", err.Error())
@@ -639,14 +639,14 @@ func listAllEntries() error {
 	}
 
 	orderKeys := strings.Split(settings.ListOrder, ",")
-	err, entries := iterateEntries(orderKeys[0], orderKeys[1])
+	err, entries := IterateEntries(orderKeys[0], orderKeys[1])
 
 	if err == nil {
 		if len(entries) > 0 {
-			fmt.Printf("%s", getColor(strings.ToLower(settings.Color)))
-			printDelim(settings.Delim, settings.Color)
+			fmt.Printf("%s", GetColor(strings.ToLower(settings.Color)))
+			PrintDelim(settings.Delim, settings.Color)
 			for _, entry := range entries {
-				printEntry(&entry, false)
+				PrintEntry(&entry, false)
 			}
 		} else {
 			fmt.Println("No entries.")
@@ -658,14 +658,14 @@ func listAllEntries() error {
 
 	// If max krypt on - then autodecrypt on call and auto encrypt after call
 	if maxKrypt {
-		err = encryptDatabase(defaultDB, &passwd)
+		err = EncryptDatabase(defaultDB, &passwd)
 	}
 
 	return err
 }
 
 // Find current entry by term - prints all matches
-func findCurrentEntry(term string) error {
+func FindCurrentEntry(term string) error {
 
 	var err error
 	var entries []Entry
@@ -677,7 +677,7 @@ func findCurrentEntry(term string) error {
 
 	terms = strings.Split(term, " ")
 
-	err, entries = searchDatabaseEntries(terms, "AND")
+	err, entries = SearchDatabaseEntries(terms, "AND")
 	if err != nil || len(entries) == 0 {
 		fmt.Printf("Entry for query \"%s\" not found\n", term)
 		return err
@@ -690,18 +690,18 @@ func findCurrentEntry(term string) error {
 			pcopy = true
 			// Single entry means copy password can be enabled
 		} else {
-			_, settings := getOrCreateLocalConfig(APP)
-			fmt.Printf("%s", getColor(strings.ToLower(settings.Color)))
-			printDelim(settings.Delim, settings.Color)
+			_, settings := GetOrCreateLocalConfig(APP)
+			fmt.Printf("%s", GetColor(strings.ToLower(settings.Color)))
+			PrintDelim(settings.Delim, settings.Color)
 		}
 
 		for _, entry := range entries {
-			printEntry(&entry, delim)
+			PrintEntry(&entry, delim)
 		}
 
-		if pcopy && settingsRider.CopyPassword {
+		if pcopy && SettingsRider.CopyPassword {
 			// Single entry
-			copyPasswordToClipboard(entries[0].Password)
+			CopyPasswordToClipboard(entries[0].Password)
 		}
 	}
 
@@ -709,7 +709,7 @@ func findCurrentEntry(term string) error {
 }
 
 // Remove a range of entries <id1>-<id2> say 10-14
-func removeMultipleEntries(idRangeEntry string) error {
+func RemoveMultipleEntries(idRangeEntry string) error {
 
 	var err error
 	var idRange []string
@@ -731,14 +731,14 @@ func removeMultipleEntries(idRangeEntry string) error {
 	}
 
 	for idNum := id1; idNum <= id2; idNum++ {
-		err = removeCurrentEntry(fmt.Sprintf("%d", idNum))
+		err = RemoveCurrentEntry(fmt.Sprintf("%d", idNum))
 	}
 
 	return err
 }
 
 // Remove current entry by id
-func removeCurrentEntry(idString string) error {
+func RemoveCurrentEntry(idString string) error {
 
 	var err error
 	var entry *Entry
@@ -750,20 +750,20 @@ func removeCurrentEntry(idString string) error {
 	}
 
 	if strings.Contains(idString, "-") {
-		return removeMultipleEntries(idString)
+		return RemoveMultipleEntries(idString)
 	}
 
 	id, _ = strconv.Atoi(idString)
 
-	err, entry = getEntryById(id)
+	err, entry = GetEntryById(id)
 	if err != nil || entry == nil {
 		fmt.Printf("No entry with id %d was found\n", id)
 		return err
 	}
 
-	printEntryMinimal(entry, true)
+	PrintEntryMinimal(entry, true)
 
-	if !settingsRider.AssumeYes {
+	if !SettingsRider.AssumeYes {
 		response = readInput(bufio.NewReader(os.Stdin), "Please confirm removal [Y/n]: ")
 	} else {
 		response = "y"
@@ -771,7 +771,7 @@ func removeCurrentEntry(idString string) error {
 
 	if strings.ToLower(response) != "n" {
 		// Drop from the database
-		err = removeDatabaseEntry(entry)
+		err = RemoveDatabaseEntry(entry)
 		if err == nil {
 			fmt.Printf("Entry with id %d was removed from the database\n", id)
 		}
@@ -783,7 +783,7 @@ func removeCurrentEntry(idString string) error {
 }
 
 // Copy current entry by id into new entry
-func copyCurrentEntry(idString string) error {
+func CopyCurrentEntry(idString string) error {
 
 	var err error
 	var entry *Entry
@@ -798,24 +798,24 @@ func copyCurrentEntry(idString string) error {
 
 	id, _ = strconv.Atoi(idString)
 
-	err, entry = getEntryById(id)
+	err, entry = GetEntryById(id)
 	if err != nil || entry == nil {
 		fmt.Printf("No entry with id %d was found\n", id)
 		return err
 	}
 
-	err, entryNew = cloneEntry(entry)
+	err, entryNew = CloneEntry(entry)
 	if err != nil {
 		fmt.Printf("Error cloning entry: \"%s\"\n", err.Error())
 		return err
 	}
 
-	exEntries = getExtendedEntries(entry)
+	exEntries = GetExtendedEntries(entry)
 
 	if len(exEntries) > 0 {
 		fmt.Printf("%d extended entries found\n", len(exEntries))
 
-		err = cloneExtendedEntries(entryNew, exEntries)
+		err = CloneExtendedEntries(entryNew, exEntries)
 		if err != nil {
 			fmt.Printf("Error cloning extended entries: \"%s\"\n", err.Error())
 			return err
@@ -826,7 +826,7 @@ func copyCurrentEntry(idString string) error {
 }
 
 // Encrypt the active database
-func encryptActiveDatabase() error {
+func EncryptActiveDatabase() error {
 
 	var err error
 	var dbPath string
@@ -835,17 +835,17 @@ func encryptActiveDatabase() error {
 		return err
 	}
 
-	err, dbPath = getActiveDatabase()
+	err, dbPath = GetActiveDatabase()
 	if err != nil {
 		fmt.Printf("Error getting active database path - \"%s\"\n", err.Error())
 		return err
 	}
 
-	return encryptDatabase(dbPath, nil)
+	return EncryptDatabase(dbPath, nil)
 }
 
 // Encrypt the database using AES
-func encryptDatabase(dbPath string, givenPasswd *string) error {
+func EncryptDatabase(dbPath string, givenPasswd *string) error {
 
 	var err error
 	var passwd string
@@ -858,11 +858,11 @@ func encryptDatabase(dbPath string, givenPasswd *string) error {
 
 	if len(passwd) == 0 {
 		fmt.Printf("Encryption Password: ")
-		err, passwd = readPassword()
+		err, passwd = ReadPassword()
 
 		if err == nil {
 			fmt.Printf("\nEncryption Password again: ")
-			err, passwd2 = readPassword()
+			err, passwd2 = ReadPassword()
 			if err == nil {
 				if passwd != passwd2 {
 					fmt.Println("\nPassword mismatch.")
@@ -877,17 +877,17 @@ func encryptDatabase(dbPath string, givenPasswd *string) error {
 		}
 	}
 
-	//  err = encryptFileAES(dbPath, passwd)
-	_, settings := getOrCreateLocalConfig(APP)
+	//  err = EncryptFileAES(dbPath, passwd)
+	_, settings := GetOrCreateLocalConfig(APP)
 
 	switch settings.Cipher {
 	case "aes":
-		err = encryptFileAES(dbPath, passwd)
+		err = EncryptFileAES(dbPath, passwd)
 	case "xchacha", "chacha", "xchachapoly":
-		err = encryptFileXChachaPoly(dbPath, passwd)
+		err = EncryptFileXChachaPoly(dbPath, passwd)
 	default:
 		fmt.Println("No cipher set, defaulting to AES")
-		err = encryptFileAES(dbPath, passwd)
+		err = EncryptFileAES(dbPath, passwd)
 	}
 
 	if err == nil {
@@ -898,35 +898,35 @@ func encryptDatabase(dbPath string, givenPasswd *string) error {
 }
 
 // Decrypt an encrypted database
-func decryptDatabase(dbPath string) (error, string) {
+func DecryptDatabase(dbPath string) (error, string) {
 
 	var err error
 	var passwd string
 	var flag bool
 
-	if err, flag = isFileEncrypted(dbPath); !flag {
+	if err, flag = IsFileEncrypted(dbPath); !flag {
 		fmt.Println(err.Error())
 		return err, ""
 	}
 
 	fmt.Printf("Decryption Password: ")
-	err, passwd = readPassword()
+	err, passwd = ReadPassword()
 
 	if err != nil {
 		fmt.Printf("\nError reading password - \"%s\"\n", err.Error())
 		return err, ""
 	}
 
-	_, settings := getOrCreateLocalConfig(APP)
+	_, settings := GetOrCreateLocalConfig(APP)
 
 	switch settings.Cipher {
 	case "aes":
-		err = decryptFileAES(dbPath, passwd)
+		err = DecryptFileAES(dbPath, passwd)
 	case "xchacha", "chacha", "xchachapoly":
-		err = decryptFileXChachaPoly(dbPath, passwd)
+		err = DecryptFileXChachaPoly(dbPath, passwd)
 	default:
 		fmt.Println("No cipher set, defaulting to AES")
-		err = decryptFileAES(dbPath, passwd)
+		err = DecryptFileAES(dbPath, passwd)
 	}
 
 	if err == nil {
@@ -937,7 +937,7 @@ func decryptDatabase(dbPath string) (error, string) {
 }
 
 // Migrate an existing database to the new schema
-func migrateDatabase(dbPath string) error {
+func MigrateDatabase(dbPath string) error {
 
 	var err error
 	var flag bool
@@ -949,15 +949,15 @@ func migrateDatabase(dbPath string) error {
 		return err
 	}
 
-	if err, flag = isFileEncrypted(dbPath); flag {
-		err, passwd = decryptDatabase(dbPath)
+	if err, flag = IsFileEncrypted(dbPath); flag {
+		err, passwd = DecryptDatabase(dbPath)
 		if err != nil {
 			fmt.Printf("Error decrypting - %s: %s\n", dbPath, err.Error())
 			return err
 		}
 	}
 
-	err, db = openDatabase(dbPath)
+	err, db = OpenDatabase(dbPath)
 
 	if err != nil {
 		fmt.Printf("Error opening database path - %s: %s\n", dbPath, err.Error())
@@ -981,7 +981,7 @@ func migrateDatabase(dbPath string) error {
 
 	if flag {
 		// File was encrypted - encrypt it again
-		encryptDatabase(dbPath, &passwd)
+		EncryptDatabase(dbPath, &passwd)
 	}
 
 	fmt.Println("Migration successful.")
