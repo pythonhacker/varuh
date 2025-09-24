@@ -1,4 +1,4 @@
-package main
+package varuh
 
 import (
 	"bufio"
@@ -12,7 +12,7 @@ import (
 )
 
 // Export data to a varity of file types
-func exportToFile(fileName string) error {
+func ExportToFile(fileName string) error {
 
 	var err error
 	var maxKrypt bool
@@ -26,7 +26,7 @@ func exportToFile(fileName string) error {
 	if ext == ".csv" || ext == ".md" || ext == ".html" || ext == ".pdf" {
 		// If max krypt on - then autodecrypt on call and auto encrypt after call
 		if maxKrypt {
-			err, passwd = decryptDatabase(defaultDB)
+			err, passwd = DecryptDatabase(defaultDB)
 			if err != nil {
 				return err
 			}
@@ -35,13 +35,13 @@ func exportToFile(fileName string) error {
 
 	switch ext {
 	case ".csv":
-		err = exportToCsv(fileName)
+		err = ExportToCSV(fileName)
 	case ".md":
-		err = exportToMarkdown(fileName)
+		err = ExportToMarkdown(fileName)
 	case ".html":
-		err = exportToHTML(fileName)
+		err = ExportToHTML(fileName)
 	case ".pdf":
-		err = exportToPDF(fileName)
+		err = ExportToPDF(fileName)
 	default:
 		fmt.Printf("Error - extn %s not supported\n", ext)
 		return fmt.Errorf("format %s not supported", ext)
@@ -58,7 +58,7 @@ func exportToFile(fileName string) error {
 
 			// If max krypt on - then autodecrypt on call and auto encrypt after call
 			if maxKrypt {
-				err = encryptDatabase(defaultDB, &passwd)
+				err = EncryptDatabase(defaultDB, &passwd)
 			}
 
 			return err
@@ -69,7 +69,7 @@ func exportToFile(fileName string) error {
 }
 
 // Export current database to markdown
-func exportToMarkdown(fileName string) error {
+func ExportToMarkdown(fileName string) error {
 
 	var err error
 	var dataArray [][]string
@@ -77,7 +77,7 @@ func exportToMarkdown(fileName string) error {
 	var maxLengths [7]int
 	var headers []string = []string{" ID ", " Title ", " User ", " URL ", " Password ", " Notes ", " Modified "}
 
-	err, dataArray = entriesToStringArray(false)
+	err, dataArray = EntriesToStringArray(false)
 
 	if err != nil {
 		fmt.Printf("Error exporting entries to string array - \"%s\"\n", err.Error())
@@ -144,7 +144,7 @@ func exportToMarkdown(fileName string) error {
 }
 
 // This needs pandoc and pdflatex support
-func exportToPDF(fileName string) error {
+func ExportToPDF(fileName string) error {
 
 	var err error
 	var tmpFile string
@@ -165,12 +165,12 @@ func exportToPDF(fileName string) error {
 
 	if pdfTkFound {
 		fmt.Printf("PDF Encryption Password: ")
-		err, passwd = readPassword()
+		err, passwd = ReadPassword()
 	}
 
-	tmpFile = randomFileName(os.TempDir(), ".tmp")
+	tmpFile = RandomFileName(os.TempDir(), ".tmp")
 	//  fmt.Printf("Temp file => %s\n", tmpFile)
-	err = exportToMarkdownLimited(tmpFile)
+	err = ExportToMarkdownLimited(tmpFile)
 
 	if err == nil {
 		var args []string = []string{"-o", fileName, "-f", "markdown", "-V", "geometry:landscape", "--columns=600", "--pdf-engine", "xelatex", "--dpi=150", tmpFile}
@@ -185,7 +185,7 @@ func exportToPDF(fileName string) error {
 			fmt.Printf("\nFile %s created without password.\n", fileName)
 
 			if pdfTkFound && len(passwd) > 0 {
-				tmpFile = randomFileName(".", ".pdf")
+				tmpFile = RandomFileName(".", ".pdf")
 				//              fmt.Printf("pdf file => %s\n", tmpFile)
 				args = []string{fileName, "output", tmpFile, "user_pw", passwd}
 				cmd = exec.Command("pdftk", args...)
@@ -208,7 +208,7 @@ func exportToPDF(fileName string) error {
 }
 
 // Export current database to markdown minus the long fields
-func exportToMarkdownLimited(fileName string) error {
+func ExportToMarkdownLimited(fileName string) error {
 
 	var err error
 	var dataArray [][]string
@@ -216,7 +216,7 @@ func exportToMarkdownLimited(fileName string) error {
 	var maxLengths [5]int
 	var headers []string = []string{" ID ", " Title ", " User ", " Password ", " Modified "}
 
-	err, dataArray = entriesToStringArray(true)
+	err, dataArray = EntriesToStringArray(true)
 
 	if err != nil {
 		fmt.Printf("Error exporting entries to string array - \"%s\"\n", err.Error())
@@ -283,14 +283,14 @@ func exportToMarkdownLimited(fileName string) error {
 }
 
 // Export current database to html
-func exportToHTML(fileName string) error {
+func ExportToHTML(fileName string) error {
 
 	var err error
 	var dataArray [][]string
 	var fh *os.File
 	var headers []string = []string{" ID ", " Title ", " User ", " URL ", " Password ", " Notes ", " Modified "}
 
-	err, dataArray = entriesToStringArray(false)
+	err, dataArray = EntriesToStringArray(false)
 
 	if err != nil {
 		fmt.Printf("Error exporting entries to string array - \"%s\"\n", err.Error())
@@ -338,13 +338,13 @@ func exportToHTML(fileName string) error {
 }
 
 // Export current database to CSV
-func exportToCsv(fileName string) error {
+func ExportToCSV(fileName string) error {
 
 	var err error
 	var dataArray [][]string
 	var fh *os.File
 
-	err, dataArray = entriesToStringArray(false)
+	err, dataArray = EntriesToStringArray(false)
 
 	if err != nil {
 		fmt.Printf("Error exporting entries to string array - \"%s\"\n", err.Error())

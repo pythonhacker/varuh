@@ -1,8 +1,9 @@
 // Database operations for varuh
-package main
+package varuh
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
@@ -153,7 +154,15 @@ func (e1 *ExtendedEntry) Copy(e2 *ExtendedEntry) {
 }
 
 // Create a new database
-func openDatabase(filePath string) (error, *gorm.DB) {
+func OpenDatabase(filePath string) (error, *gorm.DB) {
+	// Check if file exists first
+	if filePath == "" {
+		return errors.New("database path cannot be empty"), nil
+	}
+
+	if _, err := os.Stat(filePath); os.IsNotExist(err) {
+		return fmt.Errorf("database file does not exist: %s", filePath), nil
+	}
 
 	db, err := gorm.Open(sqlite.Open(filePath), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Silent),
@@ -162,25 +171,29 @@ func openDatabase(filePath string) (error, *gorm.DB) {
 }
 
 // Create a new table for Entries in the database
-func createNewEntry(db *gorm.DB) error {
+func CreateNewEntry(db *gorm.DB) error {
 	return db.AutoMigrate(&Entry{})
 }
 
 // Create a new table for Extended Entries in the database
-func createNewExEntry(db *gorm.DB) error {
+func CreateNewExEntry(db *gorm.DB) error {
 	return db.AutoMigrate(&ExtendedEntry{})
 }
 
 // Init new database including tables
-func initNewDatabase(dbPath string) error {
+func InitNewDatabase(dbPath string) error {
 
 	var err error
 	var db *gorm.DB
 	var absPath string
 
-	if hasActiveDatabase() {
+	if dbPath == "" {
+		return errors.New("database path cannot be empty")
+	}
+
+	if HasActiveDatabase() {
 		// Has an active database - encrypt it before creating new one
-		_, activeDbPath := getActiveDatabase()
+		_, activeDbPath := GetActiveDatabase()
 		absPath, _ = filepath.Abs(dbPath)
 
 		if absPath == activeDbPath {
@@ -189,7 +202,7 @@ func initNewDatabase(dbPath string) error {
 		} else {
 			// TBD
 			fmt.Printf("Encrytping current database - %s\n", activeDbPath)
-			encryptDatabase(activeDbPath, nil)
+			EncryptDatabase(activeDbPath, nil)
 		}
 	}
 
@@ -198,19 +211,19 @@ func initNewDatabase(dbPath string) error {
 		os.Remove(dbPath)
 	}
 
-	err, db = openDatabase(dbPath)
+	err, db = OpenDatabase(dbPath)
 	if err != nil {
 		fmt.Printf("Error creating new database - \"%s\"\n", err.Error())
 		return err
 	}
 
-	err = createNewEntry(db)
+	err = CreateNewEntry(db)
 	if err != nil {
 		fmt.Printf("Error creating schema - \"%s\"\n", err.Error())
 		return err
 	}
 
-	err = createNewExEntry(db)
+	err = CreateNewExEntry(db)
 	if err != nil {
 		fmt.Printf("Error creating schema - \"%s\"\n", err.Error())
 		return err
@@ -225,7 +238,7 @@ func initNewDatabase(dbPath string) error {
 
 	if err == nil {
 		fmt.Printf("Updating active db path - %s\n", absPath)
-		updateActiveDbPath(absPath)
+		UpdateActiveDbPath(absPath)
 	} else {
 		fmt.Printf("Error - %s\n", err.Error())
 		return err
@@ -240,13 +253,13 @@ func openActiveDatabase() (error, *gorm.DB) {
 	var dbPath string
 	var err error
 
-	err, dbPath = getActiveDatabase()
+	err, dbPath = GetActiveDatabase()
 	if err != nil {
 		fmt.Printf("Error getting active database path - %s\n", err.Error())
 		return err, nil
 	}
 
-	err, db := openDatabase(dbPath)
+	err, db := OpenDatabase(dbPath)
 	if err != nil {
 		fmt.Printf("Error opening active database path - %s: %s\n", dbPath, err.Error())
 		return err, nil
@@ -256,12 +269,12 @@ func openActiveDatabase() (error, *gorm.DB) {
 }
 
 // Add custom entries to a database entry
-func addCustomEntries(db *gorm.DB, entry *Entry, customEntries []CustomEntry) error {
+func AddCustomEntries(db *gorm.DB, entry *Entry, customEntries []CustomEntry) error {
 
 	var count int
 	var err error
 
-	err = createNewExEntry(db)
+	err = CreateNewExEntry(db)
 	if err != nil {
 		fmt.Printf("Error creating schema - \"%s\"\n", err.Error())
 		return err
@@ -270,7 +283,7 @@ func addCustomEntries(db *gorm.DB, entry *Entry, customEntries []CustomEntry) er
 	for _, customEntry := range customEntries {
 		var exEntry ExtendedEntry
 
-		exEntry = ExtendedEntry{FieldName: customEntry.fieldName, FieldValue: customEntry.fieldValue,
+		exEntry = ExtendedEntry{FieldName: customEntry.FieldName, FieldValue: customEntry.FieldValue,
 			EntryID: entry.ID}
 
 		resultEx := db.Create(&exEntry)
@@ -284,13 +297,13 @@ func addCustomEntries(db *gorm.DB, entry *Entry, customEntries []CustomEntry) er
 }
 
 // Replace custom entries to a database entry (Drop existing and add fresh)
-func replaceCustomEntries(db *gorm.DB, entry *Entry, updatedEntries []CustomEntry) error {
+func ReplaceCustomEntries(db *gorm.DB, entry *Entry, updatedEntries []CustomEntry) error {
 
 	var count int
 	var err error
 	var customEntries []ExtendedEntry
 
-	err = createNewExEntry(db)
+	err = CreateNewExEntry(db)
 	if err != nil {
 		fmt.Printf("Error creating schema - \"%s\"\n", err.Error())
 		return err
@@ -301,7 +314,7 @@ func replaceCustomEntries(db *gorm.DB, entry *Entry, updatedEntries []CustomEntr
 	for _, customEntry := range updatedEntries {
 		var exEntry ExtendedEntry
 
-		exEntry = ExtendedEntry{FieldName: customEntry.fieldName, FieldValue: customEntry.fieldValue,
+		exEntry = ExtendedEntry{FieldName: customEntry.FieldName, FieldValue: customEntry.FieldValue,
 			EntryID: entry.ID}
 
 		resultEx := db.Create(&exEntry)
@@ -315,7 +328,7 @@ func replaceCustomEntries(db *gorm.DB, entry *Entry, updatedEntries []CustomEntr
 }
 
 // Add a new entry to current database
-func addNewDatabaseEntry(title, userName, url, passwd, tags string,
+func AddNewDatabaseEntry(title, userName, url, passwd, tags string,
 	notes string, customEntries []CustomEntry) error {
 
 	var entry Entry
@@ -333,7 +346,7 @@ func addNewDatabaseEntry(title, userName, url, passwd, tags string,
 			// Add custom fields if given
 			fmt.Printf("Created new entry with id: %d.\n", entry.ID)
 			if len(customEntries) > 0 {
-				return addCustomEntries(db, &entry, customEntries)
+				return AddCustomEntries(db, &entry, customEntries)
 			}
 			return nil
 		} else if result.Error != nil {
@@ -344,7 +357,7 @@ func addNewDatabaseEntry(title, userName, url, passwd, tags string,
 	return err
 }
 
-func updateDatabaseCardEntry(entry *Entry, cardName, cardNumber, cardHolder, cardClass,
+func UpdateDatabaseCardEntry(entry *Entry, cardName, cardNumber, cardHolder, cardClass,
 	cardCvv, cardPin, cardExpiry, notes, tags string, customEntries []CustomEntry,
 	flag bool) error {
 
@@ -389,7 +402,7 @@ func updateDatabaseCardEntry(entry *Entry, cardName, cardNumber, cardHolder, car
 		}
 
 		if flag {
-			replaceCustomEntries(db, entry, customEntries)
+			ReplaceCustomEntries(db, entry, customEntries)
 		}
 		fmt.Println("Updated entry.")
 		return nil
@@ -399,7 +412,7 @@ func updateDatabaseCardEntry(entry *Entry, cardName, cardNumber, cardHolder, car
 }
 
 // Add a new card entry to current database
-func addNewDatabaseCardEntry(cardName, cardNumber, cardHolder, cardIssuer, cardClass,
+func AddNewDatabaseCardEntry(cardName, cardNumber, cardHolder, cardIssuer, cardClass,
 	cardCvv, cardPin, cardExpiry, notes, tags string, customEntries []CustomEntry) error {
 
 	var entry Entry
@@ -432,7 +445,7 @@ func addNewDatabaseCardEntry(cardName, cardNumber, cardHolder, cardIssuer, cardC
 			// Add custom fields if given
 			fmt.Printf("Created new entry with id: %d.\n", entry.ID)
 			if len(customEntries) > 0 {
-				return addCustomEntries(db, &entry, customEntries)
+				return AddCustomEntries(db, &entry, customEntries)
 			}
 			return nil
 		} else if result.Error != nil {
@@ -444,7 +457,7 @@ func addNewDatabaseCardEntry(cardName, cardNumber, cardHolder, cardIssuer, cardC
 }
 
 // Update current database entry with new values
-func updateDatabaseEntry(entry *Entry, title, userName, url, passwd, tags string,
+func UpdateDatabaseEntry(entry *Entry, title, userName, url, passwd, tags string,
 	notes string, customEntries []CustomEntry, flag bool) error {
 
 	var updateMap map[string]interface{}
@@ -482,7 +495,7 @@ func updateDatabaseEntry(entry *Entry, title, userName, url, passwd, tags string
 		}
 
 		if flag {
-			replaceCustomEntries(db, entry, customEntries)
+			ReplaceCustomEntries(db, entry, customEntries)
 		}
 		fmt.Println("Updated entry.")
 		return nil
@@ -492,7 +505,7 @@ func updateDatabaseEntry(entry *Entry, title, userName, url, passwd, tags string
 }
 
 // Find entry given the id
-func getEntryById(id int) (error, *Entry) {
+func GetEntryById(id int) (error, *Entry) {
 
 	var entry Entry
 	var err error
@@ -512,7 +525,7 @@ func getEntryById(id int) (error, *Entry) {
 }
 
 // Search database for the given string and return all matches
-func searchDatabaseEntry(term string) (error, []Entry) {
+func SearchDatabaseEntry(term string) (error, []Entry) {
 
 	var entries []Entry
 	var err error
@@ -581,7 +594,7 @@ func intersection(entry1 []Entry, entry2 []Entry) []Entry {
 }
 
 // Search database for the given terms and returns matches according to operator
-func searchDatabaseEntries(terms []string, operator string) (error, []Entry) {
+func SearchDatabaseEntries(terms []string, operator string) (error, []Entry) {
 
 	var err error
 	var finalEntries []Entry
@@ -589,7 +602,7 @@ func searchDatabaseEntries(terms []string, operator string) (error, []Entry) {
 	for idx, term := range terms {
 		var entries []Entry
 
-		err, entries = searchDatabaseEntry(term)
+		err, entries = SearchDatabaseEntry(term)
 		if err != nil {
 			fmt.Printf("Error searching for term: %s - \"%s\"\n", term, err.Error())
 			return err, entries
@@ -610,7 +623,7 @@ func searchDatabaseEntries(terms []string, operator string) (error, []Entry) {
 }
 
 // Remove a given database entry
-func removeDatabaseEntry(entry *Entry) error {
+func RemoveDatabaseEntry(entry *Entry) error {
 
 	var err error
 	var db *gorm.DB
@@ -625,7 +638,7 @@ func removeDatabaseEntry(entry *Entry) error {
 		}
 
 		// Delete extended entries if any
-		exEntries = getExtendedEntries(entry)
+		exEntries = GetExtendedEntries(entry)
 		if len(exEntries) > 0 {
 			res = db.Delete(exEntries)
 			if res.Error != nil {
@@ -640,7 +653,7 @@ func removeDatabaseEntry(entry *Entry) error {
 }
 
 // Clone an entry and return cloned entry
-func cloneEntry(entry *Entry) (error, *Entry) {
+func CloneEntry(entry *Entry) (error, *Entry) {
 
 	var entryNew Entry
 	var err error
@@ -663,7 +676,7 @@ func cloneEntry(entry *Entry) (error, *Entry) {
 }
 
 // Clone extended entries for an entry and return error code
-func cloneExtendedEntries(entry *Entry, exEntries []ExtendedEntry) error {
+func CloneExtendedEntries(entry *Entry, exEntries []ExtendedEntry) error {
 
 	var err error
 	var db *gorm.DB
@@ -688,7 +701,7 @@ func cloneExtendedEntries(entry *Entry, exEntries []ExtendedEntry) error {
 }
 
 // Return an iterator over all entries using the given order query keys
-func iterateEntries(orderKey string, order string) (error, []Entry) {
+func IterateEntries(orderKey string, order string) (error, []Entry) {
 
 	var err error
 	var db *gorm.DB
@@ -714,7 +727,7 @@ func iterateEntries(orderKey string, order string) (error, []Entry) {
 }
 
 // Export all entries to string array
-func entriesToStringArray(skipLongFields bool) (error, [][]string) {
+func EntriesToStringArray(skipLongFields bool) (error, [][]string) {
 
 	var err error
 	var db *gorm.DB
@@ -752,7 +765,7 @@ func entriesToStringArray(skipLongFields bool) (error, [][]string) {
 }
 
 // Get extended entries associated to an entry
-func getExtendedEntries(entry *Entry) []ExtendedEntry {
+func GetExtendedEntries(entry *Entry) []ExtendedEntry {
 
 	var err error
 	var db *gorm.DB

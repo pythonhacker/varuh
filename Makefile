@@ -3,10 +3,10 @@ PROGRAM=varuh
 
 all: program
 
-program: $(wildcard *.go)
+program: scripts/main.go $(wildcard *.go)
 	@echo "Building ${PROGRAM}"
 	@go mod tidy
-	@go build -o ${PROGRAM} *.go
+	@go build -o ${PROGRAM} scripts/main.go 
 
 install: 
 	@echo -n "Installing ${PROGRAM}"

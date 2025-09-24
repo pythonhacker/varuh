@@ -7,21 +7,8 @@ import (
 	"github.com/pythonhacker/argparse"
 	"os"
 	"strings"
+	"varuh"
 )
-
-const VERSION = 0.4
-const APP = "varuh"
-
-const AUTHOR_INFO = `
-AUTHORS
-    Copyright (C) 2022 Anand B Pillai <abpillai@gmail.com>
-`
-
-type actionFunc func(string) error
-type actionFunc2 func(string) (error, string)
-type voidFunc func() error
-type voidFunc2 func() (error, string)
-type settingFunc func(string)
 
 // Structure to keep the options data
 type CmdOption struct {
@@ -42,7 +29,7 @@ func printUsage() error {
 
 // Print the program's version info and exit
 func printVersionInfo() error {
-	fmt.Printf("%s version %.2f\n", APP, VERSION)
+	fmt.Printf("%s version %.2f\n", varuh.APP, varuh.VERSION)
 	os.Exit(0)
 
 	return nil
@@ -53,7 +40,7 @@ func genPass() (error, string) {
 	var err error
 	var passwd string
 
-	err, passwd = generateStrongPassword()
+	err, passwd = varuh.GenerateStrongPassword()
 
 	if err != nil {
 		fmt.Printf("Error generating password - \"%s\"\n", err.Error())
@@ -62,8 +49,8 @@ func genPass() (error, string) {
 
 	fmt.Println(passwd)
 
-	if settingsRider.CopyPassword {
-		copyPasswordToClipboard(passwd)
+	if varuh.SettingsRider.CopyPassword {
+		varuh.CopyPasswordToClipboard(passwd)
 		fmt.Println("Password copied to clipboard")
 	}
 
@@ -75,46 +62,46 @@ func performAction(optMap map[string]interface{}) {
 
 	var flag bool
 
-	boolActionsMap := map[string]voidFunc{
-		"add":      WrapperMaxKryptVoidFunc(addNewEntry),
+	boolActionsMap := map[string]varuh.VoidFunc{
+		"add":      varuh.WrapperMaxKryptVoidFunc(varuh.AddNewEntry),
 		"version":  printVersionInfo,
 		"help":     printUsage,
-		"path":     showActiveDatabasePath,
-		"list-all": WrapperMaxKryptVoidFunc(listAllEntries),
-		"encrypt":  encryptActiveDatabase,
+		"path":     varuh.ShowActiveDatabasePath,
+		"list-all": varuh.WrapperMaxKryptVoidFunc(varuh.ListAllEntries),
+		"encrypt":  varuh.EncryptActiveDatabase,
 	}
 
-	stringActionsMap := map[string]actionFunc{
-		"edit":       WrapperMaxKryptStringFunc(editCurrentEntry),
-		"init":       initNewDatabase,
-		"list-entry": WrapperMaxKryptStringFunc(listCurrentEntry),
-		"remove":     WrapperMaxKryptStringFunc(removeCurrentEntry),
-		"clone":      WrapperMaxKryptStringFunc(copyCurrentEntry),
-		"use-db":     setActiveDatabasePath,
-		"export":     exportToFile,
-		"migrate":    migrateDatabase,
+	stringActionsMap := map[string]varuh.ActionFunc{
+		"edit":       varuh.WrapperMaxKryptStringFunc(varuh.EditCurrentEntry),
+		"init":       varuh.InitNewDatabase,
+		"list-entry": varuh.WrapperMaxKryptStringFunc(varuh.ListCurrentEntry),
+		"remove":     varuh.WrapperMaxKryptStringFunc(varuh.RemoveCurrentEntry),
+		"clone":      varuh.WrapperMaxKryptStringFunc(varuh.CopyCurrentEntry),
+		"use-db":     varuh.SetActiveDatabasePath,
+		"export":     varuh.ExportToFile,
+		"migrate":    varuh.MigrateDatabase,
 	}
 
-	stringListActionsMap := map[string]actionFunc{
-		"find": WrapperMaxKryptStringFunc(findCurrentEntry),
+	stringListActionsMap := map[string]varuh.ActionFunc{
+		"find": varuh.WrapperMaxKryptStringFunc(varuh.FindCurrentEntry),
 	}
 
-	stringActions2Map := map[string]actionFunc2{
-		"decrypt": decryptDatabase,
+	stringActions2Map := map[string]varuh.ActionFunc2{
+		"decrypt": varuh.DecryptDatabase,
 	}
 
-	flagsActions2Map := map[string]voidFunc2{
+	flagsActions2Map := map[string]varuh.VoidFunc2{
 		"genpass": genPass,
 	}
 
-	flagsActionsMap := map[string]voidFunc{
-		"show":       setShowPasswords,
-		"copy":       setCopyPasswordToClipboard,
-		"assume-yes": setAssumeYes,
+	flagsActionsMap := map[string]varuh.VoidFunc{
+		"show":       varuh.SetShowPasswords,
+		"copy":       varuh.SetCopyPasswordToClipboard,
+		"assume-yes": varuh.SetAssumeYes,
 	}
 
-	flagsSettingsMap := map[string]settingFunc{
-		"type": setType,
+	flagsSettingsMap := map[string]varuh.SettingFunc{
+		"type": varuh.SetType,
 	}
 
 	// Flag actions - always done
@@ -248,7 +235,7 @@ func main() {
 
 	parser := argparse.NewParser("varuh",
 		"Password manager for the command line for Unix like operating systems",
-		AUTHOR_INFO,
+		varuh.AUTHOR_INFO,
 	)
 
 	optMap := initializeCmdLine(parser)
@@ -259,7 +246,7 @@ func main() {
 		fmt.Println(parser.Usage(err))
 	}
 
-	getOrCreateLocalConfig(APP)
+	varuh.GetOrCreateLocalConfig(varuh.APP)
 
 	performAction(optMap)
 }
