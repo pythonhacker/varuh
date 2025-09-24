@@ -18,4 +18,4 @@ jobs:
       - name: Build code
         run: |
           cd ${{ github.workspace }} && make 
-          cd ${{ github.workspace }}/tests && go test -v
+          cd tests && go test -v
