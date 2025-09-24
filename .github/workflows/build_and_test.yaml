@@ -1,4 +1,4 @@
-name: build
+name: build and test
 on: [push]
 jobs:
   varuh-build:
@@ -17,4 +17,5 @@ jobs:
       - run: echo "\U0001f34f This job's status is ${{ job.status }}."
       - name: Build code
         run: |
-          cd ${{ github.workspace }} && make
+          cd ${{ github.workspace }} && make 
+          cd ${{ github.workspace }}/tests && go test -v
