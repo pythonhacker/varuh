@@ -1,7 +1,7 @@
 name: build and test
 on:
   pull_request:
-    types: [open]
+    types: [opened]
   workflow_dispatch:
 
 jobs:
