@@ -2,9 +2,12 @@
 
 Password management done right for the Unix command line and the shell.
 
+Radicle Repo: https://app.radicle.xyz/nodes/rosa.radicle.xyz/rad%3Az2rEDrHTnqZrcYt5iiH9fbK6ozig4
+
 Table of Contents
 =================
 
+* [Current Status](#current_status)
 * [About](#about)
 * [Install](#install)
 * [Usage](#usage)
