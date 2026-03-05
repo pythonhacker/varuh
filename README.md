@@ -17,6 +17,15 @@ Table of Contents
 * [License](#license)
 * [Feedback](#feedback)
 
+[Current Status - Feb 2026]
+===========================
+Read this before you read ahead. I started varuh as a personal, fun project in late 2021.
+I use this as my regular personal password manager but it didn't get adopted by the larger
+community in a way I thought it would. Anyway, this means the releases and this documenation
+is quite out of date.
+
+Well - perhaps publishing this to radicle would give it a new lease of life. Anyway, I will
+be updating the README some time soon. Peace!
 
 About
 =====
